@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<map version="1.0" orientation="orthogonal" width="35" height="24" tilewidth="16" tileheight="16">
+ <properties>
+  <property name="background_color" value="#000000" />
+  <property name="zoneNumber" value="110" />
+  <property name="zoneSource" value="rusarh/exolon-esl asm/data_zone_data.asm" />
+  <property name="nextLevel" value="L05S12" />
+ </properties>
+ <tileset firstgid="1" name="tiles" tilewidth="16" tileheight="16">
+  <image source="tiles.png" width="240" height="512" />
+ </tileset>
+ <tileset firstgid="481" name="rocks" tilewidth="16" tileheight="16">
+  <image source="rocks.png" width="512" height="48" />
+ </tileset>
+ <tileset firstgid="577" name="generated_terrain" tilewidth="16" tileheight="16">
+  <image source="generated_terrain.png" width="256" height="16" />
+ </tileset>
+ <imagelayer name="Original Static Scenery">
+  <image source="zone_110_original.png" width="512" height="384" />
+ </imagelayer>
+ <layer name="Collision" width="35" height="24">
+  <data encoding="csv">0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</data>
+ </layer>
+ <objectgroup name="Objects">
+  <object id="1" name="vitorc" x="0" y="320" />
+  <object id="2" name="source_marker" x="288" y="0">
+   <properties>
+    <property name="sourceBlock" value="blk_beam_up" />
+    <property name="sourceY" value="0" />
+    <property name="sourceX" value="18" />
+   </properties>
+  </object>
+  <object id="3" name="source_marker" x="304" y="304">
+   <properties>
+    <property name="sourceBlock" value="blk_beam_down" />
+    <property name="sourceY" value="19" />
+    <property name="sourceX" value="19" />
+   </properties>
+  </object>
+  <object id="4" name="mine" x="208" y="320" width="32" height="16">
+   <properties>
+    <property name="sourceBlock" value="blk_mine" />
+   </properties>
+  </object>
+ </objectgroup>
+</map>

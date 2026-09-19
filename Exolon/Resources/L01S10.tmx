@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='utf-8'?>
+<map version="1.0" orientation="orthogonal" width="35" height="24" tilewidth="16" tileheight="16">
+  <properties>
+    <property name="background_color" value="#000000" />
+    <property name="zoneNumber" value="009" />
+    <property name="zoneSource" value="rusarh/exolon-esl asm/data_zone_data.asm" />
+    <property name="nextLevel" value="L01S11" />
+  </properties>
+  <tileset firstgid="1" name="tiles" tilewidth="16" tileheight="16">
+    <image source="tiles.png" width="240" height="512" />
+  </tileset>
+  <tileset firstgid="481" name="rocks" tilewidth="16" tileheight="16">
+    <image source="rocks.png" width="512" height="48" />
+  </tileset>
+  <tileset firstgid="577" name="generated_terrain" tilewidth="16" tileheight="16">
+    <image source="generated_terrain.png" width="256" height="16" />
+  </tileset>
+  <imagelayer name="Original Static Scenery">
+    <image source="zone_009_original.png" width="512" height="384" />
+  </imagelayer>
+  <layer name="Collision" width="35" height="24">
+    <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+  </layer>
+  <objectgroup name="Objects">
+    <object id="1" name="vitorc" x="0" y="320" />
+    <object id="2" name="rocket" x="112" y="320" width="64" height="96">
+      <properties>
+        <property name="sourceBlock" value="blk_tower_rocket" />
+      </properties>
+    </object>
+    <object id="3" name="grenade_pack" x="464" y="288" width="32" height="32">
+      <properties>
+        <property name="sourceBlock" value="blk_box_yellow" />
+      </properties>
+    </object>
+    <object id="4" name="ammo_pack" x="288" y="288" width="32" height="32">
+      <properties>
+        <property name="sourceBlock" value="blk_box_white" />
+      </properties>
+    </object>
+    <object id="5" name="capsule" x="368" y="176" width="32" height="80">
+      <properties>
+        <property name="coordinateMode" value="tiledRect" />
+        <property name="sourceBlock" value="blk_changing_room" />
+      </properties>
+    </object>
+    <object id="6" name="piston" x="192" y="320" width="48" height="64">
+      <properties>
+        <property name="sourceBlock" value="blk_anim_pump" />
+      </properties>
+    </object>
+    <object id="7" name="piston" x="64" y="320" width="48" height="64">
+      <properties>
+        <property name="sourceBlock" value="blk_anim_pump" />
+      </properties>
+    </object>
+  </objectgroup>
+</map>

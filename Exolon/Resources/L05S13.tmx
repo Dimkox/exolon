@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<map version="1.0" orientation="orthogonal" width="35" height="24" tilewidth="16" tileheight="16">
+ <properties>
+  <property name="background_color" value="#000000" />
+  <property name="zoneNumber" value="112" />
+  <property name="zoneSource" value="rusarh/exolon-esl asm/data_zone_data.asm" />
+  <property name="nextLevel" value="L05S14" />
+ </properties>
+ <tileset firstgid="1" name="tiles" tilewidth="16" tileheight="16">
+  <image source="tiles.png" width="240" height="512" />
+ </tileset>
+ <tileset firstgid="481" name="rocks" tilewidth="16" tileheight="16">
+  <image source="rocks.png" width="512" height="48" />
+ </tileset>
+ <tileset firstgid="577" name="generated_terrain" tilewidth="16" tileheight="16">
+  <image source="generated_terrain.png" width="256" height="16" />
+ </tileset>
+ <imagelayer name="Original Static Scenery">
+  <image source="zone_112_original.png" width="512" height="384" />
+ </imagelayer>
+ <layer name="Collision" width="35" height="24">
+  <data encoding="csv">0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,
+0,0,0,0,0,0,1,1,1,1,1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,
+0,0,0,0,0,0,1,1,1,1,1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,
+0,0,0,0,0,0,1,1,1,1,1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</data>
+ </layer>
+ <objectgroup name="Objects">
+  <object id="1" name="vitorc" x="0" y="320" />
+  <object id="2" name="source_marker" x="96" y="208">
+   <properties>
+    <property name="sourceBlock" value="blk_waggon" />
+    <property name="sourceY" value="13" />
+    <property name="sourceX" value="6" />
+   </properties>
+  </object>
+  <object id="3" name="source_marker" x="192" y="208">
+   <properties>
+    <property name="sourceBlock" value="blk_waggon" />
+    <property name="sourceY" value="13" />
+    <property name="sourceX" value="12" />
+   </properties>
+  </object>
+  <object id="4" name="teleport" x="288" y="288" width="64" height="96">
+   <properties>
+    <property name="sourceBlock" value="blk_teleportGate" />
+   </properties>
+  </object>
+  <object id="5" name="teleport" x="288" y="128" width="64" height="96">
+   <properties>
+    <property name="sourceBlock" value="blk_teleportGate" />
+   </properties>
+  </object>
+ </objectgroup>
+</map>
