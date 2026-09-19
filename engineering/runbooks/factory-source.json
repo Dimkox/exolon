@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "upstream_repository": "https://github.com/Dimkox/adaptive-grok-build-pro",
+  "source_commit": "90078959ff816068af374ad42f4bb80fdbaec866",
+  "previous_source_commit": "26a0d3db8fa9f3e8ad69caafd02a5ef4e9613960",
+  "product_version": "2.0.18",
+  "source_observed_at": "2026-09-19T22:16:00Z",
+  "managed_file_count": 346,
+  "changed_managed_files": {
+    "factory/src/adaptive_factory/landing_http.py": "21c03d67fe6f2db1126238397d59e4fec5d38c17de6a82de2eb22d565ca01ddc"
+  },
+  "change_package": "engineering/changes/20260919-update-the-installed-adaptive-grok-build-pro-man-5b75d3",
+  "supplemental_upstream_test_modules": [
+    "factory/tests/test_execution_contracts.py",
+    "factory/tests/test_execution_service.py"
+  ]
+}

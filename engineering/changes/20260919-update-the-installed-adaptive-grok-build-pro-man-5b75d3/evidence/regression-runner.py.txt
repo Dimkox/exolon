@@ -1,0 +1,19 @@
+from pathlib import Path
+import sys, unittest
+consumer = Path(sys.argv[1]).resolve()
+source = Path(sys.argv[2]).resolve()
+sys.path.insert(0, str(consumer / "factory/src"))
+import adaptive_factory
+assert Path(adaptive_factory.__file__).resolve().is_relative_to(consumer)
+sys.path.insert(0, str(source))
+import factory.tests
+from adaptive_factory import landing_http
+assert Path(landing_http.__file__).resolve().is_relative_to(consumer)
+print("Testing installed consumer module:", landing_http.__file__, flush=True)
+suite = unittest.defaultTestLoader.loadTestsFromNames([
+    "factory.tests.test_landing_failover_providers",
+    "factory.tests.test_landing_failover_backend",
+    "factory.tests.test_landing_live_executors",
+])
+result = unittest.TextTestRunner(verbosity=1).run(suite)
+sys.exit(0 if result.wasSuccessful() else 1)

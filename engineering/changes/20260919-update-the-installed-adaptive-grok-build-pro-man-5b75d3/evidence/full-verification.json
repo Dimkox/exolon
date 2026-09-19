@@ -1,0 +1,78 @@
+{
+  "created_at": "2026-09-19T22:29:20+00:00",
+  "mode": "pr",
+  "route_id": "5b75d32030b8",
+  "tree_fingerprint": "10c6fd6b651e8b6e4f6122dec1fcf0c85ab401137ec1e88242f480f46c907ce1",
+  "status": "pass",
+  "stage": "candidate before final documentation commit; final-head receipt is runtime-only",
+  "checks": [
+    {
+      "name": "git-diff-check",
+      "status": "pass",
+      "summary": "4/4 checks passed; bases=route:403eb1322d645154307ce11bf91be89e2082e1dd,pr-target:403eb1322d645154307ce11bf91be89e2082e1dd"
+    },
+    {
+      "name": "change-spec",
+      "status": "pass",
+      "summary": "1 specs checked; exempt=False"
+    },
+    {
+      "name": "architecture",
+      "status": "skip",
+      "summary": "architecture is not configured"
+    },
+    {
+      "name": "governance",
+      "status": "skip",
+      "summary": "governance is not configured"
+    },
+    {
+      "name": "workflow-artifacts",
+      "status": "skip",
+      "summary": "workflow artifacts are not configured"
+    },
+    {
+      "name": "secret-scan",
+      "status": "pass",
+      "summary": "0 potential secrets"
+    },
+    {
+      "name": "contract-structure",
+      "status": "pass",
+      "summary": "0 contracts checked"
+    },
+    {
+      "name": "sql-safety",
+      "status": "pass",
+      "summary": "0 unsafe SQL findings"
+    },
+    {
+      "name": "ruff",
+      "status": "pass",
+      "summary": "exit=0"
+    },
+    {
+      "name": "bandit",
+      "status": "pass",
+      "summary": "exit=0"
+    },
+    {
+      "name": "factory-unit",
+      "status": "pass",
+      "summary": "exit=0"
+    },
+    {
+      "name": "factory-postgres-exit",
+      "status": "pass",
+      "summary": "exit=0"
+    },
+    {
+      "name": "source-stability",
+      "status": "pass",
+      "summary": "repository fingerprint remained stable"
+    }
+  ],
+  "factory_unit_test_count": 51,
+  "postgres_api_test_count": 201,
+  "postgres_restarts": 2
+}
