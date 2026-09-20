@@ -1,6 +1,6 @@
 # Code review — Exolon initial audit package
 
-**Verdict (audit package quality): pass**  
+**Verdict (audit package quality): pass**\
 **Would record `grok_review` / `code_review`: pass**
 
 Route `7db1f3f0b126`, intent `review`, `write_agent=null`. Product HEAD `403eb1322d645154307ce11bf91be89e2082e1dd`. Independent of architect/docs/repo reports; claims spot-checked against Swift/TMX and git.
@@ -73,10 +73,10 @@ Nit (does not fail the package): §1 attributes postgres-exit mainly to missing 
 
 ## 5. Contracts / AC
 
-AC-001 frozen paths: pass.  
-AC-003 125 TMX + pbx + versions: pass vs JSON/source.  
-AC-004/005 Russian report + backlog exist and keep pending macOS.  
-AC-006 verify FAIL recorded.  
+AC-001 frozen paths: pass.\
+AC-003 125 TMX + pbx + versions: pass vs JSON/source.\
+AC-004/005 Russian report + backlog exist and keep pending macOS.\
+AC-006 verify FAIL recorded.\
 AC-008 gameplay/build blocked.
 
 No product edits; no claim of playable Linux binary.

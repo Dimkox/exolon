@@ -205,4 +205,3 @@ Original type 4 flashing cells are excluded from the expected live count. A larg
 | L05S22 | 121 | 6 | 14 | 14 | {'vitorc': 1, 'turret': 2, 'source_marker': 2, 'ammo_pack': 1, 'grenade_pack': 1, 'bubble_creator': 2} |
 | L05S23 | 122 | 5 | 8 | 8 | {'vitorc': 1, 'incubator': 1, 'turret': 1, 'piston': 3} |
 | L05S24 | 123 | 3 | 16 | 8 | {'vitorc': 1, 'source_marker': 1, 'teleport': 2, 'double_launcher': 1} |
-

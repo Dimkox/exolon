@@ -1,14 +1,14 @@
 # Architect — runtime vs ORIGINAL_MECHANICS / README Step 9
 
-**Route:** `7db1f3f0b126`  
-**Session:** `exolon-initial-audit-20260919`  
-**Intent:** review (no write_agent)  
-**Host:** Linux only — no Swift, Xcode, or gameplay validation.  
+**Route:** `7db1f3f0b126`\
+**Session:** `exolon-initial-audit-20260919`\
+**Intent:** review (no write_agent)\
+**Host:** Linux only — no Swift, Xcode, or gameplay validation.\
 **Product HEAD (route base):** `403eb1322d645154307ce11bf91be89e2082e1dd`
 
 This is a bounded architecture/audit design, not an implementation plan. It compares the **implemented SpriteKit runtime** to `ORIGINAL_MECHANICS.md` and `README.md` Step 9 limitations. Every finding is tagged **Confirmed** (source-visible) or **Hypothesis** (needs macOS play or original-ASM cross-check). Unfinished Step 9 work is **not** treated as an accidental regression: `README.md:17` describes this tree as a runnable checkpoint, not a claim that every late-zone action is audited.
 
-Companion analysis (do not duplicate):  
+Companion analysis (do not duplicate):\
 `evidence/analysis-docs_researcher.md` (intent/docs), `evidence/analysis-repo_explorer.md` (tree/pbx), `evidence/linux-static-audit.md` (TMX inventory).
 
 ---

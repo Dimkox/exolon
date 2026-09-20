@@ -7,9 +7,9 @@
 > стены будки за пол. C1 → P3 robustness (4 маркерные кабины с 0-px запасом). Актуальный
 > приоритетный список — в полном аудите (§7 бэклога v2).
 
-Источник: `engineering/reports/exolon-initial-audit.md`  
-Маршрут: `7db1f3f0b126`  
-HEAD: `403eb1322d645154307ce11bf91be89e2082e1dd`  
+Источник: `engineering/reports/exolon-initial-audit.md`\
+Маршрут: `7db1f3f0b126`\
+HEAD: `403eb1322d645154307ce11bf91be89e2082e1dd`\
 Внешние тикеты **не** создавались.
 
 Колонки: **defect** = против заявленного Step 9 / очевидный баг кода; **unfinished** = оригинал не доведён, README не обещает; **hypothesis** = нужен macOS; **packaging** = бандл/версии.
@@ -48,8 +48,8 @@ HEAD: `403eb1322d645154307ce11bf91be89e2082e1dd`
 
 ## Минимальный следующий прогон на macOS
 
-1. `xcodebuild -project Exolon.xcodeproj -target Exolon -configuration Debug build`  
-2. Сценарий C1 зоны 009.  
-3. Зоны 002, 006, 008, 023, 024, 035.  
-4. Стик UP vs D-pad UP.  
+1. `xcodebuild -project Exolon.xcodeproj -target Exolon -configuration Debug build`\
+2. Сценарий C1 зоны 009.\
+3. Зоны 002, 006, 008, 023, 024, 035.\
+4. Стик UP vs D-pad UP.\
 5. Записать фактический CFBundleShortVersionString.

@@ -1,7 +1,7 @@
 # Docs researcher — intended mechanics and Step 9 limitations
 
-**Route:** `7db1f3f0b126`  
-**Scope:** repository docs and Swift comments only.  
+**Route:** `7db1f3f0b126`\
+**Scope:** repository docs and Swift comments only.\
 **Rule:** these sources describe *intent / remake claims / compiler output*. They are **not** proof that runtime behaviour matches.
 
 Sources used:
@@ -90,10 +90,10 @@ The mapping below is **inferred** by lining those names up with counts and landm
 | 16 | **5** | stage end | L01S25, L02S25, L03S25, L04S25, L05S25 all have `:16` |
 | 17 | 10 | beam / vertical force field | L02S11 `20:2:17` (Zone 035 25-hit field); often flanked by `:2` |
 
-`ORIGINAL_MECHANICS.md:170` required runtime list (order as written):  
+`ORIGINAL_MECHANICS.md:170` required runtime list (order as written):\
 torches, gun machines, flashing cells, mines, teleport, white/yellow refill boxes, sphere homes, pumps, rocket launchers, changing room, green guidance, bonus triggers, high voltage, stage end, beam.
 
-Screens with **empty** `actions=` in the dump (compiler: no markers):  
+Screens with **empty** `actions=` in the dump (compiler: no markers):\
 `L01S23` (Zone 022), `L03S09` (058), `L03S14` (063), `L04S11` (085) — `LEVEL_COMPILER_AUDIT.md:31,58,63,85`. Walkthrough still names Zone 023 for gun-machine layout (`ORIGINAL_MECHANICS.md:160`); **zone numbering vs `LxxSyy` is 0-based zone index** (`000` = L01S01).
 
 ---
