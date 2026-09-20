@@ -5,7 +5,7 @@
 **base_commit роута:** `403eb1322d645154307ce11bf91be89e2082e1dd`
 
 ```
-$ cd /home/pall/projects/exolon && git log --oneline -3 && git rev-parse HEAD
+$ cd <repo> && git log --oneline -3 && git rev-parse HEAD
 b8aee42 (HEAD -> codex/factory-updated-20260920, origin/codex/update-factory-20260920) chore: update installed factory to upstream 9007895
 403eb13 (origin/main, codex/update-factory-20260920, codex/factory-initial-audit) Import Exolon Step 9 and factory 2.0.18 at 26a0d3d
 b8aee429e2565aa3824759639060787a7b36ae20

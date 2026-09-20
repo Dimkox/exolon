@@ -3,7 +3,7 @@
 **Agent:** repo_explorer (read-only), route `7db1f3f0b126`
 **Дата:** 2026-09-20
 **HEAD на момент анализа:** `b8aee42` (`codex/factory-updated-20260920`)
-**Метод:** все утверждения ниже подтверждены командами, выполненными в `/home/pall/projects/exolon`; вывод команд цитируется сокращённо, но дословно. Всё, что не проверено напрямую, помечено «Гипотеза».
+**Метод:** все утверждения ниже подтверждены командами, выполненными в `<repo>`; вывод команд цитируется сокращённо, но дословно. Всё, что не проверено напрямую, помечено «Гипотеза».
 
 ---
 
@@ -83,7 +83,7 @@ python3 -B -c "… full-verification.json …"
 status: pass … factory-postgres-exit pass exit=0
 ```
 
-**Вывод по Q1:** да, обновление добавило ровно те два тестовых модуля, отсутствие которых вызывало 3 ERROR в `unittest discover`; их исходники присутствуют, импортируются и проходят на системном Python 3.12. Caveat: хост-окружение уже содержит зависимости factory в `~/.local/lib/python3.12/site-packages` (проверено: `fastapi.__file__=/home/pall/.local/…`), поэтому «чистоклоновый» прогон всё равно требует venv из `factory/pyproject.toml` (или `uv run --project factory`, как делает `run_disposable_exit.py`; `uv` на хосте есть: `/home/pall/.local/bin/uv`).
+**Вывод по Q1:** да, обновление добавило ровно те два тестовых модуля, отсутствие которых вызывало 3 ERROR в `unittest discover`; их исходники присутствуют, импортируются и проходят на системном Python 3.12. Caveat: хост-окружение уже содержит зависимости factory в `~/.local/lib/python3.12/site-packages` (проверено: `fastapi.__file__=<home>/.local/…`), поэтому «чистоклоновый» прогон всё равно требует venv из `factory/pyproject.toml` (или `uv run --project factory`, как делает `run_disposable_exit.py`; `uv` на хосте есть: `<home>/.local/bin/uv`).
 
 ---
 
@@ -262,9 +262,9 @@ origin/codex/update-factory-20260920 head:b8aee42
 origin/main                          head:403eb13
 
 git worktree list
-/home/pall/projects/exolon                                   b8aee42 [codex/factory-updated-20260920]
-/home/pall/projects/.exolon-factory-update-20260920/exolon   403eb13 [codex/update-factory-20260920]
-/home/pall/projects/.exolon-factory-update-20260920/verified-exolon  b8aee42 (detached HEAD)
+<repo>                                   b8aee42 [codex/factory-updated-20260920]
+<worktree>/exolon   403eb13 [codex/update-factory-20260920]
+<worktree>/verified-exolon  b8aee42 (detached HEAD)
 ```
 
 - **Ни одна локальная ветка не имеет upstream.** Содержимое `b8aee42` ушло на remote под *другим именем* `origin/codex/update-factory-20260920`; локальная `codex/factory-updated-20260920` — непривязанная однофамилица с тем же коммитом. Локальная `codex/update-factory-20260920` отстала на 1 коммит (её checkout — в worktree за пределами репозитория).

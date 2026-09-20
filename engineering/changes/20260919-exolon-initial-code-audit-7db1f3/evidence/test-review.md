@@ -10,7 +10,7 @@ Independent of other review agents. Host: Linux. Intent: review.
 
 ## 1. XCTest / Swift test target — confirmed absent
 
-- `/home/pall/projects/exolon/Exolon.xcodeproj/project.pbxproj`: one `PBXNativeTarget` `"Exolon"`, `productType = com.apple.product-type.application`.
+- `<repo>/Exolon.xcodeproj/project.pbxproj`: one `PBXNativeTarget` `"Exolon"`, `productType = com.apple.product-type.application`.
 - No second native target, no `ExolonTests`, no `XCTest` import, no `*.swift` under a Tests folder.
 - In-game “test Invulnerability” in `README.md` is a cheat flag, not a unit suite.
 

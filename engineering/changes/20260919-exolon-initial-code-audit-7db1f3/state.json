@@ -43,11 +43,29 @@
       "from": "reviewing",
       "reason": "full audit delivered; v1 reports carry correction banners; macOS items explicitly pending",
       "to": "ready"
+    },
+    {
+      "at": "2026-09-20T07:05:08+00:00",
+      "from": "ready",
+      "reason": "correction pass on HEAD 52795d1: v3 authority written, 19 per-file lanes + 2 independent reviews incorporated, banners added to v1/v2, decisions.md control fixed (33/48 px), generator EOF bug fixed and proven byte-reproducible, executable Linux loader harness and v3_measurements.py committed, privacy scrub gate added and passed",
+      "to": "implementing"
+    },
+    {
+      "at": "2026-09-20T07:05:08+00:00",
+      "from": "implementing",
+      "reason": "grok_verify --mode pr re-run after this commit; the 02:06 FAIL (git-diff-check) is closed by 52795d1 and re-proven green at 03:07 on the pre-correction tree",
+      "to": "verifying"
+    },
+    {
+      "at": "2026-09-20T07:05:08+00:00",
+      "from": "verifying",
+      "reason": "code_review/test_review receipts re-issued on the post-correction sha (previous pair was bound to 7301595d… = HEAD b8aee42 and was stale per receipts.py:703)",
+      "to": "reviewing"
     }
   ],
   "route_id": "7db1f3f0b126",
   "schema_version": 1,
-  "status": "ready",
+  "status": "reviewing",
   "title": "Exolon initial code audit",
-  "updated_at": "2026-09-20T01:46:42+00:00"
+  "updated_at": "2026-09-20T07:05:08+00:00"
 }

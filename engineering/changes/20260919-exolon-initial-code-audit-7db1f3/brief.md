@@ -12,7 +12,7 @@ Intent: **review** (`write_agent: null`)
 
 ## Problem
 
-Exolon was imported into a claw/factory workspace as a native macOS Swift SpriteKit remake (Step 9 rebase archive). The factory must produce a bounded **code audit**, not a gameplay patch: input, collisions, cabin/teleport, suit reset/protection, and all 125 zone/action-marker datasets versus `ORIGINAL_MECHANICS.md` and Step 9 limitations in `README.md`.
+Exolon was imported into a <host>/factory workspace as a native macOS Swift SpriteKit remake (Step 9 rebase archive). The factory must produce a bounded **code audit**, not a gameplay patch: input, collisions, cabin/teleport, suit reset/protection, and all 125 zone/action-marker datasets versus `ORIGINAL_MECHANICS.md` and Step 9 limitations in `README.md`.
 
 ## Outcome
 

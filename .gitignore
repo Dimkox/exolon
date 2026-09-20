@@ -1,0 +1,25 @@
+# Machine-local agent runtime state: never evidence, never part of a fingerprint.
+# The stack's fingerprint filter (adaptive_grok/util.py::_fingerprint_noise) does not
+# exclude agent scratch dirs, and changed_files() counts untracked files via
+# `git ls-files --others --exclude-standard` — so ignoring them here is what keeps
+# fingerprint-bound receipts from going stale on an agent write. See upstream #168.
+.qwen/
+.grok-stack/runtime/
+.grok/last-*
+*.log.tmp
+
+# Python bytecode / tool caches produced by the audit measurement scripts
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.pytest_cache/
+.coverage
+coverage/
+
+# Генерируемые артефакты измерительного контура
+evidence/**/harness/fixtures/
+**/harness/fixtures/
+
+# Editor / OS
+.DS_Store
+*.swp

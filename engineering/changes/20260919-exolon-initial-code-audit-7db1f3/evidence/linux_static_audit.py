@@ -547,7 +547,8 @@ def main() -> int:
     else:
         md.append("No zones with |live - non-flash| >= 3.")
     md.append("")
-    (OUT_DIR / "linux-static-audit.md").write_text("\n".join(md) + "\n", encoding="utf-8")
+    doc = "\n".join(md).rstrip("\n") + "\n"
+    (OUT_DIR / "linux-static-audit.md").write_text(doc, encoding="utf-8")
 
     print(json.dumps(summary, indent=2, ensure_ascii=False))
     return 0

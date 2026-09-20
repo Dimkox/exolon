@@ -45,3 +45,7 @@ Canonical governance JSON under `governance/` remains separately reviewed author
 - [x] AC-F-007: `grok_verify.py --mode pr` run on the final tree; RESULT PASS (10 checks, 3 not-configured skips, 0 fail) — receipt `verification.json` pass; the Swift build/gameplay remain macOS-pending and are not claimed by any green check.
 - [x] AC-F-008: Route reviewers (`code_reviewer`, `test_reviewer`) re-inspected this final tree: code_review PASS, test_review PASS-with-fixes (all fixes incorporated into the report before receipt recording); receipts `code_review.json`, `test_review.json` pass.
 - [x] AC-F-009: Product bytes remain unmodified by this route.
+
+### Карта идентификаторов (20.09, корректурный проход)
+
+Критерии этого и предыдущего прогонов типизированы в `change-spec.yaml` под сквозными id (паттерн стека `AC-\d{3}` не допускал `AC-F-*`): `AC-F-001`→`AC-009`, `AC-F-002`→`AC-010`, `AC-F-003`→`AC-011`, `AC-F-004`→`AC-012`, `AC-F-005`→`AC-013`, `AC-F-006`→`AC-014`, `AC-F-007`→`AC-015`, `AC-F-008`→`AC-016`, `AC-F-009`→`AC-017`, `AC-F-09`→`AC-018`, `AC-F-10`→`AC-019`, `AC-F-11`→`AC-020`, `AC-F-12`→`AC-021`, `AC-F-13`→`AC-022`, `AC-F-14`→`AC-023`, `AC-F-15`→`AC-024`, `AC-F-16`→`AC-025`, `AC-F-17`→`AC-026`, `AC-F-18`→`AC-027`, `AC-F-19`→`AC-028`, `AC-F-20`→`AC-029`.

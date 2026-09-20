@@ -4,7 +4,7 @@
 **Session:** `exolon-initial-audit-20260919`\
 **HEAD:** `403eb1322d645154307ce11bf91be89e2082e1dd`\
 **Branch:** `codex/factory-initial-audit`\
-**Host:** Linux `claw` 6.8.0-110-generic x86_64 (Ubuntu).\
+**Host:** Linux `<host>` <kernel> x86_64 (Ubuntu).\
 **Date:** 2026-09-19\
 
 **Confirmed host limits:** no `swift`, no `xcodebuild`, no `qemu-system-x86_64`. This report does **not** claim a Swift/macOS build pass.
