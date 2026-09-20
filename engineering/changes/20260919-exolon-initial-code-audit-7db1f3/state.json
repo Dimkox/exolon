@@ -1,0 +1,53 @@
+{
+  "change_id": "20260919-exolon-initial-code-audit-7db1f3",
+  "created_at": "2026-09-19T11:46:41+00:00",
+  "history": [
+    {
+      "at": "2026-09-19T11:46:41+00:00",
+      "from": null,
+      "reason": "created",
+      "to": "draft"
+    },
+    {
+      "at": "2026-09-19T11:54:34+00:00",
+      "from": "draft",
+      "reason": "scope and acceptance criteria written",
+      "to": "scoped"
+    },
+    {
+      "at": "2026-09-19T11:54:35+00:00",
+      "from": "scoped",
+      "reason": "no named human gate; review-only audit",
+      "to": "approved"
+    },
+    {
+      "at": "2026-09-20T01:46:31+00:00",
+      "from": "approved",
+      "reason": "analysis wave, measurements and audit report authored; write_agent=null so no product code was written",
+      "to": "implementing"
+    },
+    {
+      "at": "2026-09-20T01:46:40+00:00",
+      "from": "implementing",
+      "reason": "grok_verify --mode pr RESULT PASS (10 checks, 0 fail) on the final tree",
+      "to": "verifying"
+    },
+    {
+      "at": "2026-09-20T01:46:42+00:00",
+      "from": "verifying",
+      "reason": "code_review PASS and test_review PASS-with-fixes incorporated; receipts recorded",
+      "to": "reviewing"
+    },
+    {
+      "at": "2026-09-20T01:46:42+00:00",
+      "from": "reviewing",
+      "reason": "full audit delivered; v1 reports carry correction banners; macOS items explicitly pending",
+      "to": "ready"
+    }
+  ],
+  "route_id": "7db1f3f0b126",
+  "schema_version": 1,
+  "status": "ready",
+  "title": "Exolon initial code audit",
+  "updated_at": "2026-09-20T01:46:42+00:00"
+}
