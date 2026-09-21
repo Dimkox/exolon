@@ -1,0 +1,40 @@
+# вывод evidence/harness/run.sh (scrubbed: абсолютные пути и PID-временные каталоги заменены;
+# хвостовые пробелы в строках вывода сняты — иначе они роняют git-diff-check)
+# HEAD=52795d1  дата=2026-09-20T06:43:45Z  rc=0
+== 1. стаб модуля CoreGraphics (только переименование типов, логики нет) ==
+shim built: <build-tmp>/libCoreGraphics.so
+
+== 2. сборочная копия загрузчика: дельта против репозитория ==
+OK: удаление строки 2 возвращает файл к репозиторному байт-в-байт (дельта = ровно 1 импорт)
+
+== 3. malformed-фикстуры ==
+fixtures 17
+
+== 4. сборка контура ==
+built: <build-tmp>/loader
+
+== 5. прогон: фикстуры + весь корпус + геометрия зоны 009 ==
+[f01_foreign_root] THREW Unsupported TMX encoding:
+[f02_empty_map] OK w=0 h=0 tw=0 layers=0 tilesets=0 ogs=0 props=[]
+[f03_gzip] THREW Unsupported TMX compression: gzip
+[f04_zlib] THREW Unsupported TMX compression: zlib
+[f05_typo_coord] OK w=4 h=2 tw=0 layers=0 tilesets=0 ogs=1 props=[] | obj(piston) gid=nil x=368.0 y=0.0 w=32.0 h=80.0 props=[] bl=CGPoint(x: 368.0, y: 64.0) | obj(noxy) gid=nil x=0.0 y=0.0 w=0.0 h=0.0 props=[] bl=CGPoint(x: 0.0, y: 64.0) | obj(badgid) gid=0 x=1.0 y=2.0 w=0.0 h=0.0 props=[] bl=CGPoint(x: 1.0, y: 62.0)
+[f06_prop_scope] OK w=1 h=1 tw=32 layers=1 tilesets=1 ogs=1 props=["fromImageLayer=LEAK", "fromObjGroup=LEAK"] | obj(x) gid=nil x=0.0 y=0.0 w=0.0 h=0.0 props=[] bl=CGPoint(x: 0.0, y: 32.0) | layer(tiles) 1x1 gids=1
+[f08_csv_short] THREW Invalid TMX layer data: L
+[f09_b64_trunc] THREW Invalid TMX layer data: L
+[f10_b64_extra] OK w=1 h=1 tw=32 layers=1 tilesets=0 ogs=0 props=[] | layer(L) 1x1 gids=1
+[f11_enc_xml] THREW Unsupported TMX encoding:
+[f12_firstgid_far] OK w=1 h=1 tw=32 layers=1 tilesets=1 ogs=0 props=[] | layer(L) 1x1 gids=1
+[f13_no_layers] OK w=4 h=5 tw=32 layers=0 tilesets=0 ogs=1 props=[] | obj(turret) gid=nil x=64.0 y=160.0 w=32.0 h=32.0 props=[] bl=CGPoint(x: 64.0, y: 0.0)
+[f14_unclosed] OK w=1 h=1 tw=0 layers=0 tilesets=0 ogs=0 props=[]
+[f15_empty] OK w=0 h=0 tw=0 layers=0 tilesets=0 ogs=0 props=[]
+[f16_neg_float] OK w=4 h=4 tw=32 layers=0 tilesets=0 ogs=1 props=[] | obj(n) gid=nil x=-5.0 y=3.5 w=32.0 h=32.0 props=[] bl=CGPoint(x: -5.0, y: 124.5)
+[f17_huge_dims] THREW Invalid TMX layer data: L
+[f18_zero_layer] OK w=2 h=2 tw=32 layers=2 tilesets=0 ogs=0 props=[] | layer(L) 0x5 gids=0 | layer(M) 2x2 gids=4
+REAL MAPS ok=125/125 failures=0 []
+L01S10 obj capsule x=368.0 y=176.0 w=32.0 h=80.0 mode=tiledRect bottomLeft=CGPoint(x: 368.0, y: 128.0) pixelH=384.0
+L01S10 obj piston x=192.0 y=320.0 w=48.0 h=64.0 mode=- bottomLeft=CGPoint(x: 192.0, y: 64.0) pixelH=384.0
+L01S10 obj piston x=64.0 y=320.0 w=48.0 h=64.0 mode=- bottomLeft=CGPoint(x: 64.0, y: 64.0) pixelH=384.0
+
+== 6. негативный контроль: без стаба сборка обязана упасть ==
+OK: без стаба не собирается (<build-tmp>/TMXMapLoader.swift:1:8: error: no such module 'CoreGraph)

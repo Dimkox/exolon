@@ -1,0 +1,3 @@
+root=/home/pall/projects/exolon
+OK: дельта сборочной копии = ровно 1 строка импорта
+OK: без стаба не собирается (/tmp/exolon-piston-anchor.108534/TMXMapLoader.swift:1:8: error: no such module 'CoreGraphi)
