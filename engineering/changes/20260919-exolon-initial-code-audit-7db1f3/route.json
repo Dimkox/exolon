@@ -1,0 +1,65 @@
+{
+  "allowed_agents": [
+    "repo_explorer",
+    "architect",
+    "docs_researcher",
+    "code_reviewer",
+    "test_reviewer"
+  ],
+  "analysis_agents": [
+    "repo_explorer",
+    "architect",
+    "docs_researcher"
+  ],
+  "base_commit": "403eb1322d645154307ce11bf91be89e2082e1dd",
+  "base_fingerprint": "c2eb9d2014b9aea821624cd8e35d2bc7b1ba97aa48f0836eb04a7d2a2b104606",
+  "complexity": "standard",
+  "created_at": "2026-09-19T11:42:22+00:00",
+  "delivery_expected": true,
+  "domains": [
+    "generic"
+  ],
+  "human_gates": [],
+  "intent": "review",
+  "primary_skill": "adaptive-delivery",
+  "quality_profiles": [
+    "base"
+  ],
+  "rationale": [
+    "bounded change without high-risk signals",
+    "intent=review",
+    "domains=generic",
+    "repository=generic",
+    "write-owner=none",
+    "analysis-wave=3/10"
+  ],
+  "repo": {
+    "bitrix_modules": [],
+    "domains": [],
+    "kind": "generic",
+    "languages": [],
+    "package_scripts": [],
+    "signals": []
+  },
+  "required_evidence": [
+    "verification",
+    "code_review",
+    "test_review"
+  ],
+  "review_agents": [
+    "code_reviewer",
+    "test_reviewer"
+  ],
+  "risk": "low",
+  "route_id": "7db1f3f0b126",
+  "schema_version": 1,
+  "session_id": "exolon-initial-audit-20260919",
+  "status": "routed",
+  "task": "Code review of Exolon, a native macOS Swift SpriteKit game. Analyze input handling, collisions, cabin behavior and all 125 zone data files against reference mechanics. Prepare a prioritized local audit report with reproducible findings, available static-check evidence and a macOS Xcode validation checklist.",
+  "task_domains": [],
+  "workflow_skills": [
+    "adaptive-delivery",
+    "verification-evidence"
+  ],
+  "write_agent": null
+}

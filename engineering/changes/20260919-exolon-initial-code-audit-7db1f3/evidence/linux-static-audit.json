@@ -1,0 +1,5504 @@
+{
+  "summary": {
+    "host_limitation": "Linux x86_64 static/data checks only; no xcodebuild/Swift/gameplay.",
+    "tmx_expected": 125,
+    "tmx_on_disk": 125,
+    "tmx_missing_disk": [],
+    "tmx_missing_pbx": [],
+    "pbx_tmx_extra": [],
+    "odd_dimensions": [],
+    "missing_vitorc": [],
+    "chain_breaks": [],
+    "zone_number_mismatches_count": 0,
+    "zone_number_mismatches_sample": [],
+    "odd_teleports": [],
+    "capsule_maps": [
+      "L01S10"
+    ],
+    "base64_collision": [
+      "L01S01",
+      "L01S02",
+      "L01S03",
+      "L01S04"
+    ],
+    "no_collision_layer": [],
+    "missing_images": [
+      {
+        "level": "L01S04",
+        "source": "../images/tiles.gif"
+      }
+    ],
+    "missing_zone_png": [],
+    "extra_zone_png": [],
+    "unhandled_count": 51,
+    "unhandled_sample": [
+      {
+        "level": "L01S23",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "128",
+        "y": "208",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L01S23",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "224",
+        "y": "208",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L01S24",
+        "name": "source_marker",
+        "sourceBlock": "blk_gunMachine_BOTTOM",
+        "x": "400",
+        "y": "272",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L01S24",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "224",
+        "y": "32",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L02S01",
+        "name": "source_marker",
+        "sourceBlock": "blk_mushroom",
+        "x": "176",
+        "y": "240",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L02S01",
+        "name": "source_marker",
+        "sourceBlock": "blk_mushroom",
+        "x": "256",
+        "y": "240",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L02S02",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "176",
+        "y": "224",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L02S02",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "272",
+        "y": "224",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L02S08",
+        "name": "source_marker",
+        "sourceBlock": "blk_gunMachine_BOTTOM",
+        "x": "160",
+        "y": "272",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L02S13",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "96",
+        "y": "208",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L02S13",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "192",
+        "y": "208",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L02S19",
+        "name": "source_marker",
+        "sourceBlock": "blk_mushroom",
+        "x": "416",
+        "y": "240",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L02S21",
+        "name": "source_marker",
+        "sourceBlock": "blk_gunMachine_BOTTOM",
+        "x": "384",
+        "y": "128",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L02S22",
+        "name": "source_marker",
+        "sourceBlock": "blk_gunMachine_BOTTOM",
+        "x": "304",
+        "y": "288",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L02S22",
+        "name": "source_marker",
+        "sourceBlock": "blk_gunMachine_BOTTOM",
+        "x": "304",
+        "y": "128",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L02S24",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "80",
+        "y": "240",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L03S04",
+        "name": "source_marker",
+        "sourceBlock": "blk_gunMachine_BOTTOM",
+        "x": "192",
+        "y": "176",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L03S04",
+        "name": "source_marker",
+        "sourceBlock": "blk_mushroom",
+        "x": "160",
+        "y": "16",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L03S04",
+        "name": "source_marker",
+        "sourceBlock": "blk_mushroom",
+        "x": "256",
+        "y": "16",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L03S05",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "160",
+        "y": "128",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L03S08",
+        "name": "source_marker",
+        "sourceBlock": "blk_gunMachine_BOTTOM",
+        "x": "400",
+        "y": "256",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L03S12",
+        "name": "source_marker",
+        "sourceBlock": "blk_gunMachine_BOTTOM",
+        "x": "384",
+        "y": "256",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L03S16",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "176",
+        "y": "224",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L03S20",
+        "name": "source_marker",
+        "sourceBlock": "blk_mushroom",
+        "x": "288",
+        "y": "224",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L03S22",
+        "name": "source_marker",
+        "sourceBlock": "blk_gunMachine_BOTTOM",
+        "x": "400",
+        "y": "256",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L03S24",
+        "name": "source_marker",
+        "sourceBlock": "blk_gunMachine_BOTTOM",
+        "x": "272",
+        "y": "256",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L04S01",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "32",
+        "y": "208",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L04S01",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "320",
+        "y": "240",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L04S04",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "160",
+        "y": "208",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L04S04",
+        "name": "source_marker",
+        "sourceBlock": "blk_gunMachine_BOTTOM",
+        "x": "160",
+        "y": "96",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L04S04",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "288",
+        "y": "48",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L04S07",
+        "name": "source_marker",
+        "sourceBlock": "blk_gunMachine_BOTTOM",
+        "x": "368",
+        "y": "256",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L04S16",
+        "name": "source_marker",
+        "sourceBlock": "blk_mushroom",
+        "x": "368",
+        "y": "96",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L04S16",
+        "name": "source_marker",
+        "sourceBlock": "blk_mushroom",
+        "x": "448",
+        "y": "96",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L04S17",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "304",
+        "y": "240",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L04S17",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "384",
+        "y": "240",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L04S20",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "96",
+        "y": "208",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L04S20",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "176",
+        "y": "208",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L04S20",
+        "name": "source_marker",
+        "sourceBlock": "blk_waggon",
+        "x": "256",
+        "y": "208",
+        "runtime": "unhandled"
+      },
+      {
+        "level": "L04S23",
+        "name": "source_marker",
+        "sourceBlock": "blk_gunMachine_BOTTOM",
+        "x": "400",
+        "y": "80",
+        "runtime": "unhandled"
+      }
+    ],
+    "unhandled_by_sourceBlock": {
+      "blk_waggon": 24,
+      "blk_gunMachine_BOTTOM": 18,
+      "blk_mushroom": 9
+    },
+    "object_name_counts": {
+      "ship": 7,
+      "ship_fire": 2,
+      "light_floor": 3,
+      "light_ceiling": 3,
+      "vitorc": 125,
+      "turret": 37,
+      "cocoon": 1,
+      "radar": 12,
+      "rocket": 29,
+      "grenade_pack": 38,
+      "ammo_pack": 48,
+      "teleport": 70,
+      "piston": 46,
+      "bubble_creator": 31,
+      "incubator": 22,
+      "double_launcher": 19,
+      "mine": 53,
+      "source_marker": 127,
+      "capsule": 1,
+      "gate": 6
+    },
+    "source_block_counts": {
+      "blk_teleportGate": 66,
+      "blk_beacon_base": 13,
+      "blk_control_beacon": 13,
+      "blk_birthpod": 21,
+      "blk_tower_rocket": 23,
+      "blk_box_yellow": 35,
+      "blk_box_white": 46,
+      "blk_changing_room": 5,
+      "blk_anim_pump": 45,
+      "blk_double_barrel": 18,
+      "blk_tower_dish": 10,
+      "blk_gate_green": 6,
+      "blk_gunMachine1": 15,
+      "blk_mine": 50,
+      "blk_anim_swarm": 28,
+      "blk_waggon": 24,
+      "blk_gunMachine_TOP": 18,
+      "blk_gunMachine_BOTTOM": 18,
+      "blk_stage_end": 5,
+      "blk_blinker": 19,
+      "blk_mushroom": 9,
+      "blk_topdown_electro": 2,
+      "blk_ship": 6,
+      "blk_beam_up": 10,
+      "blk_beam_down": 10
+    },
+    "runtime_counts": {
+      "scenery:ship": 7,
+      "scenery:ship_fire": 2,
+      "scenery:light_floor": 3,
+      "scenery:light_ceiling": 3,
+      "scenery:vitorc": 125,
+      "live:turret": 37,
+      "live:cocoon": 1,
+      "live:radar": 12,
+      "live:rocket": 29,
+      "live:grenade_pack": 38,
+      "live:ammo_pack": 48,
+      "live:teleport": 70,
+      "live:piston": 46,
+      "live:bubble_creator": 31,
+      "live:incubator": 22,
+      "live:double_launcher": 19,
+      "live:mine": 53,
+      "live:beacon_base": 13,
+      "live:control_beacon": 13,
+      "live:capsule": 1,
+      "live:gate": 6,
+      "unhandled": 51,
+      "live:stage_end": 5,
+      "noop:blinker": 19,
+      "noop:topdown_electro": 2,
+      "live:changing_room": 4,
+      "live:beam_": 20
+    },
+    "action_vs_object_count": 40,
+    "action_vs_object_sample": [
+      {
+        "level": "L01S14",
+        "zone": 13,
+        "live_tmx": 3,
+        "compiler_actions": 6,
+        "compiler_non_flash": 6,
+        "object_names": {
+          "vitorc": 1,
+          "incubator": 1,
+          "double_launcher": 1,
+          "piston": 1
+        }
+      },
+      {
+        "level": "L01S15",
+        "zone": 14,
+        "live_tmx": 6,
+        "compiler_actions": 17,
+        "compiler_non_flash": 9,
+        "object_names": {
+          "vitorc": 1,
+          "teleport": 2,
+          "double_launcher": 1,
+          "piston": 3
+        }
+      },
+      {
+        "level": "L01S21",
+        "zone": 20,
+        "live_tmx": 5,
+        "compiler_actions": 8,
+        "compiler_non_flash": 8,
+        "object_names": {
+          "vitorc": 1,
+          "double_launcher": 1,
+          "bubble_creator": 2,
+          "piston": 2
+        }
+      },
+      {
+        "level": "L01S24",
+        "zone": 23,
+        "live_tmx": 3,
+        "compiler_actions": 8,
+        "compiler_non_flash": 8,
+        "object_names": {
+          "vitorc": 1,
+          "turret": 1,
+          "source_marker": 2,
+          "piston": 1,
+          "rocket": 1
+        }
+      },
+      {
+        "level": "L02S03",
+        "zone": 27,
+        "live_tmx": 2,
+        "compiler_actions": 7,
+        "compiler_non_flash": 7,
+        "object_names": {
+          "vitorc": 1,
+          "ammo_pack": 1,
+          "grenade_pack": 1
+        }
+      },
+      {
+        "level": "L02S04",
+        "zone": 28,
+        "live_tmx": 2,
+        "compiler_actions": 9,
+        "compiler_non_flash": 9,
+        "object_names": {
+          "vitorc": 1,
+          "double_launcher": 1,
+          "incubator": 1,
+          "ship": 1
+        }
+      },
+      {
+        "level": "L02S05",
+        "zone": 29,
+        "live_tmx": 4,
+        "compiler_actions": 15,
+        "compiler_non_flash": 7,
+        "object_names": {
+          "vitorc": 1,
+          "turret": 1,
+          "teleport": 2,
+          "ammo_pack": 1
+        }
+      },
+      {
+        "level": "L02S08",
+        "zone": 32,
+        "live_tmx": 5,
+        "compiler_actions": 17,
+        "compiler_non_flash": 9,
+        "object_names": {
+          "vitorc": 1,
+          "mine": 2,
+          "turret": 1,
+          "source_marker": 1,
+          "teleport": 2
+        }
+      },
+      {
+        "level": "L02S09",
+        "zone": 33,
+        "live_tmx": 5,
+        "compiler_actions": 16,
+        "compiler_non_flash": 8,
+        "object_names": {
+          "vitorc": 1,
+          "ammo_pack": 1,
+          "grenade_pack": 1,
+          "teleport": 2,
+          "double_launcher": 1
+        }
+      },
+      {
+        "level": "L02S14",
+        "zone": 38,
+        "live_tmx": 5,
+        "compiler_actions": 16,
+        "compiler_non_flash": 8,
+        "object_names": {
+          "vitorc": 1,
+          "teleport": 2,
+          "bubble_creator": 2,
+          "double_launcher": 1
+        }
+      },
+      {
+        "level": "L02S20",
+        "zone": 44,
+        "live_tmx": 4,
+        "compiler_actions": 7,
+        "compiler_non_flash": 1,
+        "object_names": {
+          "vitorc": 1,
+          "rocket": 2,
+          "grenade_pack": 1,
+          "gate": 1
+        }
+      },
+      {
+        "level": "L02S21",
+        "zone": 45,
+        "live_tmx": 3,
+        "compiler_actions": 15,
+        "compiler_non_flash": 7,
+        "object_names": {
+          "vitorc": 1,
+          "teleport": 2,
+          "turret": 1,
+          "source_marker": 1
+        }
+      },
+      {
+        "level": "L02S22",
+        "zone": 46,
+        "live_tmx": 6,
+        "compiler_actions": 14,
+        "compiler_non_flash": 14,
+        "object_names": {
+          "vitorc": 1,
+          "turret": 2,
+          "source_marker": 2,
+          "ammo_pack": 1,
+          "grenade_pack": 1,
+          "bubble_creator": 2
+        }
+      },
+      {
+        "level": "L02S23",
+        "zone": 47,
+        "live_tmx": 5,
+        "compiler_actions": 8,
+        "compiler_non_flash": 8,
+        "object_names": {
+          "vitorc": 1,
+          "incubator": 1,
+          "turret": 1,
+          "piston": 3
+        }
+      },
+      {
+        "level": "L02S24",
+        "zone": 48,
+        "live_tmx": 3,
+        "compiler_actions": 16,
+        "compiler_non_flash": 8,
+        "object_names": {
+          "vitorc": 1,
+          "source_marker": 1,
+          "teleport": 2,
+          "double_launcher": 1
+        }
+      },
+      {
+        "level": "L03S01",
+        "zone": 50,
+        "live_tmx": 10,
+        "compiler_actions": 13,
+        "compiler_non_flash": 13,
+        "object_names": {
+          "vitorc": 1,
+          "mine": 6,
+          "source_marker": 4
+        }
+      },
+      {
+        "level": "L03S02",
+        "zone": 51,
+        "live_tmx": 4,
+        "compiler_actions": 13,
+        "compiler_non_flash": 1,
+        "object_names": {
+          "vitorc": 1,
+          "source_marker": 2,
+          "gate": 2
+        }
+      },
+      {
+        "level": "L03S03",
+        "zone": 52,
+        "live_tmx": 5,
+        "compiler_actions": 16,
+        "compiler_non_flash": 8,
+        "object_names": {
+          "vitorc": 1,
+          "teleport": 2,
+          "double_launcher": 1,
+          "bubble_creator": 2
+        }
+      },
+      {
+        "level": "L03S04",
+        "zone": 53,
+        "live_tmx": 3,
+        "compiler_actions": 7,
+        "compiler_non_flash": 7,
+        "object_names": {
+          "vitorc": 1,
+          "ammo_pack": 1,
+          "grenade_pack": 1,
+          "turret": 1,
+          "source_marker": 3
+        }
+      },
+      {
+        "level": "L03S06",
+        "zone": 55,
+        "live_tmx": 6,
+        "compiler_actions": 2,
+        "compiler_non_flash": 2,
+        "object_names": {
+          "vitorc": 1,
+          "rocket": 4,
+          "grenade_pack": 1,
+          "piston": 1
+        }
+      },
+      {
+        "level": "L03S08",
+        "zone": 57,
+        "live_tmx": 3,
+        "compiler_actions": 9,
+        "compiler_non_flash": 9,
+        "object_names": {
+          "vitorc": 1,
+          "turret": 1,
+          "source_marker": 1,
+          "grenade_pack": 1,
+          "ammo_pack": 1
+        }
+      },
+      {
+        "level": "L03S12",
+        "zone": 61,
+        "live_tmx": 3,
+        "compiler_actions": 18,
+        "compiler_non_flash": 7,
+        "object_names": {
+          "vitorc": 1,
+          "teleport": 2,
+          "source_marker": 4,
+          "turret": 1
+        }
+      },
+      {
+        "level": "L03S24",
+        "zone": 73,
+        "live_tmx": 1,
+        "compiler_actions": 5,
+        "compiler_non_flash": 5,
+        "object_names": {
+          "vitorc": 1,
+          "turret": 1,
+          "source_marker": 1
+        }
+      },
+      {
+        "level": "L04S03",
+        "zone": 77,
+        "live_tmx": 3,
+        "compiler_actions": 16,
+        "compiler_non_flash": 8,
+        "object_names": {
+          "vitorc": 1,
+          "teleport": 2,
+          "double_launcher": 1
+        }
+      },
+      {
+        "level": "L04S04",
+        "zone": 78,
+        "live_tmx": 4,
+        "compiler_actions": 8,
+        "compiler_non_flash": 8,
+        "object_names": {
+          "vitorc": 1,
+          "mine": 3,
+          "source_marker": 3,
+          "turret": 1
+        }
+      }
+    ],
+    "info_plist_version": "0.3",
+    "marketing_version": [
+      "0.5"
+    ],
+    "swift_files": [
+      "Exolon/GameCore/Effects/ExplosionEffect.swift",
+      "Exolon/GameCore/GameConstants.swift",
+      "Exolon/GameCore/GameScene.swift",
+      "Exolon/GameCore/GameState.swift",
+      "Exolon/GameCore/HUDNode.swift",
+      "Exolon/GameCore/InputState.swift",
+      "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
+      "Exolon/GameCore/Levels/TMXMapLoader.swift",
+      "Exolon/GameCore/Levels/TMXTileMapRenderer.swift",
+      "Exolon/GameCore/Objects/LevelObstacles.swift",
+      "Exolon/GameCore/Player/Player.swift",
+      "Exolon/GameCore/Player/PlayerSpriteNode.swift",
+      "Exolon/GameCore/Weapons/BlasterBullet.swift",
+      "Exolon/GameCore/Weapons/Grenade.swift",
+      "Exolon/Platform/macOS/AppDelegate.swift",
+      "Exolon/Platform/macOS/GameView.swift",
+      "Exolon/Platform/macOS/GamepadInput.swift",
+      "Exolon/main.swift"
+    ],
+    "swift_missing_pbx": [],
+    "resource_file_count": 282,
+    "compiler_zones": 125
+  },
+  "zones": [
+    {
+      "level": "L01S01",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "ddafc1e5f97ebb2c28771f6653202209b9b42e35895e80418ceb9986d1665440",
+      "bytes": 10701,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S02",
+      "zoneNumber": "",
+      "images": [
+        "tiles.png"
+      ],
+      "object_count": 12,
+      "object_names": {
+        "ship": 1,
+        "ship_fire": 2,
+        "light_floor": 3,
+        "light_ceiling": 3,
+        "vitorc": 1,
+        "turret": 1,
+        "cocoon": 1
+      },
+      "runtime": {
+        "scenery:ship": 1,
+        "scenery:ship_fire": 2,
+        "scenery:light_floor": 3,
+        "scenery:light_ceiling": 3,
+        "scenery:vitorc": 1,
+        "live:turret": 1,
+        "live:cocoon": 1
+      },
+      "collision_solid": null,
+      "live_gameplay_objects": 2
+    },
+    {
+      "level": "L01S02",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "6fc680506c1c9412f218ebbe788a886365a309523b9b99bec81a58106f18c19c",
+      "bytes": 10416,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S03",
+      "zoneNumber": "",
+      "images": [
+        "tiles.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "radar": 1,
+        "rocket": 3,
+        "grenade_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:radar": 1,
+        "live:rocket": 3,
+        "live:grenade_pack": 1
+      },
+      "collision_solid": null,
+      "live_gameplay_objects": 5
+    },
+    {
+      "level": "L01S03",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "47eec557a9df32d320d60a9c429987793d742646e19688cd453f4df33cd9da2c",
+      "bytes": 10378,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S04",
+      "zoneNumber": "",
+      "images": [
+        "tiles.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "turret": 1,
+        "ammo_pack": 1,
+        "teleport": 2,
+        "piston": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:turret": 1,
+        "live:ammo_pack": 1,
+        "live:teleport": 2,
+        "live:piston": 1
+      },
+      "collision_solid": null,
+      "live_gameplay_objects": 5
+    },
+    {
+      "level": "L01S04",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "be545fc2d4e882c8fd342ea0696c5955b62a78508158bc1d6cbf684dccec3be5",
+      "bytes": 19251,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S05",
+      "zoneNumber": "",
+      "images": [
+        "../images/tiles.gif",
+        "../images/rocks.gif"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "rocket": 2,
+        "grenade_pack": 1,
+        "bubble_creator": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:rocket": 2,
+        "live:grenade_pack": 1,
+        "live:bubble_creator": 1
+      },
+      "collision_solid": null,
+      "live_gameplay_objects": 4
+    },
+    {
+      "level": "L01S05",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "c6ac0572c9906f16795485372177bc2b150adc37426b4dc8518a10882c5ada3c",
+      "bytes": 8313,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S06",
+      "zoneNumber": "",
+      "images": [
+        "tiles.png",
+        "tiles.png",
+        "zone004_scenery.png"
+      ],
+      "object_count": 3,
+      "object_names": {
+        "vitorc": 1,
+        "bubble_creator": 1,
+        "radar": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:bubble_creator": 1,
+        "live:radar": 1
+      },
+      "collision_solid": 32,
+      "live_gameplay_objects": 2
+    },
+    {
+      "level": "L01S06",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "f04667028e22a75ad0635b9f5a3f256dd2d3361ee1fd49704a984a5519641ad5",
+      "bytes": 8323,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S07",
+      "zoneNumber": "",
+      "images": [
+        "tiles.png",
+        "tiles.png",
+        "zone005_scenery.png"
+      ],
+      "object_count": 3,
+      "object_names": {
+        "vitorc": 1,
+        "incubator": 1,
+        "bubble_creator": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:incubator": 1,
+        "live:bubble_creator": 1
+      },
+      "collision_solid": 35,
+      "live_gameplay_objects": 2
+    },
+    {
+      "level": "L01S07",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "6e5ac4491009ef8d7cfb887a0fc9b161beae986b02457604ead928e500f4abcc",
+      "bytes": 4952,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S08",
+      "zoneNumber": "",
+      "images": [
+        "tiles.png",
+        "tiles.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "rocket": 1,
+        "grenade_pack": 1,
+        "ammo_pack": 1,
+        "teleport": 2,
+        "double_launcher": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:rocket": 1,
+        "live:grenade_pack": 1,
+        "live:ammo_pack": 1,
+        "live:teleport": 2,
+        "live:double_launcher": 1
+      },
+      "collision_solid": 72,
+      "live_gameplay_objects": 6
+    },
+    {
+      "level": "L01S08",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "167f4d82dc34f8851a451ba683c0d180820e7d3e3196cfdb3fe813bec7271696",
+      "bytes": 3097,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S09",
+      "zoneNumber": "",
+      "images": [
+        "tiles.png",
+        "tiles.png",
+        "zone_007_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "turret": 2,
+        "mine": 3
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:turret": 2,
+        "live:mine": 3
+      },
+      "collision_solid": 60,
+      "live_gameplay_objects": 5
+    },
+    {
+      "level": "L01S09",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "c28516c95ac92f95eba331dac4c8c7a95873f560e1db9b723331b0ce1e33d51c",
+      "bytes": 3878,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S10",
+      "zoneNumber": "008",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_008_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "source_marker": 2,
+        "incubator": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "live:beacon_base": 1,
+        "live:control_beacon": 1,
+        "live:incubator": 1
+      },
+      "collision_solid": 55,
+      "compiler_solid": 155,
+      "compiler_actions": 13,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 13,
+      "compiler_non_flash_actions": 5
+    },
+    {
+      "level": "L01S10",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "a0221f66cdd61f90f0804d4012f1deabfd6435d6f9bc9a06761a38defbd94c13",
+      "bytes": 4069,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S11",
+      "zoneNumber": "009",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_009_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "rocket": 1,
+        "grenade_pack": 1,
+        "ammo_pack": 1,
+        "capsule": 1,
+        "piston": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:rocket": 1,
+        "live:grenade_pack": 1,
+        "live:ammo_pack": 1,
+        "live:capsule": 1,
+        "live:piston": 2
+      },
+      "collision_solid": 80,
+      "compiler_solid": 121,
+      "compiler_actions": 5,
+      "live_gameplay_objects": 6,
+      "compiler_action_count": 5,
+      "compiler_non_flash_actions": 5
+    },
+    {
+      "level": "L01S11",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "dde13de7fc8de94e0f0ffd5038466216fb20498eca9fd37230221eea408b36d9",
+      "bytes": 3923,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S12",
+      "zoneNumber": "010",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_010_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "double_launcher": 1,
+        "teleport": 2,
+        "rocket": 3
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:double_launcher": 1,
+        "live:teleport": 2,
+        "live:rocket": 3
+      },
+      "collision_solid": 120,
+      "compiler_solid": 288,
+      "compiler_actions": 14,
+      "live_gameplay_objects": 6,
+      "compiler_action_count": 14,
+      "compiler_non_flash_actions": 6
+    },
+    {
+      "level": "L01S12",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "2cb707cde5a7891f3335b9bd7d4b642c96dc103ef0855015f384cce16b4e5bca",
+      "bytes": 3878,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S13",
+      "zoneNumber": "011",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_011_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "radar": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "source_marker": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:radar": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:beacon_base": 1,
+        "live:control_beacon": 1
+      },
+      "collision_solid": 101,
+      "compiler_solid": 165,
+      "compiler_actions": 3,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 3,
+      "compiler_non_flash_actions": 3
+    },
+    {
+      "level": "L01S13",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "361f921be096c8ee3847834dda1ef5af9bb2fae276948449cc15e22724b1d855",
+      "bytes": 3914,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S14",
+      "zoneNumber": "012",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_012_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "gate": 1,
+        "teleport": 2,
+        "turret": 1,
+        "grenade_pack": 1,
+        "ammo_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:gate": 1,
+        "live:teleport": 2,
+        "live:turret": 1,
+        "live:grenade_pack": 1,
+        "live:ammo_pack": 1
+      },
+      "collision_solid": 112,
+      "compiler_solid": 156,
+      "compiler_actions": 19,
+      "live_gameplay_objects": 6,
+      "compiler_action_count": 19,
+      "compiler_non_flash_actions": 5
+    },
+    {
+      "level": "L01S14",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "29c43925e00a0cab19bedf54a84c35ac411986f9fc51019eb84a761938c47c86",
+      "bytes": 3386,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S15",
+      "zoneNumber": "013",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_013_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "incubator": 1,
+        "double_launcher": 1,
+        "piston": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:incubator": 1,
+        "live:double_launcher": 1,
+        "live:piston": 1
+      },
+      "collision_solid": 122,
+      "compiler_solid": 180,
+      "compiler_actions": 6,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 6,
+      "compiler_non_flash_actions": 6
+    },
+    {
+      "level": "L01S15",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "a78f098a07f48facdc56f4feb995228f2c28b50bd520b8da1e09c59d4add1c98",
+      "bytes": 3916,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S16",
+      "zoneNumber": "014",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_014_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "double_launcher": 1,
+        "piston": 3
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "live:double_launcher": 1,
+        "live:piston": 3
+      },
+      "collision_solid": 140,
+      "compiler_solid": 176,
+      "compiler_actions": 17,
+      "live_gameplay_objects": 6,
+      "compiler_action_count": 17,
+      "compiler_non_flash_actions": 9
+    },
+    {
+      "level": "L01S16",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "a291869d1a5ce7cf02b3bf11ae0b547d3fac958083fef26008c337551814964c",
+      "bytes": 3345,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S17",
+      "zoneNumber": "015",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_015_original.png"
+      ],
+      "object_count": 3,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:control_beacon": 1,
+        "live:beacon_base": 1
+      },
+      "collision_solid": 84,
+      "compiler_solid": 99,
+      "compiler_actions": 1,
+      "live_gameplay_objects": 2,
+      "compiler_action_count": 1,
+      "compiler_non_flash_actions": 1
+    },
+    {
+      "level": "L01S17",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "d5ac90abc583fdabd787e6fe1cda679628fcd136d98f5a233c4734d3dde3c9d7",
+      "bytes": 3360,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S18",
+      "zoneNumber": "016",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_016_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "mine": 2,
+        "turret": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:mine": 2,
+        "live:turret": 1
+      },
+      "collision_solid": 26,
+      "compiler_solid": 136,
+      "compiler_actions": 3,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 3,
+      "compiler_non_flash_actions": 3
+    },
+    {
+      "level": "L01S18",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "ceab0c0bb93e3114013ac65b65231fce0c70ba9be9bae8b09f15bf8b0a8eca0f",
+      "bytes": 3737,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S19",
+      "zoneNumber": "017",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_017_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "piston": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:piston": 1
+      },
+      "collision_solid": 64,
+      "compiler_solid": 140,
+      "compiler_actions": 15,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 15,
+      "compiler_non_flash_actions": 7
+    },
+    {
+      "level": "L01S19",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "80bc7fb204ba4a5e56b2d794001d4f733f4f5fee77b4e30a363048f08387c163",
+      "bytes": 3904,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S20",
+      "zoneNumber": "018",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_018_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "incubator": 1,
+        "teleport": 2,
+        "mine": 1,
+        "rocket": 1,
+        "ammo_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:incubator": 1,
+        "live:teleport": 2,
+        "live:mine": 1,
+        "live:rocket": 1,
+        "live:ammo_pack": 1
+      },
+      "collision_solid": 110,
+      "compiler_solid": 217,
+      "compiler_actions": 13,
+      "live_gameplay_objects": 6,
+      "compiler_action_count": 13,
+      "compiler_non_flash_actions": 5
+    },
+    {
+      "level": "L01S20",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "3980d5a2389d7ad89c5536c8af01391cba222f5590c9ecb020410b8c654222c0",
+      "bytes": 3026,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S21",
+      "zoneNumber": "019",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_019_original.png"
+      ],
+      "object_count": 2,
+      "object_names": {
+        "vitorc": 1,
+        "turret": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:turret": 1
+      },
+      "collision_solid": 198,
+      "compiler_solid": 274,
+      "compiler_actions": 1,
+      "live_gameplay_objects": 1,
+      "compiler_action_count": 1,
+      "compiler_non_flash_actions": 1
+    },
+    {
+      "level": "L01S21",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "15ff23ed7883aed03d0049ab10004c4d660bf102987820ce0cfa147e665cafe6",
+      "bytes": 3875,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S22",
+      "zoneNumber": "020",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_020_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "double_launcher": 1,
+        "bubble_creator": 2,
+        "piston": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:double_launcher": 1,
+        "live:bubble_creator": 2,
+        "live:piston": 2
+      },
+      "collision_solid": 192,
+      "compiler_solid": 256,
+      "compiler_actions": 8,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 8,
+      "compiler_non_flash_actions": 8
+    },
+    {
+      "level": "L01S22",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "1488596231ebe9dbe68c7b9ce067e48d38c20dbf8fa2b879006a69307f492b07",
+      "bytes": 3806,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S23",
+      "zoneNumber": "021",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_021_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "rocket": 2,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "bubble_creator": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:rocket": 2,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:bubble_creator": 1
+      },
+      "collision_solid": 94,
+      "compiler_solid": 202,
+      "compiler_actions": 3,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 3,
+      "compiler_non_flash_actions": 3
+    },
+    {
+      "level": "L01S23",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "6ff2c5b3e73e9ab47757e2a7a42a5a9f366bffef4f100e32f7df718c65ccf0c1",
+      "bytes": 3331,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S24",
+      "zoneNumber": "022",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_022_original.png"
+      ],
+      "object_count": 3,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "unhandled": 2
+      },
+      "collision_solid": 100,
+      "compiler_solid": 165,
+      "compiler_actions": 0,
+      "live_gameplay_objects": 0,
+      "compiler_action_count": 0,
+      "compiler_non_flash_actions": 0
+    },
+    {
+      "level": "L01S24",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "1e0a8fcdad905668825a8b69414937041b8416925bc521e1e6e6c9c1c0d930ae",
+      "bytes": 3956,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L01S25",
+      "zoneNumber": "023",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_023_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "turret": 1,
+        "source_marker": 2,
+        "piston": 1,
+        "rocket": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:turret": 1,
+        "unhandled": 2,
+        "live:piston": 1,
+        "live:rocket": 1
+      },
+      "collision_solid": 121,
+      "compiler_solid": 192,
+      "compiler_actions": 8,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 8,
+      "compiler_non_flash_actions": 8
+    },
+    {
+      "level": "L01S25",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "ae954019c7cb6a47a47776ea7744cf5d405b37b69e79c175ed30b9007844ed94",
+      "bytes": 3575,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S01",
+      "zoneNumber": "024",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_024_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 3
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:stage_end": 1,
+        "noop:blinker": 2
+      },
+      "collision_solid": 32,
+      "compiler_solid": 131,
+      "compiler_actions": 4,
+      "live_gameplay_objects": 1,
+      "compiler_action_count": 4,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L02S01",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "0a7ff28c462f973834e7c74bb9d517f3fb47b02cd9525fe5548e47a6854e9100",
+      "bytes": 3584,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S02",
+      "zoneNumber": "025",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_025_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 3
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "unhandled": 2,
+        "noop:topdown_electro": 1
+      },
+      "collision_solid": 174,
+      "compiler_solid": 291,
+      "compiler_actions": 1,
+      "live_gameplay_objects": 0,
+      "compiler_action_count": 1,
+      "compiler_non_flash_actions": 1
+    },
+    {
+      "level": "L02S02",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "11b8271836863c620da8937d5df63dc3e34df24e056d13beaa92f03af2ce5b25",
+      "bytes": 3499,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S03",
+      "zoneNumber": "026",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_026_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 2,
+        "mine": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "unhandled": 2,
+        "live:mine": 1
+      },
+      "collision_solid": 98,
+      "compiler_solid": 179,
+      "compiler_actions": 1,
+      "live_gameplay_objects": 1,
+      "compiler_action_count": 1,
+      "compiler_non_flash_actions": 1
+    },
+    {
+      "level": "L02S03",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "64d246bb3c1764cbfc994f73c898f60eda1305a9a4a3a7477924d3781ddfd2d2",
+      "bytes": 3208,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S04",
+      "zoneNumber": "027",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_027_original.png"
+      ],
+      "object_count": 3,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1
+      },
+      "collision_solid": 46,
+      "compiler_solid": 54,
+      "compiler_actions": 7,
+      "live_gameplay_objects": 2,
+      "compiler_action_count": 7,
+      "compiler_non_flash_actions": 7
+    },
+    {
+      "level": "L02S04",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "8cb55b5256305170bfcd925b8ae956e6ba43e1185651df8a4f067b7c3fcabda2",
+      "bytes": 3382,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S05",
+      "zoneNumber": "028",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_028_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "double_launcher": 1,
+        "incubator": 1,
+        "ship": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:double_launcher": 1,
+        "live:incubator": 1,
+        "scenery:ship": 1
+      },
+      "collision_solid": 39,
+      "compiler_solid": 142,
+      "compiler_actions": 9,
+      "live_gameplay_objects": 2,
+      "compiler_action_count": 9,
+      "compiler_non_flash_actions": 9
+    },
+    {
+      "level": "L02S05",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "6c10e5fe3f212764cecffdab1996a496f47e8f4d66165969e2b660d83d8d1697",
+      "bytes": 3559,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S06",
+      "zoneNumber": "029",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_029_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "turret": 1,
+        "teleport": 2,
+        "ammo_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:turret": 1,
+        "live:teleport": 2,
+        "live:ammo_pack": 1
+      },
+      "collision_solid": 213,
+      "compiler_solid": 272,
+      "compiler_actions": 15,
+      "live_gameplay_objects": 4,
+      "compiler_action_count": 15,
+      "compiler_non_flash_actions": 7
+    },
+    {
+      "level": "L02S06",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "7c3c4905a80e9ab4aa8a860fec6dc03571a5202283c743236d625fce8109e75f",
+      "bytes": 3690,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S07",
+      "zoneNumber": "030",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_030_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "piston": 1,
+        "turret": 1,
+        "bubble_creator": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:piston": 1,
+        "live:turret": 1,
+        "live:bubble_creator": 2
+      },
+      "collision_solid": 95,
+      "compiler_solid": 200,
+      "compiler_actions": 6,
+      "live_gameplay_objects": 4,
+      "compiler_action_count": 6,
+      "compiler_non_flash_actions": 6
+    },
+    {
+      "level": "L02S07",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "6e623bbb571c15a12c2cc5cafde085c73be3f1679670cc7804679fbfe3285a43",
+      "bytes": 4079,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S08",
+      "zoneNumber": "031",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_031_original.png"
+      ],
+      "object_count": 8,
+      "object_names": {
+        "vitorc": 1,
+        "piston": 3,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "radar": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:piston": 3,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:radar": 2
+      },
+      "collision_solid": 38,
+      "compiler_solid": 167,
+      "compiler_actions": 5,
+      "live_gameplay_objects": 7,
+      "compiler_action_count": 5,
+      "compiler_non_flash_actions": 5
+    },
+    {
+      "level": "L02S08",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "203caeb89e64316e7d7e1d27a0c713190df02fe21e256dd670afa61d6b1d1892",
+      "bytes": 4058,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S09",
+      "zoneNumber": "032",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_032_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "mine": 2,
+        "turret": 1,
+        "source_marker": 1,
+        "teleport": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:mine": 2,
+        "live:turret": 1,
+        "unhandled": 1,
+        "live:teleport": 2
+      },
+      "collision_solid": 102,
+      "compiler_solid": 138,
+      "compiler_actions": 17,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 17,
+      "compiler_non_flash_actions": 9
+    },
+    {
+      "level": "L02S09",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "dec490ff7464ddf4fd006ca5fe01976b6dc16d2b5993b9578ab5741fc56b0183",
+      "bytes": 3751,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S10",
+      "zoneNumber": "033",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_033_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "teleport": 2,
+        "double_launcher": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:teleport": 2,
+        "live:double_launcher": 1
+      },
+      "collision_solid": 142,
+      "compiler_solid": 176,
+      "compiler_actions": 16,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 16,
+      "compiler_non_flash_actions": 8
+    },
+    {
+      "level": "L02S10",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "5806dfe863128d091ba40e5001a72b33ef6d176d42d74527cb6a9a44be8a325c",
+      "bytes": 4445,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S11",
+      "zoneNumber": "034",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_034_original.png"
+      ],
+      "object_count": 9,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "source_marker": 1,
+        "mine": 3,
+        "bubble_creator": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:changing_room": 1,
+        "live:mine": 3,
+        "live:bubble_creator": 2
+      },
+      "collision_solid": 173,
+      "compiler_solid": 171,
+      "compiler_actions": 8,
+      "live_gameplay_objects": 8,
+      "compiler_action_count": 8,
+      "compiler_non_flash_actions": 8
+    },
+    {
+      "level": "L02S11",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "cc063f1db16d6671d7368b65112bffa7cb72ca7698c9a003938cd19620ed85d5",
+      "bytes": 3500,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S12",
+      "zoneNumber": "035",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_035_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 2,
+        "mine": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:beam_": 2,
+        "live:mine": 1
+      },
+      "collision_solid": 64,
+      "compiler_solid": 127,
+      "compiler_actions": 4,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 4,
+      "compiler_non_flash_actions": 4
+    },
+    {
+      "level": "L02S12",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "8cef785e81e978297081fde3a9f7e593d023557710d922b3abd8166fdb0c853f",
+      "bytes": 3027,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S13",
+      "zoneNumber": "036",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_036_original.png"
+      ],
+      "object_count": 2,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1
+      },
+      "collision_solid": 64,
+      "compiler_solid": 123,
+      "compiler_actions": 1,
+      "live_gameplay_objects": 1,
+      "compiler_action_count": 1,
+      "compiler_non_flash_actions": 1
+    },
+    {
+      "level": "L02S13",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "64c78a3cb1f8ea0202e4a7c9b6ddee1c1c7354acefaf626fcd4938b04b7be103",
+      "bytes": 3688,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S14",
+      "zoneNumber": "037",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_037_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 2,
+        "teleport": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "unhandled": 2,
+        "live:teleport": 2
+      },
+      "collision_solid": 140,
+      "compiler_solid": 226,
+      "compiler_actions": 10,
+      "live_gameplay_objects": 2,
+      "compiler_action_count": 10,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L02S14",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "bb599ca37293641ce628805283239ccbe7e0679569b97d587e11fde4568dcf7f",
+      "bytes": 3883,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S15",
+      "zoneNumber": "038",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_038_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "bubble_creator": 2,
+        "double_launcher": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "live:bubble_creator": 2,
+        "live:double_launcher": 1
+      },
+      "collision_solid": 140,
+      "compiler_solid": 240,
+      "compiler_actions": 16,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 16,
+      "compiler_non_flash_actions": 8
+    },
+    {
+      "level": "L02S15",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "78083e03316a3893ba8733b2bdbd392fe2c04fc4f843d1d893b5d08b5172e529",
+      "bytes": 3682,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S16",
+      "zoneNumber": "039",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_039_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "turret": 1,
+        "source_marker": 2,
+        "piston": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:turret": 1,
+        "live:beam_": 2,
+        "live:piston": 1
+      },
+      "collision_solid": 78,
+      "compiler_solid": 151,
+      "compiler_actions": 5,
+      "live_gameplay_objects": 4,
+      "compiler_action_count": 5,
+      "compiler_non_flash_actions": 5
+    },
+    {
+      "level": "L02S16",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "b1e9ef0d9338c6a7e17fc9b4f13f50c9a0ba37c456361b8e67f020830cff1850",
+      "bytes": 3913,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S17",
+      "zoneNumber": "040",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_040_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "incubator": 2,
+        "rocket": 2,
+        "grenade_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:incubator": 2,
+        "live:rocket": 2,
+        "live:grenade_pack": 1
+      },
+      "collision_solid": 23,
+      "compiler_solid": 136,
+      "compiler_actions": 4,
+      "live_gameplay_objects": 6,
+      "compiler_action_count": 4,
+      "compiler_non_flash_actions": 4
+    },
+    {
+      "level": "L02S17",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "f3154725cc46d77c3f2299dd4e938335be3271b248dc442a78df05b567a75a1c",
+      "bytes": 4398,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S18",
+      "zoneNumber": "041",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_041_original.png"
+      ],
+      "object_count": 9,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 2,
+        "incubator": 1,
+        "teleport": 2,
+        "turret": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:beam_": 2,
+        "live:incubator": 1,
+        "live:teleport": 2,
+        "live:turret": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1
+      },
+      "collision_solid": 83,
+      "compiler_solid": 234,
+      "compiler_actions": 17,
+      "live_gameplay_objects": 8,
+      "compiler_action_count": 17,
+      "compiler_non_flash_actions": 9
+    },
+    {
+      "level": "L02S18",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "b183a8144fb87651cc649c56579e47b2cda91eb7430e1bb0e78660ccdbc190d7",
+      "bytes": 3365,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S19",
+      "zoneNumber": "042",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_042_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "mine": 1,
+        "piston": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:mine": 1,
+        "live:piston": 2
+      },
+      "collision_solid": 79,
+      "compiler_solid": 202,
+      "compiler_actions": 3,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 3,
+      "compiler_non_flash_actions": 3
+    },
+    {
+      "level": "L02S19",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "02971f84c5f02c649242320a002a8d7563faa0c794a6ae813c4b01f594c71275",
+      "bytes": 4099,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S20",
+      "zoneNumber": "043",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_043_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 3,
+        "ammo_pack": 1,
+        "mine": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:control_beacon": 1,
+        "live:beacon_base": 1,
+        "live:ammo_pack": 1,
+        "live:mine": 2,
+        "unhandled": 1
+      },
+      "collision_solid": 70,
+      "compiler_solid": 146,
+      "compiler_actions": 5,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 5,
+      "compiler_non_flash_actions": 5
+    },
+    {
+      "level": "L02S20",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "4744d69f9bdaa3216c6eb7469e6df4eb69bf73ff579f7bc71eb50e17f7a213cc",
+      "bytes": 3559,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S21",
+      "zoneNumber": "044",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_044_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "rocket": 2,
+        "grenade_pack": 1,
+        "gate": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:rocket": 2,
+        "live:grenade_pack": 1,
+        "live:gate": 1
+      },
+      "collision_solid": 32,
+      "compiler_solid": 128,
+      "compiler_actions": 7,
+      "live_gameplay_objects": 4,
+      "compiler_action_count": 7,
+      "compiler_non_flash_actions": 1
+    },
+    {
+      "level": "L02S21",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "8d290f53309deece36f704aa746fad8e94690ce4d282173c5deae1fa3e972805",
+      "bytes": 3723,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S22",
+      "zoneNumber": "045",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_045_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "turret": 1,
+        "source_marker": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "live:turret": 1,
+        "unhandled": 1
+      },
+      "collision_solid": 181,
+      "compiler_solid": 139,
+      "compiler_actions": 15,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 15,
+      "compiler_non_flash_actions": 7
+    },
+    {
+      "level": "L02S22",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "636d136e29ae14debb80a27cfeddb7a64bfa3751cb416db5a8ea69beedc31db6",
+      "bytes": 4729,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S23",
+      "zoneNumber": "046",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_046_original.png"
+      ],
+      "object_count": 9,
+      "object_names": {
+        "vitorc": 1,
+        "turret": 2,
+        "source_marker": 2,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "bubble_creator": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:turret": 2,
+        "unhandled": 2,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:bubble_creator": 2
+      },
+      "collision_solid": 188,
+      "compiler_solid": 148,
+      "compiler_actions": 14,
+      "live_gameplay_objects": 6,
+      "compiler_action_count": 14,
+      "compiler_non_flash_actions": 14
+    },
+    {
+      "level": "L02S23",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "e6c8c25c3761c44ec724cc40d4ee2e081b310cdb246a5506402b9ee34eef09c5",
+      "bytes": 3723,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S24",
+      "zoneNumber": "047",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_047_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "incubator": 1,
+        "turret": 1,
+        "piston": 3
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:incubator": 1,
+        "live:turret": 1,
+        "live:piston": 3
+      },
+      "collision_solid": 101,
+      "compiler_solid": 138,
+      "compiler_actions": 8,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 8,
+      "compiler_non_flash_actions": 8
+    },
+    {
+      "level": "L02S24",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "c8025c22c2c5dac3392a8ec317a271e0f0838e874e599f2ed39903e11b8ac398",
+      "bytes": 3634,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L02S25",
+      "zoneNumber": "048",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_048_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 1,
+        "teleport": 2,
+        "double_launcher": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "unhandled": 1,
+        "live:teleport": 2,
+        "live:double_launcher": 1
+      },
+      "collision_solid": 117,
+      "compiler_solid": 168,
+      "compiler_actions": 16,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 16,
+      "compiler_non_flash_actions": 8
+    },
+    {
+      "level": "L02S25",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "bcd3047ea08c8039ed82f19eee9b3e3c245a9d6d9e1578b69423a4cf5f54a26a",
+      "bytes": 3576,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S01",
+      "zoneNumber": "049",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_049_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 3
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "noop:blinker": 2,
+        "live:stage_end": 1
+      },
+      "collision_solid": 99,
+      "compiler_solid": 148,
+      "compiler_actions": 4,
+      "live_gameplay_objects": 1,
+      "compiler_action_count": 4,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L03S01",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "4591b7286662ce71d548bad918c5938e5803911b912793edbb86455c2ec489b7",
+      "bytes": 4830,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S02",
+      "zoneNumber": "050",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_050_original.png"
+      ],
+      "object_count": 11,
+      "object_names": {
+        "vitorc": 1,
+        "mine": 6,
+        "source_marker": 4
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:mine": 6,
+        "live:beacon_base": 1,
+        "live:control_beacon": 1,
+        "live:beam_": 2
+      },
+      "collision_solid": 64,
+      "compiler_solid": 141,
+      "compiler_actions": 13,
+      "live_gameplay_objects": 10,
+      "compiler_action_count": 13,
+      "compiler_non_flash_actions": 13
+    },
+    {
+      "level": "L03S02",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "3fe4bbd13a30f15c4b7f05fa3e5fd6571a03ec45c7dbfc192672fb01c48029df",
+      "bytes": 3693,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S03",
+      "zoneNumber": "051",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_051_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 2,
+        "gate": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:beacon_base": 1,
+        "live:control_beacon": 1,
+        "live:gate": 2
+      },
+      "collision_solid": 44,
+      "compiler_solid": 110,
+      "compiler_actions": 13,
+      "live_gameplay_objects": 4,
+      "compiler_action_count": 13,
+      "compiler_non_flash_actions": 1
+    },
+    {
+      "level": "L03S03",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "208fbb737b062346f980e063f06a49adeadfa5e41b398a7929d314c2430b62e8",
+      "bytes": 3884,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S04",
+      "zoneNumber": "052",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_052_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "double_launcher": 1,
+        "bubble_creator": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "live:double_launcher": 1,
+        "live:bubble_creator": 2
+      },
+      "collision_solid": 126,
+      "compiler_solid": 132,
+      "compiler_actions": 16,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 16,
+      "compiler_non_flash_actions": 8
+    },
+    {
+      "level": "L03S04",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "db0afe2552219af6d3dfa634c00d4c28e60baaa9a93333317a5ae5c6272c8d7c",
+      "bytes": 4206,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S05",
+      "zoneNumber": "053",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_053_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "turret": 1,
+        "source_marker": 3
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:turret": 1,
+        "unhandled": 3
+      },
+      "collision_solid": 205,
+      "compiler_solid": 230,
+      "compiler_actions": 7,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 7,
+      "compiler_non_flash_actions": 7
+    },
+    {
+      "level": "L03S05",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "4e2c01ca8b6e2ff293354c3f4e2a9a94be1e2ff605a7d1a3f6c085bb76125505",
+      "bytes": 3267,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S06",
+      "zoneNumber": "054",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_054_original.png"
+      ],
+      "object_count": 3,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 1,
+        "ammo_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "unhandled": 1,
+        "live:ammo_pack": 1
+      },
+      "collision_solid": 106,
+      "compiler_solid": 141,
+      "compiler_actions": 1,
+      "live_gameplay_objects": 1,
+      "compiler_action_count": 1,
+      "compiler_non_flash_actions": 1
+    },
+    {
+      "level": "L03S06",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "47776ed1fa6decd61f3e5b764d4c695a3c682cf5310f0a624697952193c5200c",
+      "bytes": 3912,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S07",
+      "zoneNumber": "055",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_055_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "rocket": 4,
+        "grenade_pack": 1,
+        "piston": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:rocket": 4,
+        "live:grenade_pack": 1,
+        "live:piston": 1
+      },
+      "collision_solid": 60,
+      "compiler_solid": 180,
+      "compiler_actions": 2,
+      "live_gameplay_objects": 6,
+      "compiler_action_count": 2,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L03S07",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "dd5ec85a8c96e1caa9ccd63de05e6cf854dca157268d7b9f39134fa72e5a61ec",
+      "bytes": 3385,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S08",
+      "zoneNumber": "056",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_056_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "ammo_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "live:ammo_pack": 1
+      },
+      "collision_solid": 162,
+      "compiler_solid": 216,
+      "compiler_actions": 13,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 13,
+      "compiler_non_flash_actions": 5
+    },
+    {
+      "level": "L03S08",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "b62c7f1ae52f375ed5c7bbcaace2a849bef95ca8644ba9852c8430331e07da43",
+      "bytes": 3725,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S09",
+      "zoneNumber": "057",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_057_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "turret": 1,
+        "source_marker": 1,
+        "grenade_pack": 1,
+        "ammo_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:turret": 1,
+        "unhandled": 1,
+        "live:grenade_pack": 1,
+        "live:ammo_pack": 1
+      },
+      "collision_solid": 202,
+      "compiler_solid": 262,
+      "compiler_actions": 9,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 9,
+      "compiler_non_flash_actions": 9
+    },
+    {
+      "level": "L03S09",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "2effb2399b8d0a383f61c8e951233cfa09927d3e5fa474750e5efec87069a5a1",
+      "bytes": 2850,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S10",
+      "zoneNumber": "058",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_058_original.png"
+      ],
+      "object_count": 1,
+      "object_names": {
+        "vitorc": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1
+      },
+      "collision_solid": 64,
+      "compiler_solid": 140,
+      "compiler_actions": 0,
+      "live_gameplay_objects": 0,
+      "compiler_action_count": 0,
+      "compiler_non_flash_actions": 0
+    },
+    {
+      "level": "L03S10",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "dc6e9e6ea0003e0c5d7d4055b662f5620bc860ad41b256636a7be34108f79c80",
+      "bytes": 3872,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S11",
+      "zoneNumber": "059",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_059_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "source_marker": 2,
+        "ammo_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "live:beacon_base": 1,
+        "live:control_beacon": 1,
+        "live:ammo_pack": 1
+      },
+      "collision_solid": 131,
+      "compiler_solid": 113,
+      "compiler_actions": 14,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 14,
+      "compiler_non_flash_actions": 6
+    },
+    {
+      "level": "L03S11",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "ef487f19dfcd28ab8677af1bd20a546c6a1b9b8201c3e4c9c386c500422a5c34",
+      "bytes": 3872,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S12",
+      "zoneNumber": "060",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_060_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "radar": 1,
+        "grenade_pack": 1,
+        "source_marker": 2,
+        "ammo_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:radar": 1,
+        "live:grenade_pack": 1,
+        "noop:blinker": 1,
+        "live:ammo_pack": 1,
+        "live:changing_room": 1
+      },
+      "collision_solid": 105,
+      "compiler_solid": 107,
+      "compiler_actions": 4,
+      "live_gameplay_objects": 4,
+      "compiler_action_count": 4,
+      "compiler_non_flash_actions": 3
+    },
+    {
+      "level": "L03S12",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "29aee3b9a3dfbd8bbd03b7cd2a0569236a6b1ff6cfa8d510262ee4887b552525",
+      "bytes": 4445,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S13",
+      "zoneNumber": "061",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_061_original.png"
+      ],
+      "object_count": 8,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "source_marker": 4,
+        "turret": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "unhandled": 1,
+        "live:turret": 1,
+        "noop:blinker": 3
+      },
+      "collision_solid": 150,
+      "compiler_solid": 204,
+      "compiler_actions": 18,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 18,
+      "compiler_non_flash_actions": 7
+    },
+    {
+      "level": "L03S13",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "69a47f27240d015a189b27a26368d82fe3b29283e441728f9162d7c9a1dea04e",
+      "bytes": 3333,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S14",
+      "zoneNumber": "062",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_062_original.png"
+      ],
+      "object_count": 3,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:beam_": 2
+      },
+      "collision_solid": 115,
+      "compiler_solid": 197,
+      "compiler_actions": 3,
+      "live_gameplay_objects": 2,
+      "compiler_action_count": 3,
+      "compiler_non_flash_actions": 3
+    },
+    {
+      "level": "L03S14",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "45d14a12d68960b63417fa42d69cd3702e611f437827059e2a14577290215c15",
+      "bytes": 2850,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S15",
+      "zoneNumber": "063",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_063_original.png"
+      ],
+      "object_count": 1,
+      "object_names": {
+        "vitorc": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1
+      },
+      "collision_solid": 120,
+      "compiler_solid": 224,
+      "compiler_actions": 0,
+      "live_gameplay_objects": 0,
+      "compiler_action_count": 0,
+      "compiler_non_flash_actions": 0
+    },
+    {
+      "level": "L03S15",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "1f0f3de5f775395f347b9e96f2b921a26d39cebe16b56a02e239d7ae85c8575c",
+      "bytes": 3198,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S16",
+      "zoneNumber": "064",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_064_original.png"
+      ],
+      "object_count": 3,
+      "object_names": {
+        "vitorc": 1,
+        "piston": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:piston": 2
+      },
+      "collision_solid": 109,
+      "compiler_solid": 182,
+      "compiler_actions": 2,
+      "live_gameplay_objects": 2,
+      "compiler_action_count": 2,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L03S16",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "26c280f857e44534fb9ba57283d2d31aeca756b27137adb0776e0384c5fc8ebf",
+      "bytes": 3443,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S17",
+      "zoneNumber": "065",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_065_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 1,
+        "incubator": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "unhandled": 1,
+        "live:incubator": 2
+      },
+      "collision_solid": 82,
+      "compiler_solid": 177,
+      "compiler_actions": 2,
+      "live_gameplay_objects": 2,
+      "compiler_action_count": 2,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L03S17",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "60bfe9cb76ae4d87de6fce11bb6c2927fd753c7d100c62f67e505d36962dd460",
+      "bytes": 4121,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S18",
+      "zoneNumber": "066",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_066_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "rocket": 1,
+        "source_marker": 1,
+        "bubble_creator": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "live:rocket": 1,
+        "noop:topdown_electro": 1,
+        "live:bubble_creator": 2
+      },
+      "collision_solid": 170,
+      "compiler_solid": 206,
+      "compiler_actions": 13,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 13,
+      "compiler_non_flash_actions": 5
+    },
+    {
+      "level": "L03S18",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "9c9fe72d76dfd9277e861a7cc5dcd61d5849b702017300f0bc3d0a3b57d4122a",
+      "bytes": 3808,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S19",
+      "zoneNumber": "067",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_067_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "radar": 1,
+        "ammo_pack": 1,
+        "double_launcher": 1,
+        "bubble_creator": 1,
+        "piston": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:radar": 1,
+        "live:ammo_pack": 1,
+        "live:double_launcher": 1,
+        "live:bubble_creator": 1,
+        "live:piston": 1
+      },
+      "collision_solid": 197,
+      "compiler_solid": 220,
+      "compiler_actions": 7,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 7,
+      "compiler_non_flash_actions": 7
+    },
+    {
+      "level": "L03S19",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "4c0986fb76e367c60b704e3a03130710c1d370f6724fe6cfc4ffc61c4de7bd0e",
+      "bytes": 3865,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S20",
+      "zoneNumber": "068",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_068_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "piston": 1,
+        "source_marker": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:piston": 1,
+        "live:beam_": 2
+      },
+      "collision_solid": 112,
+      "compiler_solid": 153,
+      "compiler_actions": 6,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 6,
+      "compiler_non_flash_actions": 6
+    },
+    {
+      "level": "L03S20",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "17e0105ef2e0b7a47a8c618a2b84949cc2963df3d1ddbcb24b436450a1205f5f",
+      "bytes": 3790,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S21",
+      "zoneNumber": "069",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_069_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 1,
+        "incubator": 1,
+        "piston": 3
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "unhandled": 1,
+        "live:incubator": 1,
+        "live:piston": 3
+      },
+      "collision_solid": 81,
+      "compiler_solid": 151,
+      "compiler_actions": 4,
+      "live_gameplay_objects": 4,
+      "compiler_action_count": 4,
+      "compiler_non_flash_actions": 4
+    },
+    {
+      "level": "L03S21",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "a39e6f9bf033eb51478d19958c3d1ce587dac2627317f0a39bc58b88e479f279",
+      "bytes": 4201,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S22",
+      "zoneNumber": "070",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_070_original.png"
+      ],
+      "object_count": 8,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "mine": 3,
+        "source_marker": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "live:mine": 3,
+        "live:control_beacon": 1,
+        "live:beacon_base": 1
+      },
+      "collision_solid": 100,
+      "compiler_solid": 157,
+      "compiler_actions": 14,
+      "live_gameplay_objects": 7,
+      "compiler_action_count": 14,
+      "compiler_non_flash_actions": 6
+    },
+    {
+      "level": "L03S22",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "7f00d4b430040912a1037ed199949f589bbc668a0efa6b1de8f8343d4e0b4a86",
+      "bytes": 4207,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S23",
+      "zoneNumber": "071",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_071_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "radar": 2,
+        "turret": 1,
+        "source_marker": 1,
+        "bubble_creator": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:radar": 2,
+        "live:turret": 1,
+        "unhandled": 1,
+        "live:bubble_creator": 2
+      },
+      "collision_solid": 123,
+      "compiler_solid": 244,
+      "compiler_actions": 7,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 7,
+      "compiler_non_flash_actions": 7
+    },
+    {
+      "level": "L03S23",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "3ead78e69eb88010d6a48935c0042f4ad2fc1b712cee4081796a89bd113b4f2b",
+      "bytes": 3200,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S24",
+      "zoneNumber": "072",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_072_original.png"
+      ],
+      "object_count": 3,
+      "object_names": {
+        "vitorc": 1,
+        "turret": 1,
+        "piston": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:turret": 1,
+        "live:piston": 1
+      },
+      "collision_solid": 78,
+      "compiler_solid": 114,
+      "compiler_actions": 2,
+      "live_gameplay_objects": 2,
+      "compiler_action_count": 2,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L03S24",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "1ca82d8e4f967d1c329d5377a70a12a903b3554b7f8ee532a4d4707d3c80e864",
+      "bytes": 3367,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L03S25",
+      "zoneNumber": "073",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_073_original.png"
+      ],
+      "object_count": 3,
+      "object_names": {
+        "vitorc": 1,
+        "turret": 1,
+        "source_marker": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:turret": 1,
+        "unhandled": 1
+      },
+      "collision_solid": 101,
+      "compiler_solid": 98,
+      "compiler_actions": 5,
+      "live_gameplay_objects": 1,
+      "compiler_action_count": 5,
+      "compiler_non_flash_actions": 5
+    },
+    {
+      "level": "L03S25",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "2a97c444f6a40391ca883a822d22e0eac50ab7fa4cb8451d9ef3a6abaa46fc19",
+      "bytes": 3575,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S01",
+      "zoneNumber": "074",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_074_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 3
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:stage_end": 1,
+        "noop:blinker": 2
+      },
+      "collision_solid": 23,
+      "compiler_solid": 99,
+      "compiler_actions": 4,
+      "live_gameplay_objects": 1,
+      "compiler_action_count": 4,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L04S01",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "7962647762d97bc72b483c531c2e8f1902fa57875253ed0943de1406469ec110",
+      "bytes": 3741,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S02",
+      "zoneNumber": "075",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_075_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 3,
+        "ship": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "unhandled": 2,
+        "noop:blinker": 1,
+        "scenery:ship": 1
+      },
+      "collision_solid": 96,
+      "compiler_solid": 199,
+      "compiler_actions": 3,
+      "live_gameplay_objects": 0,
+      "compiler_action_count": 3,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L04S02",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "528236e7648055799f2aec54bc8246ff0ee17485c46feb821bfe1b91741aeb9b",
+      "bytes": 3208,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S03",
+      "zoneNumber": "076",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_076_original.png"
+      ],
+      "object_count": 3,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1
+      },
+      "collision_solid": 93,
+      "compiler_solid": 98,
+      "compiler_actions": 2,
+      "live_gameplay_objects": 2,
+      "compiler_action_count": 2,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L04S03",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "fed3149a10542a9a68ec390dbdae18430fa6b503e40e6b8a592cfe21f5cc60bd",
+      "bytes": 3392,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S04",
+      "zoneNumber": "077",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_077_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "double_launcher": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "live:double_launcher": 1
+      },
+      "collision_solid": 103,
+      "compiler_solid": 220,
+      "compiler_actions": 16,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 16,
+      "compiler_non_flash_actions": 8
+    },
+    {
+      "level": "L04S04",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "ed9a215cf34fc8c04c7cc316cfa7cfd9abf66bacaba3aa7f52eb38ee1d671dfc",
+      "bytes": 4344,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S05",
+      "zoneNumber": "078",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_078_original.png"
+      ],
+      "object_count": 8,
+      "object_names": {
+        "vitorc": 1,
+        "mine": 3,
+        "source_marker": 3,
+        "turret": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:mine": 3,
+        "unhandled": 3,
+        "live:turret": 1
+      },
+      "collision_solid": 135,
+      "compiler_solid": 230,
+      "compiler_actions": 8,
+      "live_gameplay_objects": 4,
+      "compiler_action_count": 8,
+      "compiler_non_flash_actions": 8
+    },
+    {
+      "level": "L04S05",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "0f1f5c7b142b03e69c8ab2219d5c0683523caae9abbe7f6d1844cb085668fb14",
+      "bytes": 3622,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S06",
+      "zoneNumber": "079",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_079_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "incubator": 1,
+        "source_marker": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:incubator": 1,
+        "noop:blinker": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1
+      },
+      "collision_solid": 104,
+      "compiler_solid": 182,
+      "compiler_actions": 4,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 4,
+      "compiler_non_flash_actions": 3
+    },
+    {
+      "level": "L04S06",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "00009532c65040ed5ca3503dbea33eafee66759c1d1aba10a415be2b873ae628",
+      "bytes": 3521,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S07",
+      "zoneNumber": "080",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_080_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "source_marker": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:control_beacon": 1,
+        "live:beacon_base": 1
+      },
+      "collision_solid": 110,
+      "compiler_solid": 122,
+      "compiler_actions": 2,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 2,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L04S07",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "5cd8228cdbade925ed0fd1c3ef61ec4906449b842e8f69196aa3676f8db7a892",
+      "bytes": 4239,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S08",
+      "zoneNumber": "081",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_081_original.png"
+      ],
+      "object_count": 8,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "piston": 2,
+        "mine": 1,
+        "turret": 1,
+        "source_marker": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "live:piston": 2,
+        "live:mine": 1,
+        "live:turret": 1,
+        "unhandled": 1
+      },
+      "collision_solid": 109,
+      "compiler_solid": 196,
+      "compiler_actions": 18,
+      "live_gameplay_objects": 6,
+      "compiler_action_count": 18,
+      "compiler_non_flash_actions": 10
+    },
+    {
+      "level": "L04S08",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "b5c8cb55ee86d2b0d9f6877603dace6b05e08b33fe07c950493b74875bad8490",
+      "bytes": 3879,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S09",
+      "zoneNumber": "082",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_082_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "incubator": 1,
+        "source_marker": 2,
+        "ammo_pack": 1,
+        "grenade_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:incubator": 1,
+        "live:control_beacon": 1,
+        "live:beacon_base": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1
+      },
+      "collision_solid": 86,
+      "compiler_solid": 160,
+      "compiler_actions": 4,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 4,
+      "compiler_non_flash_actions": 4
+    },
+    {
+      "level": "L04S09",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "8b68c6a7d9f376411ad7063c53c8717e68a7aa7fda3cd716fb45c9942e1e54ba",
+      "bytes": 3333,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S10",
+      "zoneNumber": "083",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_083_original.png"
+      ],
+      "object_count": 3,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "noop:blinker": 2
+      },
+      "collision_solid": 31,
+      "compiler_solid": 92,
+      "compiler_actions": 2,
+      "live_gameplay_objects": 0,
+      "compiler_action_count": 2,
+      "compiler_non_flash_actions": 0
+    },
+    {
+      "level": "L04S10",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "705507d0b461af307db50d661efe4346b981943ca6e1c1805a5cd4c2aad4839c",
+      "bytes": 3803,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S11",
+      "zoneNumber": "084",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_084_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "rocket": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "noop:blinker": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:rocket": 2
+      },
+      "collision_solid": 54,
+      "compiler_solid": 145,
+      "compiler_actions": 3,
+      "live_gameplay_objects": 4,
+      "compiler_action_count": 3,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L04S11",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "ab4735827065e3126a2d6cee5a742b8ed179b2f97983a808fae82b438da22481",
+      "bytes": 2850,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S12",
+      "zoneNumber": "085",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_085_original.png"
+      ],
+      "object_count": 1,
+      "object_names": {
+        "vitorc": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1
+      },
+      "collision_solid": 64,
+      "compiler_solid": 128,
+      "compiler_actions": 0,
+      "live_gameplay_objects": 0,
+      "compiler_action_count": 0,
+      "compiler_non_flash_actions": 0
+    },
+    {
+      "level": "L04S12",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "8863cafd4185606d193789efb371e463351b12d8e5702a7274d0059768c63fb4",
+      "bytes": 3384,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S13",
+      "zoneNumber": "086",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_086_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "teleport": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:teleport": 2
+      },
+      "collision_solid": 146,
+      "compiler_solid": 208,
+      "compiler_actions": 11,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 11,
+      "compiler_non_flash_actions": 3
+    },
+    {
+      "level": "L04S13",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "db76b153fb265803019431a68848032c760f6ed582b6887720d22c999cd3d2dd",
+      "bytes": 3400,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S14",
+      "zoneNumber": "087",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_087_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "double_launcher": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:double_launcher": 2
+      },
+      "collision_solid": 133,
+      "compiler_solid": 214,
+      "compiler_actions": 9,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 9,
+      "compiler_non_flash_actions": 9
+    },
+    {
+      "level": "L04S14",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "7c85f08f949a0ab12d5b162d1de4fce8b044a65155962a66ade90f54d89af335",
+      "bytes": 3518,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S15",
+      "zoneNumber": "088",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_088_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "piston": 1,
+        "source_marker": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:piston": 1,
+        "live:beacon_base": 1,
+        "live:control_beacon": 1
+      },
+      "collision_solid": 114,
+      "compiler_solid": 172,
+      "compiler_actions": 2,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 2,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L04S15",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "a555f8ecac16ec77424ac849716e379444cbe3f2b65385aa9456dadf4f9e6470",
+      "bytes": 3878,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S16",
+      "zoneNumber": "089",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_089_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "mine": 3,
+        "ship": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:mine": 3,
+        "scenery:ship": 1
+      },
+      "collision_solid": 47,
+      "compiler_solid": 155,
+      "compiler_actions": 7,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 7,
+      "compiler_non_flash_actions": 7
+    },
+    {
+      "level": "L04S16",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "26e2e6451ad483b6fe0e91c28e03c63094b0390f12fce2e3b96aa6d610753f4a",
+      "bytes": 4285,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S17",
+      "zoneNumber": "090",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_090_original.png"
+      ],
+      "object_count": 8,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "source_marker": 3,
+        "piston": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:changing_room": 1,
+        "live:piston": 2,
+        "unhandled": 2
+      },
+      "collision_solid": 154,
+      "compiler_solid": 157,
+      "compiler_actions": 5,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 5,
+      "compiler_non_flash_actions": 5
+    },
+    {
+      "level": "L04S17",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "f5b8b737da8007ae75fdf993d80e1c5335211cabbbf70a4e6189b19146fbd2b2",
+      "bytes": 3689,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S18",
+      "zoneNumber": "091",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_091_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "source_marker": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "unhandled": 2
+      },
+      "collision_solid": 120,
+      "compiler_solid": 196,
+      "compiler_actions": 10,
+      "live_gameplay_objects": 2,
+      "compiler_action_count": 10,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L04S18",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "67d67f00000e6935b134c3d45cdb83d757a55e79577c25a4123a7a99e543da83",
+      "bytes": 3828,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S19",
+      "zoneNumber": "092",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_092_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 4
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:control_beacon": 1,
+        "live:beacon_base": 1,
+        "live:beam_": 2
+      },
+      "collision_solid": 70,
+      "compiler_solid": 121,
+      "compiler_actions": 4,
+      "live_gameplay_objects": 4,
+      "compiler_action_count": 4,
+      "compiler_non_flash_actions": 4
+    },
+    {
+      "level": "L04S19",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "7655cb8bb96152b7574822e72c4f96258379f5d89089f0b37b325aab3b6fb38a",
+      "bytes": 3718,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S20",
+      "zoneNumber": "093",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_093_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "mine": 2,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "turret": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:mine": 2,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:turret": 1
+      },
+      "collision_solid": 44,
+      "compiler_solid": 118,
+      "compiler_actions": 5,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 5,
+      "compiler_non_flash_actions": 5
+    },
+    {
+      "level": "L04S20",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "edb9a479085f33e30d32ed34d313a5d4f1129df360fd0f60f10b20ea1c4e34f0",
+      "bytes": 3923,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S21",
+      "zoneNumber": "094",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_094_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 3,
+        "incubator": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "unhandled": 3,
+        "live:incubator": 2
+      },
+      "collision_solid": 109,
+      "compiler_solid": 228,
+      "compiler_actions": 2,
+      "live_gameplay_objects": 2,
+      "compiler_action_count": 2,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L04S21",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "3bf47f130106b18e746d0a1629cf89f2174f27193e15c71bc32ac8d5e8f8e5ab",
+      "bytes": 3753,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S22",
+      "zoneNumber": "095",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_095_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "double_launcher": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "live:double_launcher": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1
+      },
+      "collision_solid": 97,
+      "compiler_solid": 201,
+      "compiler_actions": 18,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 18,
+      "compiler_non_flash_actions": 10
+    },
+    {
+      "level": "L04S22",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "05dde8f33975e77058825c350c293621f04e26452d56a63770fe045e8978f8c3",
+      "bytes": 4034,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S23",
+      "zoneNumber": "096",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_096_original.png"
+      ],
+      "object_count": 8,
+      "object_names": {
+        "vitorc": 1,
+        "piston": 1,
+        "mine": 5,
+        "incubator": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:piston": 1,
+        "live:mine": 5,
+        "live:incubator": 1
+      },
+      "collision_solid": 110,
+      "compiler_solid": 256,
+      "compiler_actions": 9,
+      "live_gameplay_objects": 7,
+      "compiler_action_count": 9,
+      "compiler_non_flash_actions": 9
+    },
+    {
+      "level": "L04S23",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "a01623b0da7732c4bbeb329f5d9e2edaf8dfa0425daa45b005bee4c1c4cb2113",
+      "bytes": 4239,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S24",
+      "zoneNumber": "097",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_097_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "turret": 2,
+        "source_marker": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:turret": 2,
+        "unhandled": 2
+      },
+      "collision_solid": 144,
+      "compiler_solid": 256,
+      "compiler_actions": 14,
+      "live_gameplay_objects": 4,
+      "compiler_action_count": 14,
+      "compiler_non_flash_actions": 14
+    },
+    {
+      "level": "L04S24",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "24b0bb9db15c1718b7b69fd3e0ed3477ed777b88a59d150e8525fb73bab6253d",
+      "bytes": 4185,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L04S25",
+      "zoneNumber": "098",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_098_original.png"
+      ],
+      "object_count": 8,
+      "object_names": {
+        "vitorc": 1,
+        "mine": 3,
+        "bubble_creator": 2,
+        "ship": 1,
+        "radar": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:mine": 3,
+        "live:bubble_creator": 2,
+        "scenery:ship": 1,
+        "live:radar": 1
+      },
+      "collision_solid": 45,
+      "compiler_solid": 181,
+      "compiler_actions": 7,
+      "live_gameplay_objects": 6,
+      "compiler_action_count": 7,
+      "compiler_non_flash_actions": 7
+    },
+    {
+      "level": "L04S25",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "98831baeba235d2f2c11689b50ca706ab6ba3ddd51d8f75a7ca07e2828923c7d",
+      "bytes": 3741,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S01",
+      "zoneNumber": "099",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_099_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 3,
+        "mine": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:stage_end": 1,
+        "noop:blinker": 2,
+        "live:mine": 1
+      },
+      "collision_solid": 32,
+      "compiler_solid": 131,
+      "compiler_actions": 5,
+      "live_gameplay_objects": 2,
+      "compiler_action_count": 5,
+      "compiler_non_flash_actions": 3
+    },
+    {
+      "level": "L05S01",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "96d877f863351145ba40c88c4a485971ee5ba9330e6d204b9af78b581974f196",
+      "bytes": 3190,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S02",
+      "zoneNumber": "100",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_100_original.png"
+      ],
+      "object_count": 3,
+      "object_names": {
+        "vitorc": 1,
+        "ship": 1,
+        "gate": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "scenery:ship": 1,
+        "live:gate": 1
+      },
+      "collision_solid": 47,
+      "compiler_solid": 186,
+      "compiler_actions": 8,
+      "live_gameplay_objects": 1,
+      "compiler_action_count": 8,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L05S02",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "c055d8eb2fe129b13dd34dad9ee969d0c9b600d5792124ead1ff51c64271abd6",
+      "bytes": 3499,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S03",
+      "zoneNumber": "101",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_101_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 2,
+        "mine": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "unhandled": 2,
+        "live:mine": 1
+      },
+      "collision_solid": 62,
+      "compiler_solid": 136,
+      "compiler_actions": 1,
+      "live_gameplay_objects": 1,
+      "compiler_action_count": 1,
+      "compiler_non_flash_actions": 1
+    },
+    {
+      "level": "L05S03",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "e319b55b7c829b765dbf94db2a76dc97ca3f798c5a5c5cf0e64bd1860a408c28",
+      "bytes": 3208,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S04",
+      "zoneNumber": "102",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_102_original.png"
+      ],
+      "object_count": 3,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1
+      },
+      "collision_solid": 46,
+      "compiler_solid": 54,
+      "compiler_actions": 7,
+      "live_gameplay_objects": 2,
+      "compiler_action_count": 7,
+      "compiler_non_flash_actions": 7
+    },
+    {
+      "level": "L05S04",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "0b2ad023120c7694436b29b506d389170860a3ebe692e556f0a86ad8a46e681f",
+      "bytes": 3382,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S05",
+      "zoneNumber": "103",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_103_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "double_launcher": 1,
+        "incubator": 1,
+        "ship": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:double_launcher": 1,
+        "live:incubator": 1,
+        "scenery:ship": 1
+      },
+      "collision_solid": 39,
+      "compiler_solid": 142,
+      "compiler_actions": 9,
+      "live_gameplay_objects": 2,
+      "compiler_action_count": 9,
+      "compiler_non_flash_actions": 9
+    },
+    {
+      "level": "L05S05",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "8ceec4b2d8dadd8e3316955462790e824d68049f90443a9e863fa4a2520c8b91",
+      "bytes": 3559,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S06",
+      "zoneNumber": "104",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_104_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "turret": 1,
+        "teleport": 2,
+        "ammo_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:turret": 1,
+        "live:teleport": 2,
+        "live:ammo_pack": 1
+      },
+      "collision_solid": 213,
+      "compiler_solid": 272,
+      "compiler_actions": 15,
+      "live_gameplay_objects": 4,
+      "compiler_action_count": 15,
+      "compiler_non_flash_actions": 7
+    },
+    {
+      "level": "L05S06",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "134053458c21a96ad992b07778a418f5d0aede86083b381c57855644b89f4676",
+      "bytes": 3690,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S07",
+      "zoneNumber": "105",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_105_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "piston": 1,
+        "turret": 1,
+        "bubble_creator": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:piston": 1,
+        "live:turret": 1,
+        "live:bubble_creator": 2
+      },
+      "collision_solid": 95,
+      "compiler_solid": 200,
+      "compiler_actions": 6,
+      "live_gameplay_objects": 4,
+      "compiler_action_count": 6,
+      "compiler_non_flash_actions": 6
+    },
+    {
+      "level": "L05S07",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "f8779cfaad718d3c96cd9df0c1479e7b00e4465f0466e604d442598fe5a9fc46",
+      "bytes": 4079,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S08",
+      "zoneNumber": "106",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_106_original.png"
+      ],
+      "object_count": 8,
+      "object_names": {
+        "vitorc": 1,
+        "piston": 3,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "radar": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:piston": 3,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:radar": 2
+      },
+      "collision_solid": 38,
+      "compiler_solid": 167,
+      "compiler_actions": 5,
+      "live_gameplay_objects": 7,
+      "compiler_action_count": 5,
+      "compiler_non_flash_actions": 5
+    },
+    {
+      "level": "L05S08",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "ade092e621145117870744ea2311d5d2b40f582a50cdd89cc587d1d8cc6c7bc1",
+      "bytes": 4058,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S09",
+      "zoneNumber": "107",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_107_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "mine": 2,
+        "turret": 1,
+        "source_marker": 1,
+        "teleport": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:mine": 2,
+        "live:turret": 1,
+        "unhandled": 1,
+        "live:teleport": 2
+      },
+      "collision_solid": 102,
+      "compiler_solid": 138,
+      "compiler_actions": 17,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 17,
+      "compiler_non_flash_actions": 9
+    },
+    {
+      "level": "L05S09",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "886e6ea14f344964911f3b4c76f86a2123e9c8b370f8e25f936ccbb03dc84fd8",
+      "bytes": 3751,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S10",
+      "zoneNumber": "108",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_108_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "teleport": 2,
+        "double_launcher": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:teleport": 2,
+        "live:double_launcher": 1
+      },
+      "collision_solid": 142,
+      "compiler_solid": 176,
+      "compiler_actions": 16,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 16,
+      "compiler_non_flash_actions": 8
+    },
+    {
+      "level": "L05S10",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "b0aabf255629f1f85015c29fa4275f83bbb10374e3ddac0fd6abd37703b2c585",
+      "bytes": 4445,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S11",
+      "zoneNumber": "109",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_109_original.png"
+      ],
+      "object_count": 9,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "source_marker": 1,
+        "mine": 3,
+        "bubble_creator": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:changing_room": 1,
+        "live:mine": 3,
+        "live:bubble_creator": 2
+      },
+      "collision_solid": 173,
+      "compiler_solid": 171,
+      "compiler_actions": 8,
+      "live_gameplay_objects": 8,
+      "compiler_action_count": 8,
+      "compiler_non_flash_actions": 8
+    },
+    {
+      "level": "L05S11",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "62bfff27a9479824fb1786de3e8bc5314fecec95d3ee1ecba1bb5b5cc9cecad3",
+      "bytes": 3500,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S12",
+      "zoneNumber": "110",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_110_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 2,
+        "mine": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:beam_": 2,
+        "live:mine": 1
+      },
+      "collision_solid": 64,
+      "compiler_solid": 127,
+      "compiler_actions": 4,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 4,
+      "compiler_non_flash_actions": 4
+    },
+    {
+      "level": "L05S12",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "f3280c6c9657813153fb917a8f6d32bde38ab5e235ceb1434406fd10323ffd42",
+      "bytes": 3027,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S13",
+      "zoneNumber": "111",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_111_original.png"
+      ],
+      "object_count": 2,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1
+      },
+      "collision_solid": 64,
+      "compiler_solid": 123,
+      "compiler_actions": 1,
+      "live_gameplay_objects": 1,
+      "compiler_action_count": 1,
+      "compiler_non_flash_actions": 1
+    },
+    {
+      "level": "L05S13",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "3d14ed8781f5a680d902d93964d99ab81e28194c64a9bf46518608cb14d4e6dd",
+      "bytes": 3688,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S14",
+      "zoneNumber": "112",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_112_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 2,
+        "teleport": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "unhandled": 2,
+        "live:teleport": 2
+      },
+      "collision_solid": 140,
+      "compiler_solid": 226,
+      "compiler_actions": 10,
+      "live_gameplay_objects": 2,
+      "compiler_action_count": 10,
+      "compiler_non_flash_actions": 2
+    },
+    {
+      "level": "L05S14",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "46c48721a0b07e93ed21e8deb2821ae329cf29994be2b0ad8a9fdc07a8e6f6cb",
+      "bytes": 3883,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S15",
+      "zoneNumber": "113",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_113_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "bubble_creator": 2,
+        "double_launcher": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "live:bubble_creator": 2,
+        "live:double_launcher": 1
+      },
+      "collision_solid": 140,
+      "compiler_solid": 240,
+      "compiler_actions": 16,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 16,
+      "compiler_non_flash_actions": 8
+    },
+    {
+      "level": "L05S15",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "66511861ca900c7563f5d57ad724b0cad4df40e16b115b42a702bd6351eea932",
+      "bytes": 3682,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S16",
+      "zoneNumber": "114",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_114_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "turret": 1,
+        "source_marker": 2,
+        "piston": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:turret": 1,
+        "live:beam_": 2,
+        "live:piston": 1
+      },
+      "collision_solid": 78,
+      "compiler_solid": 151,
+      "compiler_actions": 5,
+      "live_gameplay_objects": 4,
+      "compiler_action_count": 5,
+      "compiler_non_flash_actions": 5
+    },
+    {
+      "level": "L05S16",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "e1f05befe5f69ccc8fd787630ba45e73c69aa1c2967e0e61b58a2885c4e9d3b4",
+      "bytes": 3913,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S17",
+      "zoneNumber": "115",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_115_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "ammo_pack": 1,
+        "incubator": 2,
+        "rocket": 2,
+        "grenade_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:ammo_pack": 1,
+        "live:incubator": 2,
+        "live:rocket": 2,
+        "live:grenade_pack": 1
+      },
+      "collision_solid": 23,
+      "compiler_solid": 136,
+      "compiler_actions": 4,
+      "live_gameplay_objects": 6,
+      "compiler_action_count": 4,
+      "compiler_non_flash_actions": 4
+    },
+    {
+      "level": "L05S17",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "403f84c77d7de4fbaebef77827751df49741e2f8835684bc491b8290d272a822",
+      "bytes": 4398,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S18",
+      "zoneNumber": "116",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_116_original.png"
+      ],
+      "object_count": 9,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 2,
+        "incubator": 1,
+        "teleport": 2,
+        "turret": 1,
+        "ammo_pack": 1,
+        "grenade_pack": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:beam_": 2,
+        "live:incubator": 1,
+        "live:teleport": 2,
+        "live:turret": 1,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1
+      },
+      "collision_solid": 83,
+      "compiler_solid": 234,
+      "compiler_actions": 17,
+      "live_gameplay_objects": 8,
+      "compiler_action_count": 17,
+      "compiler_non_flash_actions": 9
+    },
+    {
+      "level": "L05S18",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "f811697cbb2ecb919c96220a49bed81293f6eea84ad785a64de304460c6f76a7",
+      "bytes": 3365,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S19",
+      "zoneNumber": "117",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_117_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "mine": 1,
+        "piston": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:mine": 1,
+        "live:piston": 2
+      },
+      "collision_solid": 79,
+      "compiler_solid": 202,
+      "compiler_actions": 3,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 3,
+      "compiler_non_flash_actions": 3
+    },
+    {
+      "level": "L05S19",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "d4ab2a19d7a7f24e2c830852742ab20db9fffdad8905da5d5caf08de87786bcc",
+      "bytes": 4099,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S20",
+      "zoneNumber": "118",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_118_original.png"
+      ],
+      "object_count": 7,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 3,
+        "ammo_pack": 1,
+        "mine": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:control_beacon": 1,
+        "live:beacon_base": 1,
+        "live:ammo_pack": 1,
+        "live:mine": 2,
+        "unhandled": 1
+      },
+      "collision_solid": 70,
+      "compiler_solid": 146,
+      "compiler_actions": 5,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 5,
+      "compiler_non_flash_actions": 5
+    },
+    {
+      "level": "L05S20",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "2f2e07b9278e9c193eebada3a37a4d0e4b8a9488f2a35bfb44088ab78348c424",
+      "bytes": 3559,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S21",
+      "zoneNumber": "119",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_119_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "rocket": 2,
+        "grenade_pack": 1,
+        "gate": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:rocket": 2,
+        "live:grenade_pack": 1,
+        "live:gate": 1
+      },
+      "collision_solid": 32,
+      "compiler_solid": 128,
+      "compiler_actions": 7,
+      "live_gameplay_objects": 4,
+      "compiler_action_count": 7,
+      "compiler_non_flash_actions": 1
+    },
+    {
+      "level": "L05S21",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "07b444222f971baa468c282de660f1c41a34b5bc08f445202f6d213ec21c50b7",
+      "bytes": 3723,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S22",
+      "zoneNumber": "120",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_120_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "teleport": 2,
+        "turret": 1,
+        "source_marker": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:teleport": 2,
+        "live:turret": 1,
+        "unhandled": 1
+      },
+      "collision_solid": 181,
+      "compiler_solid": 139,
+      "compiler_actions": 15,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 15,
+      "compiler_non_flash_actions": 7
+    },
+    {
+      "level": "L05S22",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "4dd792fe85a921877b8ed10cb4e331130fc0d8b6ea032af4144e55fbcb3c392b",
+      "bytes": 4729,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S23",
+      "zoneNumber": "121",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_121_original.png"
+      ],
+      "object_count": 9,
+      "object_names": {
+        "vitorc": 1,
+        "turret": 2,
+        "source_marker": 2,
+        "ammo_pack": 1,
+        "grenade_pack": 1,
+        "bubble_creator": 2
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:turret": 2,
+        "unhandled": 2,
+        "live:ammo_pack": 1,
+        "live:grenade_pack": 1,
+        "live:bubble_creator": 2
+      },
+      "collision_solid": 188,
+      "compiler_solid": 148,
+      "compiler_actions": 14,
+      "live_gameplay_objects": 6,
+      "compiler_action_count": 14,
+      "compiler_non_flash_actions": 14
+    },
+    {
+      "level": "L05S23",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "3634c27450c5d376e8ee540b2cd137c5518a0c6d3a010051f64cd2878854c08f",
+      "bytes": 3723,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S24",
+      "zoneNumber": "122",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_122_original.png"
+      ],
+      "object_count": 6,
+      "object_names": {
+        "vitorc": 1,
+        "incubator": 1,
+        "turret": 1,
+        "piston": 3
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "live:incubator": 1,
+        "live:turret": 1,
+        "live:piston": 3
+      },
+      "collision_solid": 101,
+      "compiler_solid": 138,
+      "compiler_actions": 8,
+      "live_gameplay_objects": 5,
+      "compiler_action_count": 8,
+      "compiler_non_flash_actions": 8
+    },
+    {
+      "level": "L05S24",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "87b8068fb6a6b255b262dac6fa7c3fb6060512cf5423942ccb1c316ffb5daa1e",
+      "bytes": 3634,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "L05S25",
+      "zoneNumber": "123",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_123_original.png"
+      ],
+      "object_count": 5,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 1,
+        "teleport": 2,
+        "double_launcher": 1
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "unhandled": 1,
+        "live:teleport": 2,
+        "live:double_launcher": 1
+      },
+      "collision_solid": 117,
+      "compiler_solid": 168,
+      "compiler_actions": 16,
+      "live_gameplay_objects": 3,
+      "compiler_action_count": 16,
+      "compiler_non_flash_actions": 8
+    },
+    {
+      "level": "L05S25",
+      "exists": true,
+      "in_pbx": true,
+      "sha256": "c242d2f868df0d6873263771118281ce461a611e423e1abcb552c120490ce89e",
+      "bytes": 3529,
+      "width": 35,
+      "height": 24,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "nextLevel": "",
+      "zoneNumber": "124",
+      "images": [
+        "tiles.png",
+        "rocks.png",
+        "generated_terrain.png",
+        "zone_124_original.png"
+      ],
+      "object_count": 4,
+      "object_names": {
+        "vitorc": 1,
+        "source_marker": 3
+      },
+      "runtime": {
+        "scenery:vitorc": 1,
+        "noop:blinker": 2,
+        "live:stage_end": 1
+      },
+      "collision_solid": 99,
+      "compiler_solid": 148,
+      "compiler_actions": 4,
+      "live_gameplay_objects": 1,
+      "compiler_action_count": 4,
+      "compiler_non_flash_actions": 2
+    }
+  ]
+}

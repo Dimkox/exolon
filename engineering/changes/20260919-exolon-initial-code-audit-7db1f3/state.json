@@ -1,0 +1,71 @@
+{
+  "change_id": "20260919-exolon-initial-code-audit-7db1f3",
+  "created_at": "2026-09-19T11:46:41+00:00",
+  "history": [
+    {
+      "at": "2026-09-19T11:46:41+00:00",
+      "from": null,
+      "reason": "created",
+      "to": "draft"
+    },
+    {
+      "at": "2026-09-19T11:54:34+00:00",
+      "from": "draft",
+      "reason": "scope and acceptance criteria written",
+      "to": "scoped"
+    },
+    {
+      "at": "2026-09-19T11:54:35+00:00",
+      "from": "scoped",
+      "reason": "no named human gate; review-only audit",
+      "to": "approved"
+    },
+    {
+      "at": "2026-09-20T01:46:31+00:00",
+      "from": "approved",
+      "reason": "analysis wave, measurements and audit report authored; write_agent=null so no product code was written",
+      "to": "implementing"
+    },
+    {
+      "at": "2026-09-20T01:46:40+00:00",
+      "from": "implementing",
+      "reason": "grok_verify --mode pr RESULT PASS (10 checks, 0 fail) on the final tree",
+      "to": "verifying"
+    },
+    {
+      "at": "2026-09-20T01:46:42+00:00",
+      "from": "verifying",
+      "reason": "code_review PASS and test_review PASS-with-fixes incorporated; receipts recorded",
+      "to": "reviewing"
+    },
+    {
+      "at": "2026-09-20T01:46:42+00:00",
+      "from": "reviewing",
+      "reason": "full audit delivered; v1 reports carry correction banners; macOS items explicitly pending",
+      "to": "ready"
+    },
+    {
+      "at": "2026-09-20T07:05:08+00:00",
+      "from": "ready",
+      "reason": "correction pass on HEAD 52795d1: v3 authority written, 19 per-file lanes + 2 independent reviews incorporated, banners added to v1/v2, decisions.md control fixed (33/48 px), generator EOF bug fixed and proven byte-reproducible, executable Linux loader harness and v3_measurements.py committed, privacy scrub gate added and passed",
+      "to": "implementing"
+    },
+    {
+      "at": "2026-09-20T07:05:08+00:00",
+      "from": "implementing",
+      "reason": "grok_verify --mode pr re-run after this commit; the 02:06 FAIL (git-diff-check) is closed by 52795d1 and re-proven green at 03:07 on the pre-correction tree",
+      "to": "verifying"
+    },
+    {
+      "at": "2026-09-20T07:05:08+00:00",
+      "from": "verifying",
+      "reason": "code_review/test_review receipts re-issued on the post-correction sha (previous pair was bound to 7301595d… = HEAD b8aee42 and was stale per receipts.py:703)",
+      "to": "reviewing"
+    }
+  ],
+  "route_id": "7db1f3f0b126",
+  "schema_version": 1,
+  "status": "reviewing",
+  "title": "Exolon initial code audit",
+  "updated_at": "2026-09-20T07:05:08+00:00"
+}

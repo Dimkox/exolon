@@ -1,0 +1,9 @@
+# Прогон factory/tests/run_disposable_exit.py на этом дереве (scrubbed stdout, без изменений текста тестов)
+# HEAD=52795d1  дата=2026-09-20T06:43:45Z
+PASS: disposable PostgreSQL identity preflight
+Ran 201 tests in 162.210s
+OK
+PASS: two PostgreSQL restarts; exact runtime/attestor roles; cancelled+orphaned recovery; ambiguous cleanup fence2 replay; zero fabricated proposal/result/attestation; higher M4 fence
+PASS: disposable PostgreSQL + API + effective roles + actual restart/reconciliation
+# примечание: статистика «1 ERROR из 3 прогонов» первичного дня артефакта не имеет (логи /tmp удалены);
+# этот файл доказывает только детерминированную часть: полный зелёный прогон contours.
