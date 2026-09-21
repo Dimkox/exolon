@@ -15,6 +15,7 @@ CONFIG="Debug"
 usage() {
   printf 'usage: %s [--out <path>] [--target <xcodeproj>] [--config Debug|Release]\n' "$0"
   printf ' Runs on macOS only; emits a key=value report plus guided play observations.\n'
+  printf ' WITH_ARCHIVE=1 adds the -scheme Exolon archive attempt (slow, Release build).\n'
 }
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -61,13 +62,23 @@ else
 fi
 
 emit ""
-emit "## A. Scheme discovery (EXPECTED: no shared scheme — см. evidence/perfile/pbxproj-build.md)"
+emit "## A. Scheme discovery (EXPECTED: shared scheme present in xcshareddata and tracked by git — закрытие P1-11)"
+# Дискриминатор обязан различать ОБЩУЮ схему и автосгенерированную Xcode: современный
+# Xcode печатает Exolon в -list даже когда ни одного .xcscheme на диске нет, поэтому
+# подстрока по выводу -list (как было до P1-11) не даёт доказательства.
 if have xcodebuild; then
-  LIST="$(xcodebuild -project "$TARGET" -list 2>&1 | tr '\n' '|')"
-  emit "list_raw=${LIST}"
-  case "$LIST" in
-    *"Schemes"*"Exolon"*) emit "verdict_shared_scheme=PRESENT (unexpected: аудит finding no .xcscheme in tree)" ;;
-    *) emit "verdict_shared_scheme=ABSENT (matches audit: 0 .xcscheme)" ;;
+  LIST_JSON="$(xcodebuild -project "$TARGET" -list -json 2>/dev/null)"
+  SHARED_SCHEME_FILE="$TARGET/xcshareddata/xcschemes/Exolon.xcscheme"
+  if [ -n "$LIST_JSON" ]; then
+    emit "list_json_schemes=$(printf '%s' "$LIST_JSON" | tr -d '\n ' | grep -o '"scheme":\[[^]]*\]' | head -1)"
+  else
+    emit "list_json_schemes=UNAVAILABLE"
+  fi
+  emit "shared_scheme_file_present=$([ -f "$SHARED_SCHEME_FILE" ] && echo yes || echo no)"
+  emit "shared_scheme_tracked=$(git ls-files --error-unmatch "$SHARED_SCHEME_FILE" >/dev/null 2>&1 && echo yes || echo no)"
+  case "$(git ls-files -- "$SHARED_SCHEME_FILE" | wc -l | tr -d ' ')" in
+    1) emit "verdict_shared_scheme=PRESENT (EXPECTED after P1-11)" ;;
+    *) emit "verdict_shared_scheme=ABSENT (REGRESSION: нет общего файла схемы в xcshareddata — см. finding P1-11)" ;;
   esac
 fi
 
@@ -83,18 +94,52 @@ if have xcodebuild; then
   APP="$(find "$(dirname "$TARGET")/build" -maxdepth 3 -name 'Exolon.app' -print -quit 2>/dev/null)"
   emit "app_path_found=${APP:-none}"
   if [ -n "${APP:-}" ]; then
-    emit "## C. Bundle version truth (EXPECTED: CFBundleShortVersionString=0.3 при MARKETING_VERSION=0.5 — P1 из pbxproj-лагa)"
+    emit "## C. Bundle version truth (EXPECTED: собранные версия/билд равны build settings, неразвёрнутых подстановок не осталось)"
     PL="${APP}/Contents/Info.plist"
-    emit "plist_CFBundleShortVersionString=$(plutil -extract CFBundleShortVersionString raw "$PL" 2>/dev/null || echo na)"
-    emit "plist_CFBundleVersion=$(plutil -extract CFBundleVersion raw "$PL" 2>/dev/null || echo na)"
+    SV="$(plutil -extract CFBundleShortVersionString raw "$PL" 2>/dev/null || echo na)"
+    BV="$(plutil -extract CFBundleVersion raw "$PL" 2>/dev/null || echo na)"
+    SETTINGS="$(xcodebuild -project "$TARGET" -target Exolon -configuration "$CONFIG" -showBuildSettings 2>/dev/null)"
+    SET_MARKETING="$(printf '%s\n' "$SETTINGS" | awk -F' = ' '/^[[:space:]]*MARKETING_VERSION /{print $2; exit}')"
+    SET_PROJECT="$(printf '%s\n' "$SETTINGS" | awk -F' = ' '/^[[:space:]]*CURRENT_PROJECT_VERSION /{print $2; exit}')"
+    emit "settings_MARKETING_VERSION=${SET_MARKETING:-none}"
+    emit "settings_CURRENT_PROJECT_VERSION=${SET_PROJECT:-none}"
+    emit "plist_CFBundleShortVersionString=${SV}"
+    emit "plist_CFBundleVersion=${BV}"
+    emit "version_single_source=$( [ -n "$SET_MARKETING" ] && [ "$SV" = "$SET_MARKETING" ] && echo MATCH || echo MISMATCH)"
+    emit "build_version_single_source=$( [ -n "$SET_PROJECT" ] && [ "$BV" = "$SET_PROJECT" ] && echo MATCH || echo MISMATCH)"
+    emit "plist_unexpanded_placeholders=$(grep -c '$(' "$PL" 2>/dev/null | tr -d ' ')"
     emit "plist_LSMinimumSystemVersion=$(plutil -extract LSMinimumSystemVersion raw "$PL" 2>/dev/null || echo na)"
-    emit "plist_marker_version_present=$(grep -c 'MARKETING_VERSION = 0.5' "${TARGET}/project.pbxproj")"
     emit "bundle_resources_tmx=$(ls "${APP}/Contents/Resources"/*.tmx 2>/dev/null | wc -l | tr -d ' ') (EXPECTED 125)"
     emit "bundle_has_gif=$(ls "${APP}/Contents/Resources"/*.gif 2>/dev/null | wc -l | tr -d ' ') (EXPECTED 0 — gif не в Resources phase)"
     emit "bundle_has_generated_terrain=$(ls "${APP}/Contents/Resources/generated_terrain.png" 2>/dev/null | wc -l | tr -d ' ') (EXPECTED 1 — файл в бандле, но 0/117 карт его не рисуют)"
     emit "codesign=$(codesign -dv "${APP}" 2>&1 | tr '\n' '|' | head -c 300)"
     emit "spctl=$(spctl -a -vv "${APP}" 2>&1 | tr '\n' '|' | head -c 200)"
-    emit "hardened_runtime=$(codesign -d --entitlements :- "${APP}" 2>&1 | head -c 200)"
+    # Подпись: --entitlements печатает plist энтитлментов, где флага hardening нет
+    # физически; hardened runtime наблюдается только в словах flags= из -d --verbose=4.
+    SIGN_FLAGS="$(codesign -d --verbose=4 "${APP}" 2>&1 | grep -o 'flags=0x[0-9a-f]*([^)]*)' | head -1)"
+    emit "codesign_flags=${SIGN_FLAGS:-none}"
+    emit "hardened_runtime=$(printf '%s' "$SIGN_FLAGS" | grep -q 'runtime' && echo PRESENT || echo ABSENT)"
+  fi
+fi
+
+emit ""
+emit "## B2. Scheme addressability (EXPECTED: -scheme Exolon разрешается; отказ возможен только по подписке, не по «нет схемы»)"
+if have xcodebuild; then
+  DEST_LOG="${TMPDIR:-/tmp}/exolon-macos-probe-destinations.log"
+  xcodebuild -project "$TARGET" -scheme Exolon -showdestinations >"$DEST_LOG" 2>&1
+  emit "showdestinations_rc=$?"
+  emit "showdestinations_tail=$(tail -3 "$DEST_LOG" | tr '\n' '|')"
+  if [ "${WITH_ARCHIVE:-0}" = "1" ]; then
+    ARCHIVE_PATH="${TMPDIR:-/tmp}/Exolon.xcarchive"
+    ARCHIVE_LOG="${TMPDIR:-/tmp}/exolon-macos-probe-archive.log"
+    rm -rf "$ARCHIVE_PATH"
+    xcodebuild -project "$TARGET" -scheme Exolon -configuration Release \
+      -archivePath "$ARCHIVE_PATH" archive >"$ARCHIVE_LOG" 2>&1
+    emit "archive_rc=$?"
+    emit "archive_path_present=$([ -d "$ARCHIVE_PATH" ] && echo yes || echo no)"
+    emit "archive_tail=$(tail -8 "$ARCHIVE_LOG" | tr '\n' '|')"
+  else
+    emit "archive_rc=SKIPPED (запусти WITH_ARCHIVE=1, чтобы собрать archive той же схемой)"
   fi
 fi
 
@@ -148,7 +193,11 @@ emit ""
 emit "## F. Что этот зонд НЕ доказывает"
 emit "- он не заменяет XCTest (в продукте 0 тестов) и не доказывает отсутствие регрессий;"
 emit "- ручные пункты E1-E15 — наблюдения одного прогона без записи таймингов;"
-emit "- сборка Debug не эквивалентна релизу: подпись ad-hoc/Manual, ENABLE_HARDENED_RUNTIME отсутствует."
+emit "- сборка Debug не эквивалентна релизу: подпись ad-hoc/Manual."
+emit "- ENABLE_HARDENED_RUNTIME = DELIBERATELY DEFERRED вне этого изменения (причина и"
+emit "  следующий шаг: engineering/changes/20260921-close-audit-finding-p1-11-release-layer-for-the-2e7698/release.md);"
+emit "  виден он только как токен runtime в codesign_flags выше; включать его до первой"
+emit "  успешной сборки (M-01) нельзя — иначе отказ нельзя атрибуить между (a)/(c) и флагом."
 emit ""
 emit "## G. Практика съёма (проверено по дереву)"
 emit "product_log_calls=$(grep -rc 'print(\|NSLog\|os_log' Exolon --include=*.swift | awk -F: '{s+=$2} END {print s+0}') (0 → консоль доказательств не даёт)"
