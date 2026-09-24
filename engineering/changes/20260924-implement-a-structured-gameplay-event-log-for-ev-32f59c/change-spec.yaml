@@ -1,0 +1,167 @@
+{
+  "acceptance_criteria": [
+    {
+      "id": "AC-001",
+      "statement": "The Linux harness drives the real Foundation-only product types at emission level 2 and produces JSONL with at least one player.motion per simulated tick, every line parseable by json.loads, and log.events_dropped absent or zero.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::harness_level2_complete"},
+        {"receipt": "verification"}
+      ]
+    },
+    {
+      "id": "AC-002",
+      "statement": "P1-9: stream predicate A (no player.motion sharing the transition frame after state.zone_transition; tick.accumulator_reset witness with consistent discarded_us; at most 15 motion records per frame globally) passes on the fixed build and FAILS on the fix-reverted build in the scripted worst-case frame gap.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::p1_9_fixed_passes_and_revert_fails"},
+        {"receipt": "verification"}
+      ]
+    },
+    {
+      "id": "AC-003",
+      "statement": "P1-8: stream predicate B (at most one bonus.stage_points per completed_zone per playthrough, at most 5 per playthrough, and every repeated trigger witnessed by bonus.stage_boundary_suppressed, never silence) passes on the fixed build and FAILS on the reverted build (baseline 750 awards in a 600 s zone-124 run).",
+      "evidence": [
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::p1_8_fixed_passes_and_revert_fails"},
+        {"receipt": "verification"}
+      ]
+    },
+    {
+      "id": "AC-004",
+      "statement": "P1-4: on the real Player.swift, after a teleport or changing-room consume with UP held, no player.jump occurs until a fresh input.action_edge{action:jump,pressed:false} precedes it; player.teleport carries jump_latch_held and player.jump carries after_teleport so the predicate is decidable from the stream.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::p1_4_stream_predicate"},
+        {"receipt": "verification"}
+      ]
+    },
+    {
+      "id": "AC-005",
+      "statement": "P1-6: bonus.double_launcher reports launcher_object_id and launcher_active_after, TMXLevelRuntime.collectDoubleLauncherBonus returns the launcher identity, and a subsequent zone load emits entity.launcher_fire for the same object_id — the launcher keeps firing after the bonus is paid once.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::p1_6_stream_predicate"},
+        {"receipt": "verification"}
+      ]
+    },
+    {
+      "id": "AC-006",
+      "statement": "Level-2 emission costs at most 5 percent of a 16.67 ms fixed step measured on this host by the harness cost probe (design target 0.025 percent at 60 events per tick).",
+      "evidence": [
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::emission_cost_budget"}
+      ]
+    },
+    {
+      "id": "AC-007",
+      "statement": "Every new Swift file appears in project.pbxproj with all four marker kinds (PBXBuildFile, PBXFileReference, PBXGroup membership, PBXSourcesBuildPhase), and the project still has exactly one PBXNativeTarget addressed by the shared Archive scheme.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::pbxproj_registration_complete"},
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::native_target_count"}
+      ]
+    }
+  ],
+  "approvals": {
+    "required_scopes": []
+  },
+  "change_id": "20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c",
+  "contracts": {
+    "events": [],
+    "json_schema": [
+      "engineering/contracts/schemas/gameplay-event-v1.schema.json"
+    ],
+    "openapi": []
+  },
+  "forbidden_outcomes": [
+    {
+      "id": "FORBID-001",
+      "statement": "A run where bonus.stage_points is awarded twice for one completed_zone within a playthrough.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::forbid_double_stage_bonus"}
+      ]
+    },
+    {
+      "id": "FORBID-002",
+      "statement": "Any fixed step simulated in a new zone inside the render frame that transitioned into it.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::forbid_post_transition_steps"}
+      ]
+    },
+    {
+      "id": "FORBID-003",
+      "statement": "A wall-clock, locale-dependent, or free-text value in any log field other than log.begin.wall_utc, run_id, build, path and seed; and any log file written inside the repository working tree, which would stale every fingerprint-bound receipt.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::forbid_wallclock_fields"},
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::forbid_log_in_clone"}
+      ]
+    },
+    {
+      "id": "FORBID-004",
+      "statement": "Silent loss: any dropped, unformattable or skipped event that does not increment the drop counter and emit log.events_dropped; and any crash path (fatalError/precondition) on emission failure.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::drops_are_counted"}
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "id": "INV-001",
+      "statement": "Within one (run_id, rot) stream, seq increases strictly by 1; tick and frame are non-decreasing across the file; a single writer assigns seq (total order).",
+      "evidence": [
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::stream_invariants"}
+      ]
+    },
+    {
+      "id": "INV-002",
+      "statement": "ts_us equals round(tick*1000000/60) for every record: derived from the tick counter, never wall clock, never accumulated rounding.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::ts_us_derivation"}
+      ]
+    },
+    {
+      "id": "INV-003",
+      "statement": "The tick and frame counters are process-global: never reset by zone transition, death, respawn, pause, beginFromTitle or restartFromBeginning; GameplayEventKind raw values are append-only and an unknown value formats as unknown<N>, never aliasing a real name.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::counters_never_reset"},
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::kind_enum_append_only"}
+      ]
+    },
+    {
+      "id": "INV-004",
+      "statement": "The hot path stays allocation-free: GameplayEventLog.emit contains no String, Array, Dictionary, Data, URL, DateFormatter or closure allocation (grep gate) and the Diagnostics files import nothing beyond Foundation.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::hot_path_is_allocation_free"},
+        {"test": "engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/gameplay_log_check.py::diagnostics_import_boundary"}
+      ]
+    }
+  ],
+  "objective": {
+    "id": "OBJ-001",
+    "statement": "Every player action and game event is observable as a structured versioned event line, and the four wave-A state-machine findings (P1-9, P1-4, P1-8, P1-6) are fixed with stream-only regression predicates whose reverted controls fail.",
+    "success_metric": "gameplay_log_check.py: all AC/INV/FORBID checks green on the final fingerprint; reverted-fix controls for AC-002/AC-003 fail as required",
+    "target": "100% of listed checks pass on the merged head; drops zero in a 10-minute level-2 session"
+  },
+  "observability": [
+    {
+      "id": "SIG-001",
+      "metric": "log.events_dropped absent during a 10-minute level-2 session; tick.heartbeat gap at most 10.5 s",
+      "proves": ["OBJ-001"]
+    },
+    {
+      "id": "SIG-002",
+      "metric": "EXOLON_EVENT_LOG=off creates no file at all (empty file is a failure), proving the one-step kill switch",
+      "proves": ["OBJ-001"]
+    },
+    {
+      "id": "SIG-003",
+      "metric": "per-frame player.motion count never exceeds floor(maximumFrameTime/fixedTimeStep)=15 and no 15-step frame straddles a state.zone_transition",
+      "proves": ["OBJ-001"]
+    }
+  ],
+  "risk": {
+    "domains": [
+      "event"
+    ],
+    "tier": "yellow"
+  },
+  "rollback": {
+    "maximum_steps": 1,
+    "strategy": "forward_fix"
+  },
+  "schema_version": 2
+}

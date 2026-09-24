@@ -36,6 +36,10 @@ struct InputSnapshot {
 final class InputState {
     private let lock = NSLock()
     private var pressedBySource: [InputSource: Set<GameAction>] = [:]
+    /// Which source most recently reported each held action. The merged `snapshot()` cannot answer
+    /// that, and `input.action_edge{source}` is a frozen contract field, so the attribution is
+    /// recorded where the press arrives instead of guessed at the tick.
+    private var sourceByAction: [GameAction: InputSource] = [:]
     private var pausePressPending = false
 
     func set(_ action: GameAction, pressed isPressed: Bool, source: InputSource) {
@@ -48,21 +52,37 @@ final class InputState {
                 pausePressPending = true
             }
             actions.insert(action)
+            sourceByAction[action] = source
         } else {
             actions.remove(action)
+            if sourceByAction[action] == source {
+                sourceByAction[action] = nil
+            }
         }
         pressedBySource[source] = actions
     }
 
+    /// Read once per emitted edge (a few per second), never per frame.
+    func source(for action: GameAction) -> InputSource? {
+        lock.lock()
+        defer { lock.unlock() }
+        return sourceByAction[action]
+    }
+
     func reset(source: InputSource) {
         lock.lock()
+        let cleared = pressedBySource[source] ?? []
         pressedBySource[source] = []
+        for action in cleared where sourceByAction[action] == source {
+            sourceByAction[action] = nil
+        }
         lock.unlock()
     }
 
     func resetAll() {
         lock.lock()
         pressedBySource.removeAll()
+        sourceByAction.removeAll()
         pausePressPending = false
         lock.unlock()
     }
@@ -79,9 +99,13 @@ final class InputState {
 
     func resetGamepad() {
         lock.lock()
-        pressedBySource[.gamepadDPad] = []
-        pressedBySource[.gamepadStick] = []
-        pressedBySource[.gamepadButtons] = []
+        for source in [InputSource.gamepadDPad, .gamepadStick, .gamepadButtons] {
+            let cleared = pressedBySource[source] ?? []
+            pressedBySource[source] = []
+            for action in cleared where sourceByAction[action] == source {
+                sourceByAction[action] = nil
+            }
+        }
         lock.unlock()
     }
 

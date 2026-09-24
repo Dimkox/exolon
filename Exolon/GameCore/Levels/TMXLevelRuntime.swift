@@ -42,6 +42,12 @@ final class TMXLevelRuntime {
     private var missileGuidanceBaseCollisionRects: [CGRect] = []
     private(set) var homingMissiles: [HomingMissile] = []
 
+    /// Gameplay event sink, injected by `GameScene`. `nil` = no emission (harness/unit default).
+    var events: (any GameplayEventSink)?
+    /// Ordinal of the next object taken from `map.objectGroups.flatMap { $0.objects }`; assigned in
+    /// `buildObjectsFromTMX`, which iterates that array exactly once (architect section 5.2).
+    private var nextEntityID: UInt16 = 0
+
     init(resource name: String) {
         // IMPORTANT: resolve everything needed by immutable stored properties
         // into local values first. Swift does not allow a closure to capture
@@ -139,7 +145,12 @@ final class TMXLevelRuntime {
         }
 
         for launcher in doubleLaunchers {
-            if let shot = launcher.fixedUpdate(dt: dt, player: player) { shots.append(shot) }
+            guard let shot = launcher.fixedUpdate(dt: dt, player: player) else { continue }
+            shots.append(shot)
+            // P1-6 witness: the launcher still produces shots after its bonus has been paid.
+            guard let events = events, shot.kind == .doubleLauncher else { continue }
+            events.emitLauncherFired(objectID: launcher.entityID, at: launcher.hitbox.origin,
+                                     muzzleY: shot.position.y)
         }
 
         for spawner in bubbleSpawners {
@@ -216,18 +227,30 @@ final class TMXLevelRuntime {
         return p
     }
 
-    func collectDoubleLauncherBonus(playerBox: CGRect) -> Int {
-        for launcher in doubleLaunchers where launcher.collectBonusIfTouched(playerBox: playerBox) {
-            return 1_000
+    /// P1-6: the payout carries its own identity **and** the fire-gate state, so the witness record
+    /// cannot be skipped by a second lookup that might fail. `nil` means nothing was paid this step.
+    /// The ordinal is per zone instance, so the join key of `bonus.double_launcher` and
+    /// `entity.launcher_fire` is `(record zone, object_id)`.
+    func collectDoubleLauncherBonus(playerBox: CGRect) -> DoubleLauncherPayout? {
+        guard let launcher = doubleLaunchers.first(where: { $0.collectBonusIfTouched(playerBox: playerBox) }) else {
+            return nil
         }
-        return 0
+        return DoubleLauncherPayout(points: 1_000, objectID: launcher.entityID,
+                                    launcherActiveAfter: launcher.isActive)
     }
 
-    func teleportDestination(for playerBox: CGRect) -> CGPoint? {
+    /// Geometry of a launcher by its map ordinal, for the `bonus.double_launcher` payload.
+    func doubleLauncherOrigin(withEntityID entityID: UInt16) -> CGPoint? {
+        doubleLaunchers.first { $0.entityID == entityID }?.hitbox.origin
+    }
+
+    /// Also returns which portal pair member the player is standing in, because the
+    /// `player.teleport{portal_index}` witness cannot be recovered from the destination alone.
+    func teleportDestination(for playerBox: CGRect) -> (center: CGPoint, portalIndex: Int)? {
         guard portals.count >= 2 else { return nil }
         for (index, portal) in portals.enumerated() where portal.fullyContains(playerBox: playerBox) {
             let other = portals[(index + 1) % portals.count]
-            return other.destinationCenter
+            return (other.destinationCenter, index)
         }
         return nil
     }
@@ -237,6 +260,8 @@ final class TMXLevelRuntime {
 
         for object in objects {
             let bottom = map.worldBottomLeft(for: object)
+            let entityID = nextEntityID
+            nextEntityID = nextEntityID &+ 1
 
             switch object.name {
             case "vitorc":
@@ -320,7 +345,7 @@ final class TMXLevelRuntime {
                 }
 
             case "double_launcher":
-                let launcher = DoubleLauncherObstacle(bottomLeft: bottom)
+                let launcher = DoubleLauncherObstacle(bottomLeft: bottom, entityID: entityID)
                 doubleLaunchers.append(launcher)
                 rootNode.addChild(launcher.node)
 

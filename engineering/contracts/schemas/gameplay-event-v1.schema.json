@@ -1,0 +1,2248 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "exolon.gameplay.v1",
+  "title": "Exolon structured gameplay event record, schema_version 1",
+  "description": "Frozen wire contract for the gameplay event log (JSON-lines, one record per line). Authoritative catalog: engineering/changes/20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c/evidence/analysis-integration_architect.md sections 3, 4, 8 plus the controller rulings in brief.md (design rulings 1-8). One line = envelope (same seven keys, same order, on EVERY line) + the payload properties of that record's name. Producers and consumers are tested against this file by evidence/gameplay_log_check.py. Compatibility: adding an optional payload field or a new event name is non-breaking (names are append-only); renaming/removing a field or name, or changing a type, requires a schema_version bump, and consumers must reject an unknown major instead of mis-reading it. Field values are integers, booleans and whitelisted lowercase-ASCII labels only: there is deliberately no float, no free text and no wall-clock value anywhere except log.begin (security/PII ruling in brief.md). Because the in-memory record is a fixed 24-byte struct, several contract fields share one 16-bit lane or are derived; the exact lane map is recorded per name in x-encode and is the single authority for the Swift formatter.",
+  "x-units": {
+    "quarter-pixel": "integer, 1/4 logical pixel (512x384 field); divide by 4 for px",
+    "microsecond": "integer microseconds",
+    "tick-derived microsecond": "round(n * 1000000 / 60) for n fixed steps of GameConstants.fixedTimeStep"
+  },
+  "x-families": {
+    "active-in-wave-a": [
+      "meta",
+      "log",
+      "input",
+      "player",
+      "damage",
+      "bonus",
+      "state",
+      "tick",
+      "pickup",
+      "entity",
+      "game",
+      "score"
+    ],
+    "reserved-unused": [
+      "bullet",
+      "hud"
+    ],
+    "note": "integration_architect section 3 fixes the closed family set and reserves bullet, entity, pickup, hud. The section 8 catalog it also freezes uses further prefixes: pickup.collect (wave-A packs), entity.launcher_fire (mandatory P1-6 witness, added by brief ruling 3), game.game_over (mandatory P1-8 playthrough-end marker), score.* (listed under bonus in section 8) and log.* for the four meta records, whose names are literally log.begin, log.rotate, log.events_dropped, log.end. Those names are kept verbatim rather than renamed, because renaming a frozen identifier is a schema_version bump; bullet and hud stay unused (hud.banner is out of scope per integration section 11-5)."
+  },
+  "type": "object",
+  "required": [
+    "schema_version",
+    "seq",
+    "tick",
+    "frame",
+    "rot",
+    "ts_us",
+    "name"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "enum": [
+        1
+      ],
+      "x-encode": "literal 1 on every line; a consumer must reject any other major"
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0,
+      "x-encode": "event ordinal assigned by the single writer as lines are built, strictly +1 per line within (run_id, rot) and never reset inside a run. Proof of total order: a gap means records were lost or the stream was corrupted. A ring lap is NOT a gap (the writer numbers only what survives) and is declared by log.events_dropped instead, which brackets the hole with the two seq numbers it sits between."
+    },
+    "tick": {
+      "type": "integer",
+      "minimum": 0,
+      "x-encode": "fixed-step index; 0 is reserved for everything emitted before the first executed fixed step; the first executed step is exactly 1; process-global, never reset by transition/death/restart/pause"
+    },
+    "frame": {
+      "type": "integer",
+      "minimum": 0,
+      "x-encode": "SKScene.update render-frame index; 0 is the first update(_:) call that returns early on previousUpdateTime == 0; the first simulated tick therefore has frame >= 1; the only key that makes P1-9 visible"
+    },
+    "rot": {
+      "type": "integer",
+      "minimum": 0,
+      "x-encode": "rotation index within the run; 0 for the first file"
+    },
+    "ts_us": {
+      "type": "integer",
+      "minimum": 0,
+      "x-encode": "derived, never measured and never accumulated: round(tick * 1000000 / 60). Accumulating the rounded constant 16667 us drifts +12 ms by tick 36000"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^(meta|log|input|player|damage|bonus|state|tick|pickup|entity|game|score|bullet|hud)\\.[a-z][a-z0-9_]{0,38}$",
+      "x-encode": "<family>.<object>_<verb>, lowercase ASCII, one dot, at most 40 chars; unknown enum raw values format as unknown<N> and never alias a real name (see x-unknown-name)"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8,32}$",
+      "x-only-in": "log.begin"
+    },
+    "build": {
+      "type": "string",
+      "minLength": 1,
+      "x-only-in": "log.begin"
+    },
+    "wall_utc": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
+      "x-only-in": "log.begin",
+      "x-note": "the only wall-clock field in the contract; human correlation only, never an ordering key"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "x-only-in": "log.begin"
+    },
+    "seed": {
+      "type": "string",
+      "minLength": 1,
+      "x-only-in": "log.begin",
+      "x-note": "RNG seed if the run pins one, else the literal nondeterministic; there are 16 unseeded Int.random sites in gameplay, so streams are not reproducible and predicates must stay causal"
+    },
+    "level": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "x-only-in": "log.begin",
+      "x-note": "0 = meta/state/tick anomalies; 1 = + input edges, player actions, damage, bonus, score, pickup, entity, game; 2 = + player.motion every tick (regression tests)"
+    }
+  },
+  "x-unknown-name": {
+    "description": "A record whose kind raw value has no entry in this catalog is formatted as unknown<N> where N is the raw value, and carries no payload. Appending a case is non-breaking; renumbering an existing case is not.",
+    "pattern": "^unknown[0-9]+$"
+  },
+  "x-code-tables": {
+    "note": "Single source of truth for wire labels is the existing Swift vocabulary (integration section 3: never invent a second one). Evidence/harness prints these tables to contract.txt and gameplay_log_check.py diffs them against this file.",
+    "flow_state": [
+      "title",
+      "playing",
+      "paused",
+      "playerDead",
+      "respawning",
+      "gameOver",
+      "contentComplete"
+    ],
+    "action": [
+      "moveLeft",
+      "moveRight",
+      "jump",
+      "crouch",
+      "fire",
+      "grenade",
+      "pause",
+      "menuUp",
+      "menuDown",
+      "debugHitboxes"
+    ],
+    "source": [
+      "keyboard",
+      "gamepadDPad",
+      "gamepadStick",
+      "gamepadButtons"
+    ],
+    "motion_state": [
+      "idle",
+      "running",
+      "jumping",
+      "falling",
+      "crouching",
+      "dying"
+    ],
+    "facing": [
+      "left",
+      "right"
+    ],
+    "support": [
+      "fallback_floor",
+      "solid"
+    ],
+    "damage_cause": [
+      "bullet",
+      "mine",
+      "piston",
+      "force_field",
+      "source_hazard",
+      "bubble",
+      "egg",
+      "missile"
+    ],
+    "exoskeleton_cause": [
+      "changing_room",
+      "cheat",
+      "reset"
+    ],
+    "pickup_kind": [
+      "grenade_pack",
+      "ammo_pack"
+    ],
+    "score_reason": [
+      "blaster_shotdown",
+      "bubble",
+      "egg",
+      "force_field",
+      "grenade_kill",
+      "guidance",
+      "launcher",
+      "stage_boundary"
+    ],
+    "shoot_denied_reason": [
+      "no_ammo"
+    ],
+    "contextual_kind": [
+      "changing_room",
+      "teleport"
+    ],
+    "flow_cause": [
+      "fire_press",
+      "pause_press",
+      "resume",
+      "restart",
+      "death",
+      "respawn_timeout",
+      "zone_transition",
+      "content_complete",
+      "title_return",
+      "unspecified"
+    ],
+    "zone_load_cause": [
+      "app_launch",
+      "transition",
+      "checkpoint",
+      "restart"
+    ],
+    "checkpoint_cleared_reason": [
+      "new_game",
+      "game_over",
+      "launch"
+    ],
+    "accumulator_reset_reason": [
+      "zone_transition",
+      "new_game",
+      "paused_exit",
+      "explicit"
+    ],
+    "log_end_reason": [
+      "app_quit",
+      "error",
+      "harness_complete"
+    ],
+    "launcher_kind": [
+      "double_launcher"
+    ],
+    "stage_boundary_suppression_reason": [
+      "already_awarded",
+      "not_stage_end"
+    ],
+    "stage_component_id": [
+      "lives_x1000"
+    ],
+    "x-extension-rule": "a new stage_component_id (wave D's bravery/timed ladder) must be appended here, to GameplayStageComponent and to GameplayStageComponentSequence in the SAME commit: envelope_schema_valid rejects an id this enum does not declare, and gameplay_log_check's predicate_b takes its allowed ids from this list, so the schema stays the single authority."
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "log.begin"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "run_id",
+          "build",
+          "wall_utc",
+          "level",
+          "path",
+          "seed",
+          "zone",
+          "flow_state"
+        ],
+        "properties": {
+          "zone": {
+            "type": "integer",
+            "enum": [
+              0
+            ]
+          },
+          "flow_state": {
+            "enum": [
+              "title",
+              "playing",
+              "paused",
+              "playerDead",
+              "respawning",
+              "gameOver",
+              "contentComplete"
+            ]
+          }
+        }
+      },
+      "x-encode": "writer-built, once per file, first line: run_id,build,wall_utc,level,path,seed,zone=0,flow_state"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "log.rotate"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "from_path",
+          "to_path",
+          "rot",
+          "rotated_at_tick"
+        ],
+        "properties": {
+          "from_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "to_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rot": {
+            "type": "integer",
+            "minimum": 0,
+            "x-note": "the incoming generation (retired + 1)"
+          },
+          "rotated_at_tick": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "x-note": "placement: the LAST line of the retired file (before that file's final flush), so a consumer holding only that generation can tell a rotation from a truncation. Envelope rot names the retired generation; payload rot names the incoming one that continues seq."
+      },
+      "x-encode": "writer-built, LAST line of the retired file (so that generation is distinguishable from a truncation); envelope rot names the retired generation, payload rot the incoming one that continues seq"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "log.events_dropped"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "count",
+          "first_seq",
+          "last_seq",
+          "total_dropped",
+          "ring_capacity",
+          "marker"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 1,
+            "x-note": "records lost in this window"
+          },
+          "first_seq": {
+            "type": "integer",
+            "minimum": 0,
+            "x-note": "seq of the first record written after this line"
+          },
+          "last_seq": {
+            "type": "integer",
+            "minimum": 0,
+            "x-note": "seq of the last record written before the loss"
+          },
+          "total_dropped": {
+            "type": "integer",
+            "minimum": 0,
+            "x-note": "cumulative producer-side drop counter"
+          },
+          "ring_capacity": {
+            "type": "integer",
+            "minimum": 1,
+            "x-note": "ring slots, so a reader can size the backlog"
+          },
+          "marker": {
+            "type": "string",
+            "pattern": "^# dropped [0-9]+ oldest events",
+            "x-note": "the human-greppable marker, kept inside valid JSON because every line must parse"
+          }
+        }
+      },
+      "x-encode": "writer-built, emitted in front of the batch it brackets: last_seq/first_seq name records that exist on both sides of the loss window"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "log.end"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "reason",
+          "events"
+        ],
+        "properties": {
+          "reason": {
+            "enum": [
+              "app_quit",
+              "error",
+              "harness_complete"
+            ]
+          },
+          "events": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "x-encode": "writer-built, last line of the live file: events is the producer-side count, so events minus body records minus declared drops == a lost tail"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "input.action_edge"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "action",
+          "pressed",
+          "source",
+          "held_us"
+        ],
+        "properties": {
+          "action": {
+            "enum": [
+              "moveLeft",
+              "moveRight",
+              "jump",
+              "crouch",
+              "fire",
+              "grenade",
+              "pause",
+              "menuUp",
+              "menuDown",
+              "debugHitboxes"
+            ]
+          },
+          "pressed": {
+            "type": "boolean"
+          },
+          "source": {
+            "enum": [
+              "keyboard",
+              "gamepadDPad",
+              "gamepadStick",
+              "gamepadButtons"
+            ]
+          },
+          "held_us": {
+            "type": "integer",
+            "minimum": 0,
+            "x-unit": "microsecond"
+          }
+        }
+      },
+      "x-encode": "entity=pack(action:0..5,source:6..7),a=held_ms,b=pressed"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "input.pause_consumed"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "pending"
+        ],
+        "properties": {
+          "pending": {
+            "type": "boolean"
+          }
+        }
+      },
+      "x-encode": "a=pending"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "input.contextual_consumed"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "kind",
+          "jump_suppressed"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "changing_room",
+              "teleport"
+            ]
+          },
+          "jump_suppressed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "x-encode": "entity=contextual_kind,a=jump_suppressed"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "player.motion"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "zone",
+          "x",
+          "y",
+          "vx",
+          "vy",
+          "grounded",
+          "motion_state",
+          "facing",
+          "exoskeleton"
+        ],
+        "properties": {
+          "zone": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 124
+          },
+          "x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "vx": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "vy": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "grounded": {
+            "type": "boolean"
+          },
+          "motion_state": {
+            "enum": [
+              "idle",
+              "running",
+              "jumping",
+              "falling",
+              "crouching",
+              "dying"
+            ]
+          },
+          "facing": {
+            "enum": [
+              "left",
+              "right"
+            ]
+          },
+          "exoskeleton": {
+            "type": "boolean"
+          }
+        }
+      },
+      "x-encode": "a=x_q,b=y_q,c=vx_q,d=vy_q,entity=pack(motion:0..2,grounded:3,facing:4,exoskeleton:5)"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "player.jump"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "x",
+          "y",
+          "velocity",
+          "grounded_before",
+          "after_teleport"
+        ],
+        "properties": {
+          "x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "velocity": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "grounded_before": {
+            "type": "boolean"
+          },
+          "after_teleport": {
+            "type": "boolean"
+          }
+        }
+      },
+      "x-encode": "a=x_q,b=y_q,c=velocity_q,entity=pack(grounded_before:0,after_teleport:1)"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "player.land"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "x",
+          "y",
+          "vy_before",
+          "support"
+        ],
+        "properties": {
+          "x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "vy_before": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "support": {
+            "enum": [
+              "fallback_floor",
+              "solid"
+            ]
+          }
+        }
+      },
+      "x-encode": "a=x_q,b=y_q,c=vy_before_q,entity=support"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "player.crouch_begin"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "x",
+          "y"
+        ],
+        "properties": {
+          "x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          }
+        }
+      },
+      "x-encode": "a=x_q,b=y_q"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "player.crouch_end"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "x",
+          "y"
+        ],
+        "properties": {
+          "x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          }
+        }
+      },
+      "x-encode": "a=x_q,b=y_q"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "player.exoskeleton"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "enabled",
+          "cause"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "cause": {
+            "enum": [
+              "changing_room",
+              "cheat",
+              "reset"
+            ]
+          }
+        }
+      },
+      "x-encode": "a=enabled,entity=cause"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "player.shoot_blaster"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "x",
+          "y",
+          "facing",
+          "double",
+          "ammo_before",
+          "ammo_after"
+        ],
+        "properties": {
+          "x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "facing": {
+            "enum": [
+              "left",
+              "right"
+            ]
+          },
+          "double": {
+            "type": "boolean"
+          },
+          "ammo_before": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "ammo_after": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "x-encode": "a=x_q,b=y_q,c=ammo_before,d=ammo_after,entity=pack(facing:0,double:1)"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "player.shoot_denied"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "reason",
+          "ammo"
+        ],
+        "properties": {
+          "reason": {
+            "enum": [
+              "no_ammo"
+            ]
+          },
+          "ammo": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "x-encode": "a=ammo,entity=reason"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "player.throw_grenade"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "x",
+          "y",
+          "direction",
+          "grenades_before",
+          "grenades_after",
+          "blocked_by"
+        ],
+        "properties": {
+          "x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "direction": {
+            "enum": [
+              "left",
+              "right"
+            ]
+          },
+          "grenades_before": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "grenades_after": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "blocked_by": {
+            "enum": [
+              "none",
+              "one_in_flight"
+            ]
+          }
+        }
+      },
+      "x-encode": "a=x_q,b=y_q,c=grenades_before,d=grenades_after,entity=pack(direction:0,blocked_by:1)"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "player.teleport"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "from",
+          "to",
+          "portal_index",
+          "jump_latch_held"
+        ],
+        "properties": {
+          "from": {
+            "type": "object",
+            "required": [
+              "x",
+              "y"
+            ],
+            "properties": {
+              "x": {
+                "type": "integer",
+                "x-unit": "quarter-pixel"
+              },
+              "y": {
+                "type": "integer",
+                "x-unit": "quarter-pixel"
+              }
+            }
+          },
+          "to": {
+            "type": "object",
+            "required": [
+              "x",
+              "y"
+            ],
+            "properties": {
+              "x": {
+                "type": "integer",
+                "x-unit": "quarter-pixel"
+              },
+              "y": {
+                "type": "integer",
+                "x-unit": "quarter-pixel"
+              }
+            }
+          },
+          "portal_index": {
+            "type": "integer",
+            "minimum": -1
+          },
+          "jump_latch_held": {
+            "type": "boolean"
+          }
+        }
+      },
+      "x-encode": "a=from_x_q,b=from_y_q,c=to_x_q,d=to_y_q,entity=pack(portal_index:0..7,jump_latch_held:8)"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "player.death_begin"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "x",
+          "y",
+          "lives",
+          "ammo",
+          "grenades"
+        ],
+        "properties": {
+          "x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "lives": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "ammo": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "grenades": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "x-encode": "a=x_q,b=y_q,c=lives,d=ammo,entity=grenades"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "player.death_landed"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "x",
+          "y",
+          "ground_ticks"
+        ],
+        "properties": {
+          "x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "ground_ticks": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "x-encode": "a=x_q,b=y_q,c=ground_ticks"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "player.death_settled"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "delay_us",
+          "lives_before",
+          "lives_after",
+          "invulnerability_us",
+          "checkpoint_saved"
+        ],
+        "properties": {
+          "delay_us": {
+            "type": "integer",
+            "minimum": 0,
+            "x-unit": "microsecond"
+          },
+          "lives_before": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "lives_after": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "invulnerability_us": {
+            "type": "integer",
+            "minimum": 0,
+            "x-unit": "microsecond"
+          },
+          "checkpoint_saved": {
+            "type": "boolean"
+          }
+        }
+      },
+      "x-encode": "a=lives_before,b=lives_after,c=invulnerability_ticks,d=delay_ticks,entity=pack(checkpoint_saved:0)"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "game.game_over"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "points",
+          "high_score",
+          "zone",
+          "checkpoint_cleared"
+        ],
+        "properties": {
+          "points": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999999
+          },
+          "high_score": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "zone": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 124
+          },
+          "checkpoint_cleared": {
+            "type": "boolean"
+          }
+        }
+      },
+      "x-encode": "a,b=points_i32,c,d=high_score_i32,entity=pack(checkpoint_cleared:0)"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "damage.player_blocked"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "cause",
+          "invulnerability_us",
+          "test_invulnerability"
+        ],
+        "properties": {
+          "cause": {
+            "enum": [
+              "bullet",
+              "mine",
+              "piston",
+              "force_field",
+              "source_hazard",
+              "bubble",
+              "egg",
+              "missile"
+            ]
+          },
+          "invulnerability_us": {
+            "type": "integer",
+            "minimum": 0,
+            "x-unit": "microsecond"
+          },
+          "test_invulnerability": {
+            "type": "boolean"
+          }
+        }
+      },
+      "x-encode": "a,b=invulnerability_us_i32,c=pack(cause:0..5,test_invulnerability:6)"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "damage.player_hit"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "cause",
+          "x",
+          "y",
+          "flow_state_before",
+          "flow_state_after",
+          "lives"
+        ],
+        "properties": {
+          "cause": {
+            "enum": [
+              "bullet",
+              "mine",
+              "piston",
+              "force_field",
+              "source_hazard",
+              "bubble",
+              "egg",
+              "missile"
+            ]
+          },
+          "x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "flow_state_before": {
+            "enum": [
+              "title",
+              "playing",
+              "paused",
+              "playerDead",
+              "respawning",
+              "gameOver",
+              "contentComplete"
+            ]
+          },
+          "flow_state_after": {
+            "enum": [
+              "title",
+              "playing",
+              "paused",
+              "playerDead",
+              "respawning",
+              "gameOver",
+              "contentComplete"
+            ]
+          },
+          "lives": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "x-encode": "a=x_q,b=y_q,c=pack(cause:0..5,flow_before:6..8,flow_after:9..11),d=lives"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "pickup.collect"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "kind",
+          "count_before",
+          "count_after",
+          "x",
+          "y"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "grenade_pack",
+              "ammo_pack"
+            ]
+          },
+          "count_before": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "count_after": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          }
+        }
+      },
+      "x-encode": "a=x_q,b=y_q,c=count_before,d=count_after,entity=kind"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "bonus.double_launcher"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "points",
+          "completed_zone",
+          "launcher_object_id",
+          "x",
+          "y",
+          "launcher_active_after"
+        ],
+        "properties": {
+          "points": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "completed_zone": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 124
+          },
+          "launcher_object_id": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "launcher_active_after": {
+            "type": "boolean"
+          }
+        }
+      },
+      "x-encode": "a=points,b=x_q,c=y_q,d=launcher_active_after,entity=launcher_object_ordinal"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "bonus.stage_points"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "completed_zone",
+          "points",
+          "lives_before",
+          "lives_after",
+          "ammo_reset"
+        ],
+        "properties": {
+          "completed_zone": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 124
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "lives_before": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "lives_after": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "ammo_reset": {
+            "type": "boolean"
+          }
+        }
+      },
+      "x-encode": "a,b=points_i32,entity=pack(lives_before:0..3,lives_after:4..7,ammo_reset:8)"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "bonus.stage_component"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "completed_zone",
+          "component_id",
+          "points"
+        ],
+        "properties": {
+          "completed_zone": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 124
+          },
+          "component_id": {
+            "enum": [
+              "lives_x1000"
+            ]
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "x-encode": "a=points,entity=component_id"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "bonus.stage_boundary_suppressed"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "completed_zone",
+          "reason"
+        ],
+        "properties": {
+          "completed_zone": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 124
+          },
+          "reason": {
+            "enum": [
+              "already_awarded",
+              "not_stage_end"
+            ]
+          }
+        }
+      },
+      "x-encode": "entity=reason"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "score.awarded"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "points",
+          "reason",
+          "points_before",
+          "points_after",
+          "clamped"
+        ],
+        "properties": {
+          "points": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "enum": [
+              "blaster_shotdown",
+              "bubble",
+              "egg",
+              "force_field",
+              "grenade_kill",
+              "guidance",
+              "launcher",
+              "stage_boundary"
+            ]
+          },
+          "points_before": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "points_after": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999999
+          },
+          "clamped": {
+            "type": "boolean"
+          }
+        }
+      },
+      "x-encode": "a=points,b,c=points_before_i32,entity=reason"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "score.high_score_saved"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "x-encode": "a,b=value_i32"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "state.flow"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "from",
+          "to",
+          "cause"
+        ],
+        "properties": {
+          "from": {
+            "enum": [
+              "title",
+              "playing",
+              "paused",
+              "playerDead",
+              "respawning",
+              "gameOver",
+              "contentComplete"
+            ]
+          },
+          "to": {
+            "enum": [
+              "title",
+              "playing",
+              "paused",
+              "playerDead",
+              "respawning",
+              "gameOver",
+              "contentComplete"
+            ]
+          },
+          "cause": {
+            "enum": [
+              "fire_press",
+              "pause_press",
+              "resume",
+              "restart",
+              "death",
+              "respawn_timeout",
+              "zone_transition",
+              "content_complete",
+              "title_return",
+              "unspecified"
+            ]
+          }
+        }
+      },
+      "x-encode": "a=from,b=to,c=cause"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "state.zone_load"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "resource",
+          "zone",
+          "cause"
+        ],
+        "properties": {
+          "resource": {
+            "type": "string",
+            "pattern": "^L[0-9]{2}S[0-9]{2}$"
+          },
+          "zone": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 124
+          },
+          "cause": {
+            "enum": [
+              "app_launch",
+              "transition",
+              "checkpoint",
+              "restart"
+            ]
+          }
+        }
+      },
+      "x-encode": "entity=cause"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "state.zone_loaded"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "resource",
+          "zone",
+          "solid_count",
+          "spawn_x",
+          "spawn_y",
+          "ground_y",
+          "invulnerability_us",
+          "carried_y"
+        ],
+        "properties": {
+          "resource": {
+            "type": "string",
+            "pattern": "^L[0-9]{2}S[0-9]{2}$"
+          },
+          "zone": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 124
+          },
+          "solid_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "spawn_x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "spawn_y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "ground_y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "invulnerability_us": {
+            "type": "integer",
+            "minimum": 0,
+            "x-unit": "microsecond"
+          },
+          "carried_y": {
+            "type": "boolean"
+          }
+        }
+      },
+      "x-encode": "a=solid_count,b=spawn_x_q,c=spawn_y_q,d=ground_y_q,entity=pack(invulnerability_ticks:0..8,carried_y:9)"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "state.zone_exit"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "zone",
+          "trigger_x",
+          "player_x",
+          "next_level"
+        ],
+        "properties": {
+          "zone": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 124
+          },
+          "trigger_x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "player_x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "next_level": {
+            "type": "string",
+            "pattern": "^(|L[0-9]{2}S[0-9]{2})$"
+          }
+        }
+      },
+      "x-encode": "a=trigger_x_q,b=player_x_q,entity=has_next_level"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "state.zone_transition"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "from_zone",
+          "to_zone",
+          "accumulator_us",
+          "pending_steps"
+        ],
+        "properties": {
+          "from_zone": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 124
+          },
+          "to_zone": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 124
+          },
+          "accumulator_us": {
+            "type": "integer",
+            "minimum": 0,
+            "x-unit": "microsecond"
+          },
+          "pending_steps": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "x-encode": "a,b=accumulator_us_i32,c=pending_steps,entity=to_zone"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "state.content_complete"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "zone",
+          "next_level",
+          "points",
+          "final"
+        ],
+        "properties": {
+          "zone": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 124
+          },
+          "next_level": {
+            "type": "string",
+            "pattern": "^(|L[0-9]{2}S[0-9]{2})$"
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "final": {
+            "type": "boolean"
+          }
+        }
+      },
+      "x-encode": "a,b=points_i32,entity=pack(final:0,has_next_level:1)"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "state.title_enter"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "high_score",
+          "has_saved_checkpoint"
+        ],
+        "properties": {
+          "high_score": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "has_saved_checkpoint": {
+            "type": "boolean"
+          }
+        }
+      },
+      "x-encode": "a,b=high_score_i32,entity=pack(has_saved_checkpoint:0)"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "state.checkpoint_saved"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "resource",
+          "ammo",
+          "grenades",
+          "points",
+          "lives"
+        ],
+        "properties": {
+          "resource": {
+            "type": "string",
+            "pattern": "^L[0-9]{2}S[0-9]{2}$"
+          },
+          "ammo": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "grenades": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "lives": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "x-encode": "b,c=points_i32,entity=pack(ammo:0..6,grenades:7..11,lives:12..15)"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "state.checkpoint_cleared"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "enum": [
+              "new_game",
+              "game_over",
+              "launch"
+            ]
+          }
+        }
+      },
+      "x-encode": "entity=reason"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "state.pause_enter"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "state_before",
+          "selected_index"
+        ],
+        "properties": {
+          "state_before": {
+            "enum": [
+              "title",
+              "playing",
+              "paused",
+              "playerDead",
+              "respawning",
+              "gameOver",
+              "contentComplete"
+            ]
+          },
+          "selected_index": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "x-encode": "a=state_before,b=selected_index"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "state.pause_exit"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "state_before",
+          "selected_index"
+        ],
+        "properties": {
+          "state_before": {
+            "enum": [
+              "title",
+              "playing",
+              "paused",
+              "playerDead",
+              "respawning",
+              "gameOver",
+              "contentComplete"
+            ]
+          },
+          "selected_index": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "x-encode": "a=state_before,b=selected_index"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "state.restart"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "from_zone",
+          "points"
+        ],
+        "properties": {
+          "from_zone": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 124
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "x-encode": "a,b=points_i32"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "state.cheat_invulnerability"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "enabled",
+          "menu_index"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "menu_index": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "x-encode": "a=enabled,b=menu_index"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "tick.frame_gap_clamped"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "raw_frame_time_us",
+          "clamp_us",
+          "lost_us"
+        ],
+        "properties": {
+          "raw_frame_time_us": {
+            "type": "integer",
+            "minimum": 0,
+            "x-unit": "microsecond"
+          },
+          "clamp_us": {
+            "type": "integer",
+            "enum": [
+              250000
+            ]
+          },
+          "lost_us": {
+            "type": "integer",
+            "minimum": 0,
+            "x-unit": "microsecond"
+          }
+        }
+      },
+      "x-encode": "a,b=raw_frame_time_us_i32"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "tick.accumulator_reset"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "reason",
+          "discarded_us",
+          "discarded_steps"
+        ],
+        "properties": {
+          "reason": {
+            "enum": [
+              "zone_transition",
+              "new_game",
+              "paused_exit",
+              "explicit"
+            ]
+          },
+          "discarded_us": {
+            "type": "integer",
+            "minimum": 0,
+            "x-unit": "microsecond"
+          },
+          "discarded_steps": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "x-encode": "a,b=discarded_us_i32,c=discarded_steps,entity=reason"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "tick.slow_step"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "step_us",
+          "budget_us",
+          "steps_this_frame"
+        ],
+        "properties": {
+          "step_us": {
+            "type": "integer",
+            "minimum": 0,
+            "x-unit": "microsecond"
+          },
+          "budget_us": {
+            "type": "integer",
+            "enum": [
+              16667
+            ]
+          },
+          "steps_this_frame": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "x-encode": "a,b=step_us_i32,c=steps_this_frame"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "tick.heartbeat"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "uptime_us",
+          "events",
+          "drops",
+          "zone",
+          "flow_state"
+        ],
+        "properties": {
+          "uptime_us": {
+            "type": "integer",
+            "minimum": 0,
+            "x-unit": "microsecond"
+          },
+          "events": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "drops": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "zone": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 124
+          },
+          "flow_state": {
+            "enum": [
+              "title",
+              "playing",
+              "paused",
+              "playerDead",
+              "respawning",
+              "gameOver",
+              "contentComplete"
+            ]
+          }
+        }
+      },
+      "x-encode": "a,b=events_i32,c,d=drops_i32,entity=flow_code"
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "entity.launcher_fire"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "required": [
+          "object_id",
+          "kind",
+          "x",
+          "y",
+          "muzzle_y"
+        ],
+        "properties": {
+          "object_id": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "kind": {
+            "enum": [
+              "double_launcher"
+            ]
+          },
+          "x": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          },
+          "muzzle_y": {
+            "type": "integer",
+            "x-unit": "quarter-pixel"
+          }
+        }
+      },
+      "x-encode": "a=x_q,b=y_q,c=muzzle_y_q,entity=launcher_object_ordinal"
+    }
+  ]
+}

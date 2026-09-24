@@ -1,0 +1,168 @@
+ARTIFACTS=/tmp/exolon-harness-2rh30s7m/artifacts
+
+== 1. стаб модуля CoreGraphics (1-строка + CGVector; логики нет) ==
+shim built: /tmp/exolon-harness-2rh30s7m/artifacts/libCoreGraphics.so
+
+== 2. сборка контура (-O, как в измерениях M1..M11) ==
+built: /tmp/exolon-harness-2rh30s7m/artifacts/harness (9 файлов продукта, без единой правки)
+
+== 3. прогоны: обычный + два варианта с откатанным фиксом ==
+--- fixed (EXOLON_REVERT=none) -> /tmp/exolon-harness-2rh30s7m/artifacts/fixed
+== scenario level2 ==
+== scenario p1_9 ==
+p1_9: revert=false steps=3 ticks=3 zone=1
+== scenario p1_4 ==
+p1_4: teleportTick=5 bufferedJumps=0
+== scenario p1_4_control ==
+== scenario p1_8 ==
+p1_8: revert=false awards=1 suppressed=748 points=9000
+== scenario p1_6 ==
+== scenario drops ==
+== scenario rotation ==
+== scenario lane_round_trip ==
+== scenario async_writer ==
+== scenario contract ==
+== scenario cost ==
+COST hot-path=64.3 ns/event (0.0232 % of a tick at 60 ev/step); formatting=1122.5 ns; drain=301733 ev/s
+== scenario contract_dump ==
+HARNESS OK scenarios=13 revert=none
+--- revert-p1-9 (EXOLON_REVERT=p1_9) -> /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9
+== scenario level2 ==
+== scenario p1_9 ==
+p1_9: revert=true steps=17 ticks=17 zone=1
+== scenario p1_4 ==
+p1_4: teleportTick=5 bufferedJumps=0
+== scenario p1_4_control ==
+== scenario p1_8 ==
+p1_8: revert=false awards=1 suppressed=748 points=9000
+== scenario p1_6 ==
+== scenario drops ==
+== scenario rotation ==
+== scenario lane_round_trip ==
+== scenario async_writer ==
+== scenario contract ==
+== scenario cost ==
+COST hot-path=64.5 ns/event (0.0232 % of a tick at 60 ev/step); formatting=1135.0 ns; drain=301339 ev/s
+== scenario contract_dump ==
+HARNESS OK scenarios=13 revert=p1_9
+--- revert-p1-8 (EXOLON_REVERT=p1_8) -> /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8
+== scenario level2 ==
+== scenario p1_9 ==
+p1_9: revert=false steps=3 ticks=3 zone=1
+== scenario p1_4 ==
+p1_4: teleportTick=5 bufferedJumps=0
+== scenario p1_4_control ==
+== scenario p1_8 ==
+p1_8: revert=true awards=749 suppressed=0 points=999999
+== scenario p1_6 ==
+== scenario drops ==
+== scenario rotation ==
+== scenario lane_round_trip ==
+== scenario async_writer ==
+== scenario contract ==
+== scenario cost ==
+COST hot-path=64.1 ns/event (0.0231 % of a tick at 60 ev/step); formatting=1112.6 ns; drain=304878 ev/s
+== scenario contract_dump ==
+HARNESS OK scenarios=13 revert=p1_8
+
+== 4. негативный контроль: без стаба сборка обязана упасть ==
+OK: без стаба не собирается (/home/pall/projects/exolon/Exolon/GameCore/GameConstants.swift:1:8: error: no such module )
+
+== 5. артефакты ==
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/async-d75cb90eb50b60a9-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/contract-52cd56db13681780-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/contract.txt
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/drops-00528227144eba19-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/lane-roundtrip-ea847592677ae465-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/level0-5be3a53725897a2f-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/manifest.json
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/p1-4-1871730b236f0610-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/p1-4-negative-control-d5bd772cdf685cf4-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/p1-6-baseline-control-69eabe1970ad78da-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/p1-6-fixed-f6fc185398ad5465-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/p1-8-fixed-078f390bc2e6fe2d-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/p1-8-fixed-078f390bc2e6fe2d-1.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/p1-9-fixed-97c1c9565773db01-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/rotation-04043bad75791b77-123.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/rotation-04043bad75791b77-124.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/rotation-04043bad75791b77-125.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/fixed/session-level2-0b63fa1d1448c15e-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/async-e165b1eabd8a153d-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/contract-6cc65ec71be7cc24-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/contract.txt
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/drops-195b7a031ccd70bd-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/lane-roundtrip-f49d6d7e5ffa9909-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/level0-65fc9d131e093fc3-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/manifest.json
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/p1-4-228a7bf72befcba4-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/p1-4-negative-control-efc66f09d8e81198-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/p1-6-baseline-control-73f3b6f5782d2e7e-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/p1-6-fixed-0005004f802c0a09-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/p1-8-reverted-29a8682c250a6568-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/p1-8-reverted-29a8682c250a6568-1.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/p1-9-fixed-a1dab1325ff280a5-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/rotation-1e0d34896de9c11b-123.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/rotation-1e0d34896de9c11b-124.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/rotation-1e0d34896de9c11b-125.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/session-level2-157ce2f91cc887f2-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/async-2753e47cd0786828-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/contract-92b481492ee51f1f-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/contract.txt
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/drops-5f49be862fbbb3a7-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/lane-roundtrip-3a7ba1f172e8ecf3-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/level0-abdad1a5310772bd-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/manifest.json
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/p1-4-6878ae7a3eed0e9e-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/p1-4-negative-control-15a4a29bebd65482-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/p1-6-baseline-control-b9e1f9778b2b7069-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/p1-6-fixed-46f343c1a32b5df3-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/p1-8-fixed-57766469dd5406bc-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/p1-8-fixed-57766469dd5406bc-1.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/p1-9-reverted-25f68896d6d26306-0.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/rotation-54fb671b80e71305-123.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/rotation-54fb671b80e71305-124.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/rotation-54fb671b80e71305-125.jsonl
+  /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/session-level2-5b5a267c30b6caec-0.jsonl
+OK: контур зелёный; артефакты в /tmp/exolon-harness-2rh30s7m/artifacts (вне клона)
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/fixed/session-level2-0b63fa1d1448c15e-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/fixed/p1-9-fixed-97c1c9565773db01-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/fixed/p1-4-1871730b236f0610-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/fixed/p1-4-negative-control-d5bd772cdf685cf4-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/fixed/p1-8-fixed-078f390bc2e6fe2d-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/fixed/p1-6-fixed-f6fc185398ad5465-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/fixed/p1-6-baseline-control-69eabe1970ad78da-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/fixed/drops-00528227144eba19-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/fixed/rotation-04043bad75791b77-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/fixed/lane-roundtrip-ea847592677ae465-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/fixed/async-d75cb90eb50b60a9-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/fixed/contract-52cd56db13681780-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/fixed/level0-5be3a53725897a2f-0.jsonl
+exolon: gameplay event log: discard://0
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/session-level2-5b5a267c30b6caec-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/p1-9-reverted-25f68896d6d26306-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/p1-4-6878ae7a3eed0e9e-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/p1-4-negative-control-15a4a29bebd65482-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/p1-8-fixed-57766469dd5406bc-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/p1-6-fixed-46f343c1a32b5df3-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/p1-6-baseline-control-b9e1f9778b2b7069-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/drops-5f49be862fbbb3a7-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/rotation-54fb671b80e71305-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/lane-roundtrip-3a7ba1f172e8ecf3-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/async-2753e47cd0786828-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/contract-92b481492ee51f1f-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-9/level0-abdad1a5310772bd-0.jsonl
+exolon: gameplay event log: discard://0
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/session-level2-157ce2f91cc887f2-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/p1-9-fixed-a1dab1325ff280a5-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/p1-4-228a7bf72befcba4-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/p1-4-negative-control-efc66f09d8e81198-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/p1-8-reverted-29a8682c250a6568-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/p1-6-fixed-0005004f802c0a09-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/p1-6-baseline-control-73f3b6f5782d2e7e-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/drops-195b7a031ccd70bd-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/rotation-1e0d34896de9c11b-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/lane-roundtrip-f49d6d7e5ffa9909-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/async-e165b1eabd8a153d-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/contract-6cc65ec71be7cc24-0.jsonl
+exolon: gameplay event log: /tmp/exolon-harness-2rh30s7m/artifacts/revert-p1-8/level0-65fc9d131e093fc3-0.jsonl
+exolon: gameplay event log: discard://0

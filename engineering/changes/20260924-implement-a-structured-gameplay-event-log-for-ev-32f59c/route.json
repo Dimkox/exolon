@@ -1,0 +1,72 @@
+{
+  "allowed_agents": [
+    "repo_explorer",
+    "architect",
+    "docs_researcher",
+    "integration_architect",
+    "code_reviewer",
+    "test_reviewer",
+    "integration_implementer"
+  ],
+  "analysis_agents": [
+    "repo_explorer",
+    "architect",
+    "docs_researcher",
+    "integration_architect"
+  ],
+  "base_commit": "295690b7fc724e57b37b5fac86b71c1da7d8b032",
+  "base_fingerprint": "c2f0ebf799a2a474000b20e124b39de5169456b9ce46608221b7ef309b493b62",
+  "complexity": "standard",
+  "created_at": "2026-09-24T19:09:55+00:00",
+  "delivery_expected": true,
+  "domains": [
+    "event"
+  ],
+  "human_gates": [],
+  "intent": "bugfix",
+  "primary_skill": "adaptive-delivery",
+  "quality_profiles": [
+    "base",
+    "contracts"
+  ],
+  "rationale": [
+    "medium-risk integration, contract, data, AI, or modernization work",
+    "intent=bugfix",
+    "domains=event",
+    "repository=generic",
+    "write-owner=integration_implementer",
+    "analysis-wave=4/10"
+  ],
+  "repo": {
+    "bitrix_modules": [],
+    "domains": [],
+    "kind": "generic",
+    "languages": [],
+    "package_scripts": [],
+    "signals": []
+  },
+  "required_evidence": [
+    "verification",
+    "code_review",
+    "test_review"
+  ],
+  "review_agents": [
+    "code_reviewer",
+    "test_reviewer"
+  ],
+  "risk": "medium",
+  "route_id": "32f59cc7dcb6",
+  "schema_version": 1,
+  "session_id": "manual",
+  "status": "routed",
+  "task": "Implement a structured gameplay event log for every player action and game event in the Exolon Swift/SpriteKit game, and fix the wave-A fixed-tick/input/terminal state-machine audit findings it exposes: P1-9 (fixed-tick accumulator not reset on zone transition), P1-4 (jump latch fires after teleport while UP held), P1-8 (stage bonus re-triggers on final zone enabling score farm), P1-6 (double launcher permanently disabled after bonus collect). Regression tests per finding; logging must be cheap, structured, and testable.",
+  "task_domains": [
+    "event"
+  ],
+  "workflow_skills": [
+    "adaptive-delivery",
+    "bugfix-workflow",
+    "api-event-change"
+  ],
+  "write_agent": "integration_implementer"
+}
