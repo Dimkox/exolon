@@ -32,3 +32,16 @@ not a rehearsal fixture.
 ## 2026-09-24: The ring is the backlog, the wire is JSON-lines, and the file lives outside the clone
 
 Wave A's gameplay event log measured three shapes before committing to one: a single-slot batch handoff from producer to writer silently lost 250 of 26 873 events (99.1 %) with no crash, a `DispatchSourceTimer` whose handler called the `queue.sync` wrapper deadlocked dispatch outright, and `beginTick` pre-incrementing made the first tick 2 - so the shipped core appends one 24-byte record into a 65 536-slot ring under `NSLock` (measured 55-68 ns/event = 0.020-0.025 % of a 16.67 ms step at the worst credible 60 events/tick), the ring itself is the file backlog with a consumer cursor and a counted drop, and the drain (measured ~296 000 events/s formatting to JSON-lines) never runs through the sync wrapper. Formatting stays on the drain thread and the wire is JSON-lines rather than the compact positional format the measurements would have preferred, because three consumers (`json.loads`, `tail -f`, the in-game F1 tail) must read one self-describing record with no bespoke parser - which costs ~1.1 µs/event off the frame path and buys an enforceable contract file. The directory is `$TMPDIR/exolon/` rather than `~/Library/Caches` because this route's fingerprint-bound receipts count any untracked file inside the clone as a tree change, so a log written under the working tree silently invalidates its own evidence.
+
+## 2026-09-24: A probe extension is guarded by diffing its own emitted keys against git HEAD
+
+`engineering/runbooks/macos-probe.sh` gained Track A archive inspection, a Track-B gate, a flush
+barrier and out-of-tree build roots without losing a single consumer: `macos_handout_check.py`
+extracts the emit-keys of `git show HEAD:<probe>` and requires every one of them to still be
+emitted (46 before, 126 after, zero lost), because measurement M-7 proved that renaming one
+detector token (`EXOLON_FORBIDDEN_ARGV`) reddens exactly one AC of the merged verifier - a guard
+string is product surface, not prose. The same rule applies to the tool's own assertions: a shell
+probe must pass operator-shaped patterns to `grep -e` (a pattern starting with `-` is parsed as an
+option), a checker that asserts on the environment must compare against its own baseline (the agent
+host exports `*_TOKEN` names), and a control that "mutates" a shipped file must mutate a string in
+memory, never the file.

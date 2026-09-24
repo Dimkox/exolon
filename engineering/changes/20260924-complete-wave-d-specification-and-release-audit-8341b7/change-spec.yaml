@@ -1,0 +1,136 @@
+{
+  "acceptance_criteria": [
+    {
+      "id": "AC-001",
+      "statement": "macos-probe.sh Track A extension: mandatory archive step plus .xcarchive content inspection (archived Info.plist versions, codesign -vv on the archived binary, entitlements read), 5-valued verdicts emitted only as machine-parsable key=value, exit contract extended with 77 refused / 78 misconfiguration, Darwin guard preserved, and the unmodified merged release_layer_check.py subprocess still returns its pre-change rc on the D-2 tree.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/macos_handout_check.py::probe_contract_green"}
+      ]
+    },
+    {
+      "id": "AC-002",
+      "statement": "M-8 tee-flush race closed: report_flush_verified line-count barrier makes an incomplete --out file impossible behind rc=0, validated by a local bash simulation loop; M-9 build roots contract: probe forces SYMROOT/OBJROOT outside the clone so no run can stale fingerprint receipts.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/macos_handout_check.py::flush_barrier"},
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/macos_handout_check.py::build_roots_out_of_tree"}
+      ]
+    },
+    {
+      "id": "AC-003",
+      "statement": "Handout contract exolon.macos-probe-report/1: schema file committed; each of the 10 consistency rules has a contradictory synthetic fixture that reddens the checker; binding fields (repo_head, tree_fingerprint, probe git-blob sha1, artifact sha256/CDHash, notary uuid) make stale evidence report STALE and never green; absence of a run yields MACOS_EVIDENCE=ABSENT (unverified) rc=1 distinct from FAIL.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/macos_handout_check.py::handout_controls_flip"},
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/macos_handout_check.py::absent_is_unverified"}
+      ]
+    },
+    {
+      "id": "AC-004",
+      "statement": "Agent/human boundary is structural: Track B executes only with WITH_SIGNING=1 AND EXOLON_HUMAN_SIGNING_RUN=1 AND interactive tty confirmation, refuses off-tty with exit 77; forbidden argv/env scan aborts (never redacts) before any exec; no code path accepts or stores credentials; identity material enters handouts only as hashes.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/macos_handout_check.py::agent_boundary"}
+      ]
+    },
+    {
+      "id": "AC-005",
+      "statement": "Stage-end sequence (after wave-A merge) is data-driven in StageBoundaryLedger and identity-holds per boundary: points == lives*1000 + bravery_component + timed_component with bravery_component in {0,10000}, timed_component in {0,1000,3000,5000,7000}; award computed before +1 life; +1 life bounded by explicit maxLives=9; exoskeleton cleared at the boundary; refill uses shared 99/10 constants (also replacing the duplicated literals in updatePickups); clamp case satisfies applied == min(earned, 999_999 - points_before).",
+      "evidence": [
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/stage_boundary_check.py::sequence_components_identity"},
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/stage_boundary_check.py::lives_and_refill_semantics"}
+      ]
+    },
+    {
+      "id": "AC-006",
+      "statement": "Bravery predicate implemented as the owner-ruled activation latch (exoskeleton activated at any point within the stage forfeits bravery at its boundary, OM:142 reading, OM:118 falsified by a distinguishable test); timed bonus is the owner-approved deterministic tick ladder phase = min(4,(tick - stageStartTick)/1800) over [7000,5000,3000,1000,0], PHASE_TICKS a named constant carrying the deviation comment; auditor recomputes the phase from relative ts_us/tick deltas.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/stage_boundary_check.py::bravery_latch_distinguishes"},
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/stage_boundary_check.py::timed_ladder_deterministic"}
+      ]
+    },
+    {
+      "id": "AC-007",
+      "statement": "Bounded debug warp per owner ruling: EXOLON_DEBUG_WARP=LxxSyy reaches the zone through the real transition(to:) path (exercising wave-A accumulator reset), emits stderr echo and a log event once the sink exists, is compiled out under Release (DEBUG-gated) and inert when the flag is unset.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/stage_boundary_check.py::warp_debug_only"}
+      ]
+    }
+  ],
+  "approvals": {
+    "required_scopes": [
+      "design_approval_granted",
+      "timed_tick_ladder_granted",
+      "debug_warp_bounded_granted",
+      "track_b_human_only"
+    ]
+  },
+  "change_id": "20260924-complete-wave-d-specification-and-release-audit-8341b7",
+  "contracts": {
+    "events": [],
+    "json_schema": [
+      "engineering/contracts/schemas/macos-probe-report-v1.schema.json"
+    ],
+    "openapi": []
+  },
+  "forbidden_outcomes": [
+    {
+      "id": "FORBID-001",
+      "statement": "No claim that Track B (real Developer ID signing / notarization Accepted) is closed by this PR; handouts must express NOT_ATTEMPTED where credentials are absent.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/macos_handout_check.py::no_track_b_claim"}
+      ]
+    },
+    {
+      "id": "FORBID-002",
+      "statement": "Merged historical evidence (engineering/changes/20260921-*) is immutable; expected post-D-1 reds of the merged checker are exactly the MEASURED set {hardened_runtime_key_count} — hardened_deferral_recorded cannot flip without editing dated plan text (forbidden) and is therefore declared non-red; the checker enforces observed subset-of-declared, non-emptiness and liveness of each member; any other cutover red is a regression.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/macos_handout_check.py::cutover_set_exact"}
+      ]
+    },
+    {
+      "id": "FORBID-003",
+      "statement": "No approximate canonical claim: the timed tick ladder must never be documented or asserted as the original interactive cursor mechanic; the deviation comment is mandatory.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/stage_boundary_check.py::ladder_is_declared_deviation"}
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "id": "INV-001",
+      "statement": "All score changes from the stage sequence flow through the single awardPoints funnel; the ledger decides, GameScene applies.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/stage_boundary_check.py::single_funnel"}
+      ]
+    },
+    {
+      "id": "INV-002",
+      "statement": "Probe verdicts are key=value only and every step carries rc semantics plus a flipping control; free-text verdict lines are rejected by the checker.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/macos_handout_check.py::verdicts_machine_readable"}
+      ]
+    }
+  ],
+  "objective": {
+    "id": "OBJ-001",
+    "statement": "P1-10 is closed as the full owner-ruled stage-end sequence in the wave-A ledger, and P1-11's remaining scope becomes a machine-checkable Track A probe contract plus a falsifiable clean-machine handout protocol, with Track B structurally reserved to the human owner.",
+    "success_metric": "macos_handout_check.py and stage_boundary_check.py green with every control flipping; merged checker rc invariance then exact cutover set after D-1",
+    "target": "all AC-001..AC-007 green on the final D-1 tree"
+  },
+  "observability": [
+    {
+      "id": "SIG-001",
+      "metric": "handout run receipts bind repo_head+tree_fingerprint+probe blob sha1+artifact sha256, recorded after the commit that carries them (fingerprint order)",
+      "proves": ["OBJ-001"]
+    }
+  ],
+  "risk": {
+    "domains": [
+      "api"
+    ],
+    "tier": "red"
+  },
+  "rollback": {
+    "maximum_steps": 1,
+    "strategy": "forward_fix"
+  },
+  "schema_version": 2
+}
