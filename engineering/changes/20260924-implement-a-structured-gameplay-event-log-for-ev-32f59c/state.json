@@ -1,0 +1,29 @@
+{
+  "change_id": "20260924-implement-a-structured-gameplay-event-log-for-ev-32f59c",
+  "created_at": "2026-09-24T19:10:39+00:00",
+  "history": [
+    {
+      "at": "2026-09-24T19:10:39+00:00",
+      "from": null,
+      "reason": "created",
+      "to": "draft"
+    },
+    {
+      "at": "2026-09-24T19:38:45+00:00",
+      "from": "draft",
+      "reason": "scope, acceptance criteria (AC-001..007), design rulings and spec-gap decisions recorded; analysis wave 4/4 in evidence/",
+      "to": "scoped"
+    },
+    {
+      "at": "2026-09-24T19:38:45+00:00",
+      "from": "scoped",
+      "reason": "route human_gates is empty (medium bugfix); controller rulings close all spec gaps",
+      "to": "approved"
+    }
+  ],
+  "route_id": "32f59cc7dcb6",
+  "schema_version": 1,
+  "status": "approved",
+  "title": "Implement a structured gameplay event log for every player action and game event in the Exolon Swift/SpriteKit game, and fix the wave-A fixed-tick/input/terminal state-machine audit findings it exposes: P1-9 (fixed-tick accumulator not reset on zone transition), P1-4 (jump latch fires after teleport while UP held), P1-8 (stage bonus re-triggers on final zone enabling score farm), P1-6 (double launcher permanently disabled after bonus collect). Regression tests per finding; logging must be cheap, structured, and testable.",
+  "updated_at": "2026-09-24T19:38:45+00:00"
+}

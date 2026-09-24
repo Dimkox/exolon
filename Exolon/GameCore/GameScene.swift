@@ -23,6 +23,45 @@ final class GameScene: SKScene {
 
     private let persistence = GamePersistence.shared
 
+    /// Gameplay event sink. Injected by the composition root (`AppDelegate`); the default
+    /// `NullGameplayEventSink` keeps every construction path that does not inject behave exactly
+    /// as before this change (architect ruling D3).
+    var events: any GameplayEventSink = NullGameplayEventSink.shared {
+        didSet {
+            currentLevel?.events = events
+            player.events = events
+            // The driver owns tick/frame/heartbeat numbering; binding it here (rather than
+            // snapshotting at init) is what keeps `tick` from sticking at 0 in a non-empty file.
+            tickDriver.useSink(events)
+        }
+    }
+
+    /// Fixed-step accumulator loop, P1-9 (extracted so the Linux gate runs the real arithmetic).
+    /// Created eagerly and bound through `events.didSet`, never lazily against a stale sink.
+    private let tickDriver = FixedTickDriver()
+
+    /// P1-8: one stage-boundary award per completed zone per playthrough, with a visible witness
+    /// for every suppressed repeat.
+    private let stageBoundaries = StageBoundaryLedger()
+
+    /// Per-tick input snapshot, diffed to emit `input.action_edge` from inside the loop.
+    private var previousTickInput: InputSnapshot?
+    /// Held duration per action in fixed steps, indexed by `GameplayWire.code(action)`. The array
+    /// is allocated once; updating it never allocates, which keeps the tick path cheap.
+    private var heldStepsByAction = [Int32](repeating: 0, count: 10)
+    private static let trackedActions: [GameAction] = GameAction.allCases
+    private static let actionProjections: [(InputSnapshot) -> Bool] = [
+        { $0.moveLeft }, { $0.moveRight }, { $0.jump }, { $0.crouch }, { $0.fire },
+        { $0.grenade }, { $0.pause }, { $0.menuUp }, { $0.menuDown }, { $0.debugHitboxes }
+    ]
+
+    /// Cause carried to the `flowState` observer, which is the single emission site for
+    /// `state.flow` (integration section 11-2: one edit, cannot drift from the 11 assignment sites).
+    private var pendingFlowCause: GameplayFlowCause = .unspecified
+    /// Reused F1 hitbox-window node (task 10): never rebuilt per frame.
+    private var eventTailLabel: SKLabelNode?
+    private var renderedFramesSinceTailUpdate = 0
+
     private var bullets: [BlasterBullet] = []
     private var grenades: [Grenade] = []
     private var enemyBullets: [EnemyTurretBullet] = []
@@ -35,7 +74,14 @@ final class GameScene: SKScene {
     private var sceneJumpWasPressed = false
     private var debugWasPressed = false
     private var showHitboxes = false
-    private var flowState: GameFlowState = .title
+    private var flowState: GameFlowState = .title {
+        didSet {
+            guard flowState != oldValue else { return }
+            let cause = pendingFlowCause
+            pendingFlowCause = .unspecified
+            emitFlow(from: oldValue, to: flowState, cause: cause)
+        }
+    }
     private var stateBeforePause: GameFlowState = .playing
     private var pauseConfirmWasPressed = false
     private var pauseMenuUpWasPressed = false
@@ -47,8 +93,8 @@ final class GameScene: SKScene {
     private var deathGroundTimer: TimeInterval = 0
     private var hasSavedCheckpoint = false
 
-    private var previousUpdateTime: TimeInterval = 0
-    private var accumulator: TimeInterval = 0
+    // P1-9 note: the frame-time reference and the accumulator used to live here and were never
+    // reset on a zone swap. They are `FixedTickDriver` state now.
 
     private let includedLevels: Set<String> = Set((1...5).flatMap { stage in (1...25).map { String(format: "L%02dS%02d", stage, $0) } })
 
@@ -56,10 +102,15 @@ final class GameScene: SKScene {
         backgroundColor = .black
         anchorPoint = CGPoint(x: 0, y: 0)
 
+        player.events = events
         loadPersistentState()
+        emitCheckpointCleared(reason: .launch)
+        emitZoneLoad(cause: .appLaunch)
         currentLevel = TMXLevelRuntime(resource: currentLevelName)
+        currentLevel.events = events
         addChild(currentLevel.rootNode)
         player.configure(spawnCenter: currentLevel.spawnCenter, groundY: currentLevel.groundY)
+        emitZoneLoaded(carriedY: false)
         syncPlayerNodePosition()
         addChild(playerNode)
         addChild(hud)
@@ -96,6 +147,19 @@ final class GameScene: SKScene {
         debugOverlay.zPosition = 500
         addChild(debugOverlay)
 
+        // One reused label for the log tail (architect section 5.3): never a node per event, and
+        // never rebuilt - only its text changes, at most every 10th rendered frame.
+        let tail = SKLabelNode(fontNamed: "Menlo")
+        tail.fontSize = 5
+        tail.lineSpacing = 1
+        tail.horizontalAlignmentMode = .left
+        tail.verticalAlignmentMode = .top
+        tail.position = CGPoint(x: 8, y: 364)
+        tail.zPosition = 120
+        tail.isHidden = true
+        addChild(tail)
+        eventTailLabel = tail
+
         buildPauseOverlay()
         addChild(pauseOverlay)
         buildTitleOverlay()
@@ -116,23 +180,20 @@ final class GameScene: SKScene {
         gameState.zone = zoneNumber(for: currentLevelName)
         hud.update(state: gameState)
         updateTitleOverlayText()
+        emitTitleEnter()
         setGameplayNodesPaused(true)
         updateDebugText()
     }
 
     override func update(_ currentTime: TimeInterval) {
-        if previousUpdateTime == 0 {
-            previousUpdateTime = currentTime
-            return
-        }
+        // P1-9: the clamp, the accumulator, the 15-step budget and the catch-up loop now live in
+        // `FixedTickDriver`, which is SpriteKit-free and therefore regression-testable on Linux.
+        // The first call only records the reference time, so `frame` 0 carries no simulated step.
+        guard tickDriver.beginFrame(currentTime: currentTime) else { return }
+        events.beginFrame()
 
-        let frameTime = min(currentTime - previousUpdateTime, GameConstants.maximumFrameTime)
-        previousUpdateTime = currentTime
-        accumulator += frameTime
-
-        while accumulator >= GameConstants.fixedTimeStep {
+        while tickDriver.beginStep(zone: gameState.zone) {
             fixedUpdate(dt: GameConstants.fixedTimeStep)
-            accumulator -= GameConstants.fixedTimeStep
         }
 
         syncPlayerNodePosition()
@@ -147,8 +208,15 @@ final class GameScene: SKScene {
 
     private func fixedUpdate(dt: TimeInterval) {
         let rawInput = inputState.snapshot()
+        // Edges come from the per-tick snapshot diff, never from `InputState.set`: a press that
+        // opens and closes between two steps would otherwise be stamped with the wrong tick
+        // (integration section 9).
+        emitInputEdges(current: rawInput)
 
         if inputState.consumePausePress() {
+            // Only the consumption itself is a fact worth a record; polling `false` every step
+            // would be a per-frame heartbeat by another name.
+            events.emitPausePressConsumed()
             if flowState == .playing || flowState == .respawning {
                 enterPause(currentInput: rawInput)
             } else if flowState == .paused {
@@ -185,6 +253,8 @@ final class GameScene: SKScene {
                 } else {
                     testInvulnerabilityEnabled.toggle()
                     testModeLabel.isHidden = !testInvulnerabilityEnabled
+                    events.emitCheatInvulnerability(enabled: testInvulnerabilityEnabled,
+                                                   menuIndex: pauseSelectedIndex)
                     updatePauseMenuText()
                 }
             }
@@ -212,8 +282,10 @@ final class GameScene: SKScene {
 
         if invulnerability > 0 {
             invulnerability = max(0, invulnerability - dt)
-            if invulnerability == 0, flowState == .respawning {
-                flowState = .playing
+            if invulnerability == 0 {
+                if flowState == .respawning {
+                    changeFlow(to: .playing, cause: .respawnTimeout)
+                }
             }
         }
 
@@ -232,49 +304,52 @@ final class GameScene: SKScene {
 
         if jumpJustPressed, !player.isDying {
             if currentLevel.changingRooms.contains(where: { $0.intersects(player.movementHitbox) }) {
-                player.toggleExoskeleton()
+                player.toggleExoskeleton(cause: .changingRoom)
                 playerNode.update(from: player, dt: 0)
                 showBanner(player.hasExoskeleton ? "EXOSKELETON ON" : "EXOSKELETON OFF")
                 consumedUpInteraction = true
+                emitContextualConsumed(kind: .changingRoom, jumpSuppressed: rawInput.jump)
             } else if let destination = currentLevel.teleportDestination(for: player.movementHitbox) {
                 let departure = player.position
-                player.teleport(to: destination)
+                // `jump_latch_held` is the physically-held UP at the consume: the precondition
+                // P1-4 needs. `Player.teleport` then arms the latch, which is what
+                // `input.contextual_consumed.jump_suppressed` reports as suppressed.
+                let upHeldThroughTeleport = rawInput.jump
+                player.teleport(to: destination.center)
+                events.emitTeleport(from: departure, to: destination.center,
+                                    portalIndex: destination.portalIndex, jumpLatchHeld: upHeldThroughTeleport)
                 createTeleportFlash(at: departure)
-                createTeleportFlash(at: destination)
+                createTeleportFlash(at: destination.center)
                 consumedUpInteraction = true
+                emitContextualConsumed(kind: .teleport, jumpSuppressed: upHeldThroughTeleport)
             }
         }
 
         // UP is contextual in the original game. When a changing room or
         // teleport consumes it, do not also start a normal jump on the same
-        // fixed step.
+        // fixed step. P1-4: the consume now also holds the Player-side edge latch
+        // until the key is physically released, so the *next* step cannot turn the
+        // same press into a jump.
         if consumedUpInteraction {
             player.consumeContextualJumpPress()
         }
 
-        let playerInput = consumedUpInteraction ? InputSnapshot(
-            moveLeft: rawInput.moveLeft,
-            moveRight: rawInput.moveRight,
-            jump: false,
-            crouch: rawInput.crouch,
-            fire: rawInput.fire,
-            grenade: rawInput.grenade,
-            pause: rawInput.pause,
-            menuUp: rawInput.menuUp,
-            menuDown: rawInput.menuDown,
-            debugHitboxes: rawInput.debugHitboxes
-        ) : rawInput
-
+        // P1-4: the scene used to hand Player a one-step `jump: false` mask. That mask is what
+        // made the leak possible - Player re-sampled the physical state on the *next* step and
+        // turned the same press into a jump. `Player.consumeContextualJumpPress()` now holds the
+        // edge until the key is actually released, so the real snapshot goes through unchanged and
+        // the same step is still guarded (the latch was set before this call).
         let previousPosition = player.position
-        player.update(input: playerInput, dt: dt)
+        player.update(input: rawInput, dt: dt)
 
         let solids = currentLevel.solidRects
         for solid in solids where player.movementHitbox.intersects(solid) {
             player.resolveSolidCollision(previousPosition: previousPosition, solid: solid)
         }
         player.refreshGroundSupport(solids: solids)
-        player.finalizeMotionState(input: playerInput)
+        player.finalizeMotionState(input: rawInput)
         playerNode.update(from: player, dt: dt)
+        emitMotion()
 
         if player.isDying {
             fireWasPressed = rawInput.fire
@@ -296,9 +371,10 @@ final class GameScene: SKScene {
 
         updateEnemyBullets(dt: dt)
         updatePickups()
-        let launcherBonus = currentLevel.collectDoubleLauncherBonus(playerBox: player.movementHitbox)
-        if launcherBonus > 0 {
-            awardPoints(launcherBonus)
+        if let payout = currentLevel.collectDoubleLauncherBonus(playerBox: player.movementHitbox) {
+            awardPoints(payout.points, reason: .launcher)
+            events.emitDoubleLauncherBonus(points: payout.points, launcherObjectID: payout.objectID,
+                                           at: launcherOrigin(of: payout), launcherActiveAfter: payout.launcherActiveAfter)
             showBanner("+1000")
         }
         updateLethalEntities()
@@ -315,8 +391,12 @@ final class GameScene: SKScene {
             return
         }
 
+        if deathGroundTimer == 0 {
+            // First grounded step of the death slide: the record the settle delay counts from.
+            emitDeathLanded(groundTicks: 0)
+        }
         deathGroundTimer += dt
-        guard deathGroundTimer >= 70.0 / 60.0 else { return }
+        guard deathGroundTimer >= GameConstants.deathSettleDelay else { return }
         deathGroundTimer = 0
 
         gameState.lives = max(0, gameState.lives - 1)
@@ -331,32 +411,56 @@ final class GameScene: SKScene {
         gameState.grenades = GameState.startingGrenades
         player.finishDeathAndRespawn()
         invulnerability = GameConstants.postDeathProtectionDuration
-        flowState = .respawning
+        changeFlow(to: .respawning, cause: .death)
         saveCheckpoint()
+        // After the save, so `checkpoint_saved` reports what the settle actually persisted.
+        emitDeathSettled(livesBefore: gameState.lives + 1, livesAfter: gameState.lives)
     }
 
     private func updateWeapons(input: InputSnapshot) {
         // User-selected modern scheme: FIRE and GRENADE are always separate.
+        // No early `return` anywhere below: the fire/grenade latches at the end of this function
+        // must update on every step, exactly as before the log existed.
         let fireJustPressed = input.fire && !fireWasPressed
-        if fireJustPressed && gameState.ammo > 0 {
-            let origin = player.blasterOrigin()
-            let bullet = BlasterBullet(position: origin, direction: player.facing)
-            bullets.append(bullet)
-            addChild(bullet.node)
-            if player.hasExoskeleton {
-                let second = BlasterBullet(position: CGPoint(x: origin.x, y: origin.y + 12), direction: player.facing)
-                bullets.append(second)
-                addChild(second.node)
+        if fireJustPressed {
+            if gameState.ammo > 0 {
+                let ammoBefore = gameState.ammo
+                let origin = player.blasterOrigin()
+                let bullet = BlasterBullet(position: origin, direction: player.facing)
+                bullets.append(bullet)
+                addChild(bullet.node)
+                if player.hasExoskeleton {
+                    let second = BlasterBullet(position: CGPoint(x: origin.x, y: origin.y + 12), direction: player.facing)
+                    bullets.append(second)
+                    addChild(second.node)
+                }
+                gameState.ammo -= 1
+                events.emitBlasterShot(origin: origin, facing: player.facing, double: player.hasExoskeleton,
+                                       ammoBefore: ammoBefore, ammoAfter: gameState.ammo)
+            } else {
+                events.emitShootDenied(.noAmmo, ammo: gameState.ammo)
             }
-            gameState.ammo -= 1
         }
 
         let grenadeJustPressed = input.grenade && !grenadeWasPressed
-        if grenadeJustPressed && gameState.grenades > 0 && grenades.isEmpty {
-            let grenade = Grenade(position: player.grenadeOrigin(), direction: player.facing, groundY: currentLevel.groundY)
-            grenades.append(grenade)
-            addChild(grenade.node)
-            gameState.grenades -= 1
+        if grenadeJustPressed, gameState.grenades > 0 {
+            // `blocked_by` is the one-in-flight rule of the original, which the pre-change guard
+            // expressed as a single condition. Splitting it keeps the behavior and names the cause.
+            let blocked = !grenades.isEmpty
+            let grenadesBefore = gameState.grenades
+            if blocked {
+                events.emitGrenadeThrow(origin: player.grenadeOrigin(), direction: player.facing,
+                                        grenadesBefore: grenadesBefore, grenadesAfter: grenadesBefore,
+                                        blockedByOneInFlight: true)
+            } else {
+                let grenade = Grenade(position: player.grenadeOrigin(), direction: player.facing, groundY: currentLevel.groundY)
+                grenades.append(grenade)
+                addChild(grenade.node)
+                gameState.grenades -= 1
+                events.emitGrenadeThrow(origin: grenade.position, direction: player.facing,
+                                        grenadesBefore: grenadesBefore, grenadesAfter: gameState.grenades,
+                                        blockedByOneInFlight: false)
+            }
         }
 
         fireWasPressed = input.fire
@@ -376,14 +480,14 @@ final class GameScene: SKScene {
                 bullet.destroy()
                 hostile.destroy()
                 createBlasterExplosion(at: hostile.position)
-                awardPoints(hostile.pointsWhenShotDown)
+                awardPoints(hostile.pointsWhenShotDown, reason: .blasterShotdown)
                 continue
             }
 
             if let bubble = currentLevel.bubbles.first(where: { $0.isAlive && bullet.hitbox.intersects($0.hitbox) }) {
                 bullet.destroy()
                 bubble.destroy()
-                awardPoints(bubble.points)
+                awardPoints(bubble.points, reason: .bubble)
                 createCircularExplosion(at: bubble.position)
                 continue
             }
@@ -391,7 +495,7 @@ final class GameScene: SKScene {
             if let egg = currentLevel.eggs.first(where: { $0.isAlive && bullet.hitbox.intersects($0.hitbox) }) {
                 bullet.destroy()
                 egg.destroy()
-                awardPoints(egg.points)
+                awardPoints(egg.points, reason: .egg)
                 createBlasterExplosion(at: egg.position)
                 continue
             }
@@ -400,7 +504,7 @@ final class GameScene: SKScene {
                 bullet.destroy()
                 let destroyed = field.hitByBlaster()
                 createBlasterExplosion(at: bullet.position)
-                if destroyed { awardPoints(1_000) }
+                if destroyed { awardPoints(1_000, reason: .forceField) }
                 continue
             }
 
@@ -462,7 +566,7 @@ final class GameScene: SKScene {
                 for missilePosition in guidanceHit.missilePositions {
                     createCircularExplosion(at: missilePosition)
                 }
-                awardPoints(guidanceHit.points)
+                awardPoints(guidanceHit.points, reason: .guidance)
                 continue
             }
 
@@ -483,7 +587,7 @@ final class GameScene: SKScene {
         grenade.destroy()
         createCircularExplosion(at: grenade.position)
         destroy()
-        awardPoints(150)
+        awardPoints(150, reason: .grenadeKill)
         createCircularExplosion(at: center)
     }
 
@@ -509,7 +613,7 @@ final class GameScene: SKScene {
             if invulnerability <= 0 && !player.isDying && bullet.hitbox.intersects(player.damageHitbox) {
                 bullet.destroy()
                 if bullet.kind == .doubleLauncher { createBlasterExplosion(at: bullet.position) }
-                hitPlayer()
+                hitPlayer(cause: .bullet, at: bullet.position)
             }
         }
 
@@ -523,14 +627,19 @@ final class GameScene: SKScene {
         for pickup in currentLevel.grenadePacks where pickup.isActive {
             if player.movementHitbox.intersects(pickup.hitbox) {
                 pickup.collect()
+                let before = gameState.grenades
                 gameState.grenades = 10
+                emitPickup(kind: .grenadePack, countBefore: before, countAfter: gameState.grenades,
+                           at: pickup.hitbox.origin)
             }
         }
 
         for pickup in currentLevel.ammoPacks where pickup.isActive {
             if player.movementHitbox.intersects(pickup.hitbox) {
                 pickup.collect()
+                let before = gameState.ammo
                 gameState.ammo = 99
+                emitPickup(kind: .ammoPack, countBefore: before, countAfter: gameState.ammo, at: pickup.hitbox.origin)
             }
         }
     }
@@ -538,7 +647,7 @@ final class GameScene: SKScene {
     private func updateLethalEntities() {
         if let missileHit = currentLevel.consumeGuidedMissileHit(playerBox: player.damageHitbox) {
             createCircularExplosion(at: missileHit)
-            hitPlayer()
+            hitPlayer(cause: .missile, at: missileHit)
             if player.isDying { return }
         }
 
@@ -547,7 +656,7 @@ final class GameScene: SKScene {
             if mine.triggerIfPlayerEnters(playerBox: player.movementHitbox) {
                 createCircularExplosion(at: mine.center)
                 if invulnerability <= 0 && !player.isDying {
-                    hitPlayer()
+                    hitPlayer(cause: .mine, at: mine.center)
                     return
                 }
             }
@@ -560,29 +669,29 @@ final class GameScene: SKScene {
                invulnerability <= 0,
                !player.isDying,
                player.damageHitbox.intersects(box) {
-                hitPlayer()
+                hitPlayer(cause: .piston, at: CGPoint(x: box.midX, y: box.midY))
                 return
             }
         }
 
         if invulnerability <= 0, !player.isDying,
            currentLevel.forceFields.contains(where: { $0.isActive && $0.hitbox.intersects(player.damageHitbox) }) {
-            hitPlayer()
+            hitPlayer(cause: .forceField, at: player.position)
             return
         }
 
         if invulnerability <= 0, !player.isDying,
            currentLevel.sourceHazards.contains(where: { !$0.isEmpty && $0.intersects(player.damageHitbox) }) {
-            hitPlayer()
+            hitPlayer(cause: .sourceHazard, at: player.position)
             return
         }
 
         for bubble in currentLevel.bubbles where bubble.isAlive {
             if player.damageHitbox.intersects(bubble.hitbox) {
                 bubble.destroy()
-                awardPoints(bubble.points)
+                awardPoints(bubble.points, reason: .bubble)
                 createCircularExplosion(at: bubble.position)
-                hitPlayer()
+                hitPlayer(cause: .bubble, at: bubble.position)
                 return
             }
         }
@@ -590,28 +699,41 @@ final class GameScene: SKScene {
         for egg in currentLevel.eggs where egg.isAlive {
             if player.damageHitbox.intersects(egg.hitbox) {
                 egg.destroy()
-                awardPoints(egg.points)
+                awardPoints(egg.points, reason: .egg)
                 createBlasterExplosion(at: egg.position)
-                hitPlayer()
+                hitPlayer(cause: .egg, at: egg.position)
                 return
             }
         }
     }
 
-    private func hitPlayer() {
-        guard !testInvulnerabilityEnabled else { return }
-        guard !player.isDying, invulnerability <= 0 else { return }
+    /// Every lethal path funnels through here, so this is where the hit and the swallowed hit
+    /// become records (architect section 5: `hitPlayer` is a choke point).
+    private func hitPlayer(cause: GameplayDamageCause, at position: CGPoint) {
+        if testInvulnerabilityEnabled {
+            emitBlockedHit(cause: cause, testInvulnerability: true)
+            return
+        }
+        if player.isDying || invulnerability > 0 {
+            emitBlockedHit(cause: cause, testInvulnerability: false)
+            return
+        }
+        emitPlayerHit(cause: cause, at: position, stateBefore: flowState)
         player.beginDeath()
-        flowState = .playerDead
+        changeFlow(to: .playerDead, cause: .death)
+        emitDeathBegin()
         deathGroundTimer = 0
     }
 
     private func checkScreenExit() {
         guard player.position.x > 510 else { return }
         let next = currentLevel.nextLevelName
+        let playableNext = !next.isEmpty && includedLevels.contains(next)
+        events.emitZoneExit(triggerX: GameConstants.screenExitX, playerX: player.position.x,
+                            hasPlayableNextLevel: playableNext)
         applyOriginalStageBoundaryIfNeeded(completedZone: gameState.zone)
 
-        guard !next.isEmpty, includedLevels.contains(next) else {
+        guard playableNext else {
             enterContentComplete(nextLevelName: next)
             return
         }
@@ -619,24 +741,55 @@ final class GameScene: SKScene {
         transition(to: next)
     }
 
+    /// P1-8 (audit 2026-09-20, issue #12; architecture.md -> Decisions 3).
+    ///
+    /// The old body had no idempotency flag, and because `enterContentComplete` keeps the player
+    /// parked past x=510 with the checkpoint persisted, the zone-124 title loop re-awarded
+    /// `lives * 1000` on every FIRE cycle (750 awards in the 600 s probe). `StageBoundaryLedger`
+    /// now owns the once-per-playthrough rule per award component, and every suppressed repeat is
+    /// witnessed by `bonus.stage_boundary_suppressed` instead of being silent.
+    ///
+    /// The old "deliberately dormant until later steps add Zones 024/049/074/099/124" comment was
+    /// stale: all 125 zones ship since Step 9, so the guard was live and farmable.
     private func applyOriginalStageBoundaryIfNeeded(completedZone: Int) {
-        // Original Exolon awards the lives bonus at the five 25-zone stage ends.
-        // Our current content is still being extended through Step 9, so this is deliberately dormant
-        // until later steps add Zones 024/049/074/099/124.
-        guard [24, 49, 74, 99, 124].contains(completedZone) else { return }
-        awardPoints(gameState.lives * 1_000)
-        if gameState.lives < GameState.startingLives { gameState.lives += 1 }
-        gameState.ammo = GameState.startingAmmo
-        gameState.grenades = GameState.startingGrenades
+        let outcome = stageBoundaries.outcome(zone: completedZone,
+                                             lives: gameState.lives,
+                                             startingLives: GameState.startingLives,
+                                             startingAmmo: GameState.startingAmmo,
+                                             startingGrenades: GameState.startingGrenades)
+        switch outcome {
+        case .notApplicable:
+            return
+        case .suppressed(_, let reason):
+            events.emitStageBoundarySuppressed(reason)
+        case let .awarded(award):
+            awardPoints(award.points, reason: .stageBoundary)
+            if award.refillsAmmoAndGrenades {
+                gameState.lives = award.livesAfter
+                gameState.ammo = award.startingAmmo
+                gameState.grenades = award.startingGrenades
+            }
+            emitStageBoundary(award: award)
+        }
     }
 
     private func transition(to levelName: String) {
+        // P1-9 witness, recorded while the log's zone lane still names the outgoing zone.
+        emitZoneTransition(to: levelName)
+        // P1-9 fix: discard the accumulator remainder so no step of the catch-up budget can run
+        // in the new zone inside the render frame that transitioned (architecture.md -> Decisions 4).
+        // `tick`/`frame` are process-global and are deliberately not touched; neither is the
+        // driver's frame reference, because zeroing it would hand the next frame a paused-size delta.
+        tickDriver.reset(reason: .zoneTransition)
+
         clearTransientObjects()
         currentLevel.rootNode.removeFromParent()
 
         currentLevelName = levelName
         let carriedY = player.position.y
+        emitZoneLoad(cause: .transition)
         currentLevel = TMXLevelRuntime(resource: levelName)
+        currentLevel.events = events
         addChild(currentLevel.rootNode)
         gameState.zone = zoneNumber(for: levelName)
         let isStageStart = [0, 25, 50, 75, 100].contains(gameState.zone)
@@ -644,10 +797,11 @@ final class GameScene: SKScene {
             ? currentLevel.spawnCenter
             : CGPoint(x: currentLevel.spawnCenter.x, y: max(currentLevel.groundY + GameConstants.playerSpriteSize.height * 0.5, carriedY))
         player.configure(spawnCenter: targetSpawn, groundY: currentLevel.groundY)
+        emitZoneLoaded(carriedY: !isStageStart)
 
         // Normal screen entry is not invulnerable in the original game.
         invulnerability = 0
-        flowState = .playing
+        changeFlow(to: .playing, cause: .zoneTransition)
         deathGroundTimer = 0
         sceneJumpWasPressed = false
         fireWasPressed = inputState.snapshot().fire
@@ -657,12 +811,17 @@ final class GameScene: SKScene {
         saveCheckpoint()
     }
 
-    private func awardPoints(_ value: Int) {
+    /// The only points funnel in the game (10 call sites), so `score.awarded` has one emission
+    /// site and cannot disagree with the score.
+    private func awardPoints(_ value: Int, reason: GameplayScoreReason = .blasterShotdown) {
         guard value > 0 else { return }
+        let before = gameState.points
         gameState.points = min(999_999, gameState.points + value)
+        events.emitScoreAwarded(points: value, pointsBefore: before, reason: reason)
         if gameState.points > gameState.highScore {
             gameState.highScore = gameState.points
             persistence.saveHighScore(gameState.highScore)
+            emitHighScoreSaved(gameState.highScore)
         }
     }
 
@@ -703,11 +862,17 @@ final class GameScene: SKScene {
         )
         persistence.saveCheckpoint(checkpoint)
         hasSavedCheckpoint = true
+        emitCheckpointSaved(checkpoint)
     }
 
     private func beginFromTitle(currentInput: InputSnapshot) {
         titleOverlay.isHidden = true
-        flowState = .playing
+        if !hasSavedCheckpoint {
+            // A title start with no checkpoint is a new playthrough; continuing from a saved
+            // checkpoint keeps the current one, which is what makes the P1-8 farm impossible.
+            stageBoundaries.beginPlaythrough()
+        }
+        changeFlow(to: .playing, cause: .firePress)
         setGameplayNodesPaused(false)
         menuFireWasPressed = currentInput.fire
         fireWasPressed = currentInput.fire
@@ -717,14 +882,18 @@ final class GameScene: SKScene {
     }
 
     private func enterGameOver() {
-        flowState = .gameOver
+        changeFlow(to: .gameOver, cause: .death)
         invulnerability = 0
         persistence.clearCheckpoint()
         hasSavedCheckpoint = false
+        stageBoundaries.endPlaythrough()
+        emitCheckpointCleared(reason: .gameOver)
         if gameState.points > gameState.highScore {
             gameState.highScore = gameState.points
             persistence.saveHighScore(gameState.highScore)
+            emitHighScoreSaved(gameState.highScore)
         }
+        events.emitGameOver(points: gameState.points, highScore: gameState.highScore, checkpointCleared: true)
         setGameplayNodesPaused(true)
         showTerminalOverlay(
             title: "GAME OVER",
@@ -736,7 +905,11 @@ final class GameScene: SKScene {
     }
 
     private func enterContentComplete(nextLevelName: String) {
-        flowState = .contentComplete
+        changeFlow(to: .contentComplete, cause: .contentComplete)
+        let playableNext = !nextLevelName.isEmpty && includedLevels.contains(nextLevelName)
+        events.emitContentComplete(points: gameState.points,
+                                   final: gameState.zone >= 124 && nextLevelName.isEmpty,
+                                   hasNextLevel: playableNext)
         saveCheckpoint()
         setGameplayNodesPaused(true)
         let nextText = nextLevelName.isEmpty ? "NEXT ZONE" : nextLevelName
@@ -761,8 +934,9 @@ final class GameScene: SKScene {
     private func showTitleAfterContentComplete(currentInput: InputSnapshot) {
         terminalOverlay.isHidden = true
         titleOverlay.isHidden = false
-        flowState = .title
+        changeFlow(to: .title, cause: .titleReturn)
         updateTitleOverlayText()
+        emitTitleEnter()
         menuFireWasPressed = currentInput.fire
     }
 
@@ -917,7 +1091,8 @@ final class GameScene: SKScene {
     private func enterPause(currentInput: InputSnapshot) {
         guard flowState == .playing || flowState == .respawning else { return }
         stateBeforePause = flowState
-        flowState = .paused
+        changeFlow(to: .paused, cause: .pausePress)
+        emitPause(entering: true, stateBefore: stateBeforePause)
         pauseOverlay.isHidden = false
         pauseSelectedIndex = 0
         pauseConfirmWasPressed = currentInput.fire
@@ -929,7 +1104,8 @@ final class GameScene: SKScene {
 
     private func leavePause(currentInput: InputSnapshot) {
         guard flowState == .paused else { return }
-        flowState = stateBeforePause
+        emitPause(entering: false, stateBefore: stateBeforePause)
+        changeFlow(to: stateBeforePause, cause: .resume)
         pauseOverlay.isHidden = true
         setGameplayNodesPaused(false)
 
@@ -948,24 +1124,33 @@ final class GameScene: SKScene {
     }
 
     private func restartFromBeginning(currentInput: InputSnapshot) {
+        events.emitRunRestarted(discardedPoints: gameState.points)
         persistence.clearCheckpoint()
         hasSavedCheckpoint = false
+        emitCheckpointCleared(reason: .newGame)
+        stageBoundaries.beginPlaythrough()
         clearTransientObjects()
         currentLevel.rootNode.removeFromParent()
+        // Same defect class as P1-9 (repo_explorer section 8-4): this also swaps `currentLevel`
+        // inside a rendered frame, so the accumulator is discarded here too.
+        tickDriver.reset(reason: .newGame)
 
         currentLevelName = "L01S01"
+        emitZoneLoad(cause: .restart)
         currentLevel = TMXLevelRuntime(resource: currentLevelName)
+        currentLevel.events = events
         addChild(currentLevel.rootNode)
+        emitZoneLoaded(carriedY: false)
 
         gameState.resetForNewGame()
         gameState.highScore = persistence.loadHighScore()
 
-        player.setExoskeleton(false)
+        player.setExoskeleton(false, cause: .reset)
         player.configure(spawnCenter: currentLevel.spawnCenter, groundY: currentLevel.groundY)
         playerNode.update(from: player, dt: 0)
         invulnerability = 0
         deathGroundTimer = 0
-        flowState = .playing
+        changeFlow(to: .playing, cause: .restart)
         stateBeforePause = .playing
         bannerLabel.text = ""
 
@@ -983,6 +1168,176 @@ final class GameScene: SKScene {
         debugWasPressed = currentInput.debugHitboxes
         stepLabel.text = "STEP 9 · L01S01 · ZONE 000"
         saveCheckpoint()
+    }
+
+    // MARK: - Gameplay event emission
+    //
+    // Every record leaves through a `GameplayEventSink.emit…` helper: the lane maps live once, in
+    // `GameCore/Diagnostics/GameplayEventSink.swift`, which `evidence/harness/run.sh` compiles and
+    // which `lane_round_trip_is_exact` proves field by field. Nothing in this file may pack a lane
+    // by hand - the code review's four wire lies were all hand-ordered lanes or hand-picked bit
+    // offsets at these sites. The frozen contract is
+    // `engineering/contracts/schemas/gameplay-event-v1.schema.json`.
+
+    /// The only `flowState` mutation path that names a cause, so `state.flow` cannot drift from the
+    /// assignment sites (integration section 11-2).
+    private func changeFlow(to next: GameFlowState, cause: GameplayFlowCause) {
+        pendingFlowCause = cause
+        flowState = next
+    }
+
+    private func emitFlow(from: GameFlowState, to: GameFlowState, cause: GameplayFlowCause) {
+        events.emitFlowChange(from: from, to: to, cause: cause)
+    }
+
+    /// Once per executed fixed step at emission level 2; the log drops it silently below that.
+    private func emitMotion() {
+        events.emitMotion(state: player.motionState, grounded: player.isGrounded, facing: player.facing,
+                          exoskeleton: player.hasExoskeleton, position: player.position,
+                          velocityX: player.velocity.dx, velocityY: player.velocity.dy)
+    }
+
+    /// Diffed against the previous tick's snapshot inside the loop: one comparison per step, edges
+    /// stamped with the tick that actually saw them, and `held_us` derived from a fixed-step count
+    /// so no wall clock enters the stream (integration section 9).
+    private func emitInputEdges(current: InputSnapshot) {
+        defer { previousTickInput = current }
+        guard let previous = previousTickInput else { return }
+        for (index, action) in Self.trackedActions.enumerated() {
+            let projection = Self.actionProjections[index]
+            let wasPressed = projection(previous)
+            let isPressed = projection(current)
+            let heldBefore = heldStepsByAction[index]
+            if isPressed {
+                // Saturating: a long hold must not wrap the 16-bit millisecond lane.
+                heldStepsByAction[index] = heldBefore < 1_000_000 ? heldBefore + 1 : heldBefore
+            } else {
+                heldStepsByAction[index] = 0
+            }
+            guard wasPressed != isPressed else { continue }
+            // A press edge has held nothing yet; a release edge reports the run that just ended.
+            let heldSteps = isPressed ? 0 : Int(heldBefore)
+            events.emitActionEdge(action, source: inputState.source(for: action) ?? .keyboard,
+                                  pressed: isPressed,
+                                  heldMilliseconds: GameplayEvent.microseconds(fromSteps: heldSteps) / 1_000)
+        }
+    }
+
+    /// `jump_suppressed` is the P1-4 witness: the UP key is still physically down while Player
+    /// carries the contextual latch - the exact state the audited defect leaked through on the next
+    /// fixed step.
+    private func emitContextualConsumed(kind: GameplayContextualAction, jumpSuppressed: Bool) {
+        events.emitContextualConsume(kind, jumpSuppressed: jumpSuppressed)
+    }
+
+    private func emitPickup(kind: GameplayPickupKind, countBefore: Int, countAfter: Int, at origin: CGPoint) {
+        events.emitPickupCollected(kind, countBefore: countBefore, countAfter: countAfter, at: origin)
+    }
+
+    /// P1-8: the boundary total plus one component record each, so a later wave can add award
+    /// components without changing the total's name or the witness plumbing.
+    private func emitStageBoundary(award: StageBoundaryAward) {
+        events.emitStageBoundaryPoints(points: award.points, livesBefore: award.livesBefore,
+                                       livesAfter: award.livesAfter,
+                                       ammoReset: award.refillsAmmoAndGrenades)
+        for component in award.components {
+            events.emitStageAwardComponent(component.id, points: component.points)
+        }
+    }
+
+    private func emitZoneLoad(cause: GameplayZoneLoadCause) {
+        events.emitZoneLoad(cause)
+    }
+
+    private func emitZoneLoaded(carriedY: Bool) {
+        events.emitZoneLoaded(solidCount: currentLevel.solidRects.count,
+                              spawnCenter: currentLevel.spawnCenter,
+                              groundY: currentLevel.groundY,
+                              invulnerabilityTicks: ticks(invulnerability),
+                              carriedY: carriedY)
+    }
+
+    /// P1-9 witness: the accumulator still charged at the swap plus the steps it would have bought.
+    private func emitZoneTransition(to levelName: String) {
+        events.emitZoneTransition(toZone: zoneNumber(for: levelName),
+                                  accumulatorMicroseconds: tickDriver.accumulatorMicroseconds,
+                                  pendingSteps: tickDriver.pendingSteps)
+    }
+
+    private func emitCheckpointSaved(_ checkpoint: GameCheckpoint) {
+        events.emitCheckpointSaved(ammo: checkpoint.ammo, grenades: checkpoint.grenades,
+                                   lives: checkpoint.lives, points: checkpoint.points)
+    }
+
+    private func emitCheckpointCleared(reason: GameplayCheckpointClearedReason) {
+        events.emitCheckpointCleared(reason)
+    }
+
+    private func emitTitleEnter() {
+        events.emitTitleEnter(highScore: gameState.highScore, hasSavedCheckpoint: hasSavedCheckpoint)
+    }
+
+    private func emitPause(entering: Bool, stateBefore: GameFlowState) {
+        events.emitPauseChanged(entering: entering, stateBefore: stateBefore, selectedIndex: pauseSelectedIndex)
+    }
+
+    private func emitHighScoreSaved(_ value: Int) {
+        events.emitHighScoreSaved(value)
+    }
+
+    private func emitPlayerHit(cause: GameplayDamageCause, at position: CGPoint, stateBefore: GameFlowState) {
+        events.emitPlayerHit(cause: cause, position: position, flowBefore: stateBefore,
+                             flowAfter: .playerDead, lives: gameState.lives)
+    }
+
+    private func emitBlockedHit(cause: GameplayDamageCause, testInvulnerability: Bool) {
+        events.emitBlockedHit(cause: cause,
+                              invulnerabilityMicroseconds: Int((max(0, invulnerability) * 1_000_000).rounded()),
+                              testInvulnerability: testInvulnerability)
+    }
+
+    private func emitDeathBegin() {
+        events.emitDeathBegin(position: player.position, lives: gameState.lives, ammo: gameState.ammo,
+                              grenades: gameState.grenades)
+    }
+
+    private func emitDeathLanded(groundTicks: Int) {
+        events.emitDeathLanded(position: player.position, groundTicks: groundTicks)
+    }
+
+    private func emitDeathSettled(livesBefore: Int, livesAfter: Int) {
+        events.emitDeathSettled(livesBefore: livesBefore, livesAfter: livesAfter,
+                                invulnerabilityTicks: ticks(GameConstants.postDeathProtectionDuration),
+                                settleTicks: ticks(GameConstants.deathSettleDelay),
+                                checkpointSaved: hasSavedCheckpoint)
+    }
+
+    /// The launcher's own box origin, reported by `bonus.double_launcher` as `x`/`y`. Looking the
+    /// object up by identity is safe here: the payout just named it, and `nil` (a runtime rebuilt
+    /// mid-step, which cannot happen on this path) degrades to the player's position rather than
+    /// dropping the witness.
+    private func launcherOrigin(of payout: DoubleLauncherPayout) -> CGPoint {
+        currentLevel.doubleLauncherOrigin(withEntityID: payout.objectID) ?? player.position
+    }
+
+    /// Seconds of gameplay in fixed steps, so every `*_us` duration in the stream is derived from
+    /// the simulation clock rather than measured.
+    private func ticks(_ seconds: TimeInterval) -> Int {
+        Int((seconds / GameConstants.fixedTimeStep).rounded())
+    }
+
+    /// The F1 tail: the newest records of the same ring, in the same wire format.
+    private func updateEventTail() {
+        renderedFramesSinceTailUpdate += 1
+        guard renderedFramesSinceTailUpdate >= 10 else { return }
+        renderedFramesSinceTailUpdate = 0
+        guard let label = eventTailLabel else { return }
+        guard showHitboxes, events.isRecording else {
+            if !label.isHidden { label.isHidden = true }
+            return
+        }
+        label.text = ((events as? GameplayEventLog)?.describe(8) ?? []).joined(separator: "\n")
+        label.isHidden = false
     }
 
     private func zoneNumber(for levelName: String) -> Int {
@@ -1074,6 +1429,7 @@ final class GameScene: SKScene {
 
     private func updateDebugOverlay() {
         debugOverlay.removeAllChildren()
+        updateEventTail()
         guard showHitboxes else { return }
 
         addDebugRect(player.movementHitbox, color: .green)

@@ -682,10 +682,25 @@ final class EggEnemy {
 final class DoubleLauncherObstacle {
     let node: SKSpriteNode
     let hitbox: CGRect
-    private(set) var isActive = true
+    /// P1-6 (audit 2026-09-20, issue #10; architecture.md -> Decisions 2): the fire gate and the
+    /// bonus payout used to be the same flag, so collecting the invisible-region bonus paid 1000
+    /// points once and permanently silenced the launcher. `bonusState` now owns both facts
+    /// separately; `isActive` stays the fire gate and the payout never clears it.
+    private var bonusState = LauncherBonusState()
+    /// Ordinal of the `double_launcher` object in `map.objectGroups.flatMap { $0.objects }`, so a
+    /// `bonus.double_launcher` line can be joined to the map and to its `entity.launcher_fire`
+    /// records (architect section 5.2).
+    let entityID: UInt16
     private var fireTimer: TimeInterval = TimeInterval(Int.random(in: 20...160)) / 60.0
 
-    init(bottomLeft: CGPoint) {
+    /// Fire gate: unchanged for every existing reader of `isActive`; the query goes through
+    /// `LauncherBonusState.canFire` so the value the launcher fires on and the value
+    /// `launcher_active_after` reports are the same read.
+    var isActive: Bool { bonusState.canFire }
+    /// Reported as `launcher_active_after`: the payout must leave the launcher firing.
+    var bonusWasCollected: Bool { bonusState.bonusCollected }
+
+    init(bottomLeft: CGPoint, entityID: UInt16) {
         let texture = SKTexture(imageNamed: "double_launcher")
         texture.filteringMode = .nearest
         node = SKSpriteNode(texture: texture, size: CGSize(width: 64, height: 48))
@@ -715,9 +730,10 @@ final class DoubleLauncherObstacle {
         return EnemyTurretBullet(position: muzzle, kind: .doubleLauncher)
     }
 
+    /// Pays the region bonus exactly once per launcher per zone instantiation and leaves the
+    /// fire gate alone. The dimmed sprite keeps marking the spent region.
     func collectBonusIfTouched(playerBox: CGRect) -> Bool {
-        guard isActive, playerBox.intersects(hitbox) else { return false }
-        isActive = false
+        guard bonusState.payBonus(touchesBonusRegion: playerBox.intersects(hitbox)) else { return false }
         node.alpha = 0.45
         return true
     }

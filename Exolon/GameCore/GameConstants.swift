@@ -5,8 +5,11 @@ enum GameConstants {
     static let logicalSize = CGSize(width: 512, height: 384)
     static let fixedTimeStep: TimeInterval = 1.0 / 60.0
     static let maximumFrameTime: TimeInterval = 0.25
-    // Original dead_sprite_delay2 retains 20 protection ticks after the 46-tick
-    // death animation. ZX Spectrum timing is 50 Hz: 20 / 50 = 0.4 s.
+    // Original dead_sprite_delay2 retains 20 protection ticks after the 46-tick death animation.
+    // The remake's canonical simulation rate is 60 Hz (`fixedTimeStep` above), so the window is
+    // expressed in seconds against that clock: 0.4 s = 24 fixed steps. The 50 Hz figure that used
+    // to be quoted here was the ZX Spectrum's own frame rate, not this loop's - audit TC-05 was
+    // closed by ruling (change 20260924 wave A, decision 5).
     static let postDeathProtectionDuration: TimeInterval = 0.4
 
     static let defaultGroundY: CGFloat = 96
@@ -31,4 +34,13 @@ enum GameConstants {
     static let playerCrouchingDamageSize = CGSize(width: 46, height: 49)
 
     static let hudHeight: CGFloat = 48
+
+    /// Original screen-exit trigger: crossing this x leaves the zone (`GameScene.checkScreenExit`).
+    /// Named because the event contract reports it as `state.zone_exit.trigger_x`.
+    static let screenExitX: CGFloat = 510
+
+    /// Original death animation settle: 70 fixed steps on the ground before a life is paid.
+    /// Named because `player.death_settled.delay_us` must not be restated at the call site, where a
+    /// silent change would make the record lie.
+    static let deathSettleDelay: TimeInterval = 70.0 / 60.0
 }
