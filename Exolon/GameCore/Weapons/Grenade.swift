@@ -32,7 +32,7 @@ final class Grenade {
 
         let texture = SKTexture(imageNamed: "grenade")
         texture.filteringMode = .nearest
-        node = SKSpriteNode(texture: texture, size: CGSize(width: 16, height: 16))
+        node = SKSpriteNode(texture: texture, size: GameConstants.grenadeSize)
         node.zPosition = 19
         node.xScale = direction == .left ? -1 : 1
         node.position = position
@@ -77,7 +77,13 @@ final class Grenade {
         position.y += velocityPerTick.dy * tickScale
         node.position = position
 
-        if position.x < -24 || position.x > GameConstants.logicalSize.width + 24 || position.y > GameConstants.logicalSize.height + 40 {
+        // AC-004 (amended): the same derived x-bound policy as the blaster —
+        // the old inline `x > logicalSize.width + 24` culled at 536, which is
+        // inside the reachable throw origin at max clamp (544 + 4 = 548), so
+        // right-thrown grenades could be born dead.
+        if position.x < GameConstants.grenadeCullMinimumX
+            || position.x > GameConstants.grenadeCullMaximumX
+            || position.y > GameConstants.logicalSize.height + 40 {
             isAlive = false
         }
 

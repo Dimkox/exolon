@@ -1,0 +1,30 @@
+# wave_b_check.py — финальный зелёный прогон ПОСЛЕ REBASE на post-A main 17a742a (head e520884)
+# cmd: python3 engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py
+# battery: 14 мутационных прогонов (A1–A8, B1–B4, M12, M13) — см. wave_b_ablations.txt (пред-ребейс; артефакт после ребейса байт-идентичен)
+# receipt binding: ПРЕЖНИЙ a5ad67be5a00… недействителен после ребейса; гейт/рекорд — за контроллером на свежем fingerprint
+# date: 2026-09-24T23:55:19Z
+
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+PASS spawn_ground_all_maps
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+PASS beam_shared_hp_all_maps
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+PASS bullet_cull_bounds
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+PASS controls_flip
+  added-lines: 237 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+PASS no_magic_offsets
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96; rects base-порт==new-порт==исполненный на 125/125 (всего 1437 rect'ов), worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: True)
+elapsed=3.1s (бюджет 60s: ok)
+RESULT: ALL_WAVE_B_CHECKS_MATCH_SPEC
+rc=0

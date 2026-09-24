@@ -79,6 +79,249 @@ struct TMXMapData {
         }
         return CGPoint(x: object.x, y: pixelHeight - object.y)
     }
+
+    /// The shared SpriteKit-free Collision surface query. Spawn anchoring, the
+    /// piston anchor and the tile map renderer's collision rects all read the
+    /// Collision layer through this type, so "the ground at x" has exactly one
+    /// definition in the product (wave B ruling 4).
+    var surfaceQuery: TMXSurfaceQuery { TMXSurfaceQuery(map: self) }
+
+    /// Spawn bottom-left resolved through the shared surface query (P1-2,
+    /// AC-001 bounded per amendment 2 of 2026-09-24).
+    ///
+    /// The audited defect is exactly one tile: the corpus places the `vitorc`
+    /// marker 0/+16/−16 px off the Collision surface (37/59/29 over 125 maps).
+    /// The correction may therefore only act inside that defect: candidates are
+    /// the Collision tops overlapping the feet span within ±one tile height of
+    /// the marker line. Body-clear is a PREFERENCE inside that window — a
+    /// clear candidate wins over a buried one; when every in-window top is
+    /// inside solid geometry the nearest is still taken (that is where the
+    /// shipped plane-snap already landed, so the spawn is never worse than
+    /// base), and only a completely empty window leaves the marker UNMOVED
+    /// (enumerated in the change evidence). Hard bound: no spawn moves more
+    /// than one tile. Two variants were rejected by the audits: the unbounded
+    /// nearest-body-clear rule relocated 91/125 spawns by up to 208 px, and
+    /// wholesale deletion of the preference buried 48 spawns that it freed.
+    func resolvedPlayerBottom(using query: TMXSurfaceQuery) -> CGPoint {
+        guard let playerObject = object(named: "vitorc") else {
+            return CGPoint(x: 0, y: GameConstants.defaultGroundY)
+        }
+        let marker = worldBottomLeft(for: playerObject)
+        let centerX = marker.x + GameConstants.playerSpriteSize.width * 0.5
+        let halfBody = GameConstants.playerStandingMovementSize.width * 0.5
+        let inset = GameConstants.footSupportHorizontalInset
+        let feet = query.boundedSurfaceY(
+            x0: centerX - halfBody + inset,
+            x1: centerX + halfBody - inset,
+            around: marker.y,
+            halfWindow: CGFloat(tileHeight),
+            bodyX0: centerX - halfBody,
+            bodyX1: centerX + halfBody,
+            bodyHeight: GameConstants.playerStandingMovementSize.height
+        ) ?? marker.y
+        return CGPoint(x: marker.x, y: feet)
+    }
+}
+
+/// Solid Collision cells and every ground derivation built on them.
+///
+/// Coordinates are scene space: bottom-left origin, logical field
+/// `GameConstants.logicalSize`, cell top = pixel Y of the cell's upper edge.
+struct TMXSurfaceQuery {
+    struct SolidCell {
+        var x0: CGFloat
+        var x1: CGFloat
+        var top: CGFloat
+    }
+
+    let cells: [SolidCell]
+    let tileHeight: CGFloat
+
+    init(map: TMXMapData) {
+        tileHeight = CGFloat(map.tileHeight)
+        guard let collision = map.layers.first(where: { $0.name.lowercased() == "collision" }),
+              collision.gids.count == collision.width * collision.height else {
+            cells = []
+            return
+        }
+        var built: [SolidCell] = []
+        for row in 0..<collision.height {
+            let top = map.pixelHeight - CGFloat(row * map.tileHeight)
+            let base = row * collision.width
+            for column in 0..<collision.width where collision.gids[base + column] & 0x1FFF_FFFF != 0 {
+                built.append(SolidCell(
+                    x0: CGFloat(column * map.tileWidth),
+                    x1: CGFloat((column + 1) * map.tileWidth),
+                    top: top
+                ))
+            }
+        }
+        cells = built
+    }
+
+    /// The original global safety floor: the top of the lowest solid cell in
+    /// the map. Maps without any Collision data keep the default ground
+    /// constant. This is the value `TMXLevelRuntime.groundY` has always
+    /// published to the fallback-floor and grenade code paths.
+    var fallbackPlaneY: CGFloat {
+        cells.map(\.top).min() ?? GameConstants.defaultGroundY
+    }
+
+    /// Top of the highest solid cell overlapping [x0, x1) at or below
+    /// `limitY`; the map fallback plane when the span holds no such cell.
+    func groundY(x0: CGFloat, x1: CGFloat, atOrBelow limitY: CGFloat) -> CGFloat {
+        var best: CGFloat?
+        for cell in cells where cell.top <= limitY && cell.x0 < x1 && cell.x1 > x0 {
+            if best == nil || cell.top > best! { best = cell.top }
+        }
+        return best ?? fallbackPlaneY
+    }
+
+    /// Collision cell tops overlapping [x0, x1), ascending, deduplicated.
+    func surfaceTops(x0: CGFloat, x1: CGFloat) -> [CGFloat] {
+        var tops: [CGFloat] = []
+        for cell in cells where cell.x0 < x1 && cell.x1 > x0 && !tops.contains(cell.top) {
+            tops.append(cell.top)
+        }
+        return tops.sorted()
+    }
+
+    /// The Collision top nearest `y` inside the closed window
+    /// [y − halfWindow, y + halfWindow] over the span; equidistant candidates
+    /// resolve to the lower Y. Nil when the window holds no surface.
+    ///
+    /// Body-clear over the body span is a PREFERENCE, not a filter (AC-001
+    /// amendment 2): clear in-window candidates shadow buried ones; with none
+    /// clear the nearest in-window top is still returned.
+    func boundedSurfaceY(x0: CGFloat, x1: CGFloat, around y: CGFloat, halfWindow: CGFloat,
+                         bodyX0: CGFloat, bodyX1: CGFloat, bodyHeight: CGFloat) -> CGFloat? {
+        let bodyTops = surfaceTops(x0: bodyX0, x1: bodyX1)
+        func isClear(_ top: CGFloat) -> Bool {
+            !bodyTops.contains { $0 > top && $0 - tileHeight < top + bodyHeight }
+        }
+        var clearBest: CGFloat?
+        var clearDistance = CGFloat.greatestFiniteMagnitude
+        var anyBest: CGFloat?
+        var anyDistance = CGFloat.greatestFiniteMagnitude
+        for top in surfaceTops(x0: x0, x1: x1) {
+            let distance = abs(top - y)
+            guard distance <= halfWindow else { continue }
+            if distance < anyDistance || (distance == anyDistance && top < anyBest!) {
+                anyBest = top
+                anyDistance = distance
+            }
+            if isClear(top),
+               distance < clearDistance || (distance == clearDistance && top < clearBest!) {
+                clearBest = top
+                clearDistance = distance
+            }
+        }
+        return clearBest ?? anyBest
+    }
+
+    /// Piston anchor (P1-1): the Collision surface the piston must emerge from
+    /// is the one directly under its fully raised tread. The marker's own row
+    /// is not that surface — it leaves the world bottom 64 px below the floor
+    /// on 40 of 46 pistons and 48 px below on 3 more (only 3 are anchored on
+    /// the surface already; edge-grazing hits under the fallback plane make
+    /// 6/46 lethal with the old anchor). Three pistons (L01S15 x128,
+    /// L02S23/L05S23 x400) sit at y=pixelHeight: their hit spans DO carry
+    /// Collision cells (tops 160/192 and 272) but NONE at or below the raised
+    /// tread (anchor+travel = 64), so the query resolves to the GLOBAL
+    /// `fallbackPlaneY` — the map's lowest cell top (48 on all three maps),
+    /// not any local floor.
+    func pistonGroundY(markerX: CGFloat, markerBottomY: CGFloat) -> CGFloat {
+        let x0 = markerX + GameConstants.pistonHitXInset
+        return groundY(x0: x0, x1: x0 + GameConstants.pistonHitWidth,
+                       atOrBelow: markerBottomY + GameConstants.pistonTravel)
+    }
+
+    /// Horizontal run merges per row, one tile tall — the exact geometry the
+    /// tile map renderer published before the query existed. Rows are emitted
+    /// top to bottom and runs left to right so consumers see a byte-stable
+    /// order.
+    var collisionRects: [CGRect] {
+        guard !cells.isEmpty else { return [] }
+        var tops: [CGFloat] = []
+        for cell in cells where !tops.contains(cell.top) { tops.append(cell.top) }
+        tops.sort(by: >)
+        var rects: [CGRect] = []
+        for top in tops {
+            let rowCells = cells.filter { $0.top == top }.sorted { $0.x0 < $1.x0 }
+            var run = rowCells[0]
+            for cell in rowCells.dropFirst() {
+                if cell.x0 == run.x1 {
+                    run.x1 = cell.x1
+                } else {
+                    rects.append(CGRect(x: run.x0, y: run.top - tileHeight, width: run.x1 - run.x0, height: tileHeight))
+                    run = cell
+                }
+            }
+            rects.append(CGRect(x: run.x0, y: run.top - tileHeight, width: run.x1 - run.x0, height: tileHeight))
+        }
+        return rects
+    }
+}
+
+/// P1-5: one beam field entity. Every visual side of a beam (the imported
+/// `blk_beam_up`/`blk_beam_down` marker pair) shares this single hit-point
+/// pool and the field is destroyed as a unit — issue #9: 25 hits per beam,
+/// not 25 per side. SpriteKit-free so the Linux harness can execute the pool.
+final class BeamFieldModel {
+    static let sharedHitPoints = 25
+
+    private(set) var remainingHitPoints = BeamFieldModel.sharedHitPoints
+    private var destructionNotified = false
+    private var destructionHandlers: [() -> Void] = []
+
+    var isActive: Bool { remainingHitPoints > 0 }
+
+    /// Register a destruction side effect. Handlers must capture their subject
+    /// WEAKLY: the field owns the handler list, so a handler holding a strong
+    /// reference to a side would close a field ↔ side retain cycle and leak
+    /// every beam of every visited level.
+    func onDestroyed(_ handler: @escaping () -> Void) {
+        destructionHandlers.append(handler)
+    }
+
+    /// Returns true exactly once: on the hit that empties the shared pool.
+    @discardableResult
+    func registerHit() -> Bool {
+        guard isActive else { return false }
+        remainingHitPoints -= 1
+        guard remainingHitPoints <= 0, !destructionNotified else { return false }
+        destructionNotified = true
+        for handler in destructionHandlers { handler() }
+        return true
+    }
+}
+
+/// Groups beam marker boxes into fields: boxes whose x intervals strictly
+/// overlap belong to the same beam (an up/down pair is one beam). SpriteKit-
+/// free so both the level runtime and the measurement harness share it.
+enum TMXBeamGrouping {
+    static func groups(for boxes: [CGRect]) -> [[Int]] {
+        // Deterministic total order: minX first, original marker index as
+        // tie-break (Swift's sort is unstable; the measurement mirror keys
+        // (minX, index) and compares groups byte-exact).
+        let indexed = boxes.enumerated().sorted { a, b in
+            if a.element.minX != b.element.minX { return a.element.minX < b.element.minX }
+            return a.offset < b.offset
+        }
+        var groups: [[Int]] = []
+        var current: [Int] = []
+        var currentMaxX: CGFloat = 0
+        for (index, box) in indexed {
+            if !current.isEmpty, box.minX >= currentMaxX {
+                groups.append(current)
+                current = []
+            }
+            current.append(index)
+            currentMaxX = max(currentMaxX, box.maxX)
+        }
+        if !current.isEmpty { groups.append(current) }
+        return groups
+    }
 }
 
 enum TMXMapLoaderError: Error, CustomStringConvertible {

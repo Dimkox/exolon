@@ -1,0 +1,105 @@
+{
+  "acceptance_criteria": [
+    {
+      "id": "AC-001",
+      "statement": "Spawn correction bounded and non-degrading: candidates are Collision tops within one half-tile (+/-16 px) of the marker feet; among candidates the body-clear surface is PREFERRED, else nearest is taken; no candidate keeps the marker unmoved and enumerated. Hard bounds: (a) no spawn moves more than 16 px vs marker, (b) the count of maps whose spawn leaves the standing body inside solid cells must not exceed the same count computed on the base tree 295690b (no-worse-than-base control), (c) the 37/59/29 marker-vs-surface control still reproduces under the old computation. Amendment 2 (2026-09-24, after architect audit): amendment 1 deleted body-clear filtering wholesale and left 48/125 spawns buried; that is rejected. Scope disclosure required in evidence: runtime consumes resolved spawn Y only on stage-start entries (carried-Y discards it otherwise, GameScene.swift:638-646) — about 5-6 zone entries per playthrough.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py::spawn_ground_all_maps"}
+      ]
+    },
+    {
+      "id": "AC-002",
+      "statement": "All 46 pistons on 27 maps: with the anchored ground surface under the piston base, the piston world-bottom reaches the player foot band (lethal); recomputing with the old object-row anchor FAILS the same predicate (contradictory control).",
+      "evidence": [
+        {"test": "engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py::piston_anchor_all_pistons"}
+      ]
+    },
+    {
+      "id": "AC-003",
+      "statement": "Every beam_up/beam_down pair is one field entity sharing a single 25 hit-point pool; the per-map sum of field hit points equals 25 times the number of pairs across all maps, and destruction removes both visual segments together.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py::beam_shared_hp_all_maps"}
+      ]
+    },
+    {
+      "id": "AC-004",
+      "statement": "Projectile culling is coherent: blaster cull bound derived from the player clamp maximum (544) plus the bullet width, never a smaller literal; no shot can be born outside its own cull bound at any reachable player x (muzzle origin within cull bounds up to x=544); the same x-bound policy covers grenades (no surviving inline literal); the screen-transition trigger at x>510 is unchanged.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py::bullet_cull_bounds"}
+      ]
+    },
+    {
+      "id": "AC-005",
+      "statement": "The meter is deterministic over the repository (stdlib-only, <=60 s) and every contradictory control actually flips: a check that cannot fail is itself a failure.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py::controls_flip"},
+        {"receipt": "verification"}
+      ]
+    }
+  ],
+  "approvals": {
+    "required_scopes": []
+  },
+  "change_id": "20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2",
+  "contracts": {
+    "events": [],
+    "json_schema": [],
+    "openapi": []
+  },
+  "forbidden_outcomes": [
+    {
+      "id": "FORBID-001",
+      "statement": "Any per-map special-case table, magic ±16 px offset, or edited TMX content: every fixed value must derive from Collision data or existing constants.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py::no_magic_offsets"}
+      ]
+    },
+    {
+      "id": "FORBID-002",
+      "statement": "A second, ad-hoc ground computation: spawn, pistons and foot-band math must share the one surface query.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py::single_surface_query"}
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "id": "INV-001",
+      "statement": "Zone identity validation precedes every per-map measurement: int(zoneNumber) == (stage-1)*25 + (scene-1) for all 125 TMX files, and file-name pairing never trusts zoneNumber naively.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py::zone_index_formula"}
+      ]
+    },
+    {
+      "id": "INV-002",
+      "statement": "Non-defect behavior is pinned: screen-transition trigger geometry (x>510), player clamp (544) and logical field 512x384 are byte-stable across the change.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py::pinned_geometry_unchanged"}
+      ]
+    }
+  ],
+  "objective": {
+    "id": "OBJ-001",
+    "statement": "P1-1, P1-2, P1-3 and P1-5 are fixed by deriving physics from the shared Collision surface query, each proven by an all-map self-checking meter whose reverted control fails.",
+    "success_metric": "wave_b_check.py: all AC/INV/FORBID checks green; controls flip",
+    "target": "125/125 spawn exact, 46/46 pistons lethal, beam HP == 25 per pair, no cull corridor"
+  },
+  "observability": [
+    {
+      "id": "SIG-001",
+      "metric": "meter prints per-map delta tables (spawn, pistons, beams) so any difficulty shift beyond the rectified defect is visible to review",
+      "proves": ["OBJ-001"]
+    }
+  ],
+  "risk": {
+    "domains": [
+      "generic"
+    ],
+    "tier": "green"
+  },
+  "rollback": {
+    "maximum_steps": 1,
+    "strategy": "forward_fix"
+  },
+  "schema_version": 2
+}
