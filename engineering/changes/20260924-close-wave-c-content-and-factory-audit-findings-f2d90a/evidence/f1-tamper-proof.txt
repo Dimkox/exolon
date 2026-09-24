@@ -1,0 +1,55 @@
+# F1 tamper-proof demo — manifest_selfcheck before/after (test review finding F1, BLOCKING)
+# Generated 2026-09-24 in an isolated copy at /tmp/f1-demo (repo .git pointer preserved so
+# `git show 295690b:...` still resolves). The committed contract was mutated there and the FULL
+# 9-probe net re-run each time; nothing in the real worktree was touched.
+
+## Method note (a false start worth recording)
+The first copy I built omitted another package's harness directory, so
+`swift_product_evidence()` could not find the CoreGraphics shim and three probes went red for a
+*methodological* reason - the meter failed closed rather than passing on missing execution. That
+contaminated the whole matrix until I checked the pristine run. Restoring the rule the reviewer
+used: **the unmutated copy must be green before any tamper row is trusted.**
+
+## Meta-control (pristine copy, no mutation)
+  RESULT: ALL_WAVE_C_PROBES_PASS | probes=9 failed=0
+  product executed: True | loaded 125/125 | unmatched {} | no-shim negative control: True
+
+## Tamper matrix — every row mutates the committed JSON AND re-seals self_check.body_sha256
+
+tamper of the committed contract                         seal    selfcheck whole 9-probe net
+----------------------------------------------------------------------------------------------------------------------------------
+C7  maps[L01S01].sha256 -> zeros                         unkeyed FAIL      WAVE_C_PROBES_FAIL | probes=9 failed=2 level_pair_manifest_pinned,manifest_selfcheck
+C8  maps[L01S01].background -> zone_999                  unkeyed FAIL      WAVE_C_PROBES_FAIL | probes=9 failed=1 manifest_selfcheck
+C9  drop one declared pair                               unkeyed FAIL      WAVE_C_PROBES_FAIL | probes=9 failed=2 level_pair_manifest_pinned,manifest_selfcheck
+C10 L02S16.background -> zone_999 (was ALL GREEN)        unkeyed FAIL      WAVE_C_PROBES_FAIL | probes=9 failed=1 manifest_selfcheck
+C11 L02S16.background_sha256 fabricated (was ALL GREEN)  unkeyed FAIL      WAVE_C_PROBES_FAIL | probes=9 failed=1 manifest_selfcheck
+K10 C10 re-sealed WITH the key (expert forger)           keyed   FAIL      WAVE_C_PROBES_FAIL | probes=9 failed=1 manifest_selfcheck
+K11 C11 re-sealed WITH the key (expert forger)           keyed   FAIL      WAVE_C_PROBES_FAIL | probes=9 failed=1 manifest_selfcheck
+K12 L02S16.background_count -> 0 + key                   keyed   FAIL      WAVE_C_PROBES_FAIL | probes=9 failed=1 manifest_selfcheck
+K13 declare pair L01S01/L01S02 identical + key           keyed   FAIL      WAVE_C_PROBES_FAIL | probes=9 failed=2 level_pair_manifest_pinned,manifest_selfcheck
+
+restored -> ALL_WAVE_C_PROBES_PASS | probes=9 failed=0
+
+## What this proves
+- The reviewer's shipping cases **C10** (`L02S16.background` -> a file that does not exist) and
+  **C11** (`L02S16.background_sha256` -> fabricated 64-hex), which previously produced
+  `ALL_WAVE_C_PROBES_PASS, rc=0` across the entire net, now fail `manifest_selfcheck`.
+- **K10/K11/K12 re-seal with the real embedded key**, i.e. an attacker who read
+  `wave_c_check.py` and recomputed the digest correctly: still red, because
+  `validate_manifest` now re-derives every data claim from `Exolon/Resources` (per-map canonical
+  digest, backdrop name, backdrop bytes via the renderer's basename resolution, layer count, and
+  hash-equality of each declared pair) instead of trusting the file's own numbers.
+- `manifest_selfcheck` previously called `validate_manifest(manifest)` with no corpus, so the
+  corpus branch was dead in the probe; it is now mandatory (the parameter defaults to a fresh
+  recomputation, so even the generator path cannot skip it).
+- Restoring the authentic contract returns the net to green, so the detections are not
+  over-strictness.
+
+## Honest limit of the digest (also stated in the probe output as `binding_limit`)
+A keyed digest in a public repository is a *construction* barrier, not a cryptographic one. What
+it genuinely buys: the old 'edit a value + recompute sha256(body)' path is rejected. What it does
+NOT buy: a forger who reads INTEGRITY_BIND can still re-seal **prose** fields (ruling wording,
+pair_notes text). Those are defended by `level_pair_manifest_pinned` asserting the disclosures
+exist and by the blob-identity check on `Exolon/Resources`, not by the digest. No doc in this
+package may claim body_sha256 protects wording, and INV-001's 'bound transitively' language is
+read with that limit in mind.

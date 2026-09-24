@@ -1,0 +1,212 @@
+# RED baseline meter run — change f2d90a, task 2 (REGENERATED; supersedes the 20:05 revision)
+#
+# Provenance (test review F7): produced by the checker committed in the worktree, so artifact
+# and checker agree control-for-control.
+#   checker sha256 = 5ad27c981b33a67984b9b089930c5b3e0e47baeeba9891164fe92bc4401edbc0
+#   IDENTICAL to the worktree checker
+#
+# How the pre-change tree was obtained (product only — never the meter, data or contract):
+#   1. copy the worktree to /tmp/red-base (repo .git pointer kept, so git show resolves)
+#   2. git checkout 295690b -- Exolon/
+#   3. verify  git diff 295690b -- Exolon/  -> EMPTY; loader = 352 lines;
+#      0 hits for TMXSourceMarkerKind / unmatchedSourceMarkers
+#   4. copy the FINAL wave_c_check.py + disposition table + golden in, then run
+#
+# The 20:05 revision it replaces came from an earlier checker (4 controls in
+# unchanged_marker_output incl. the since-removed branch_edit_detected, no check_citation).
+# Headline numbers were already right; the detail blocks were not. That is the whole point of F7.
+
+ignored_types_disposition    FAIL
+    ! blk_gunMachine_BOTTOM: table claims substring 'gunMachine_BOTTOM' which the product does not test
+    ! blk_mushroom: table claims substring 'mushroom' which the product does not test
+    ! blk_waggon: table claims substring 'waggon' which the product does not test
+    ! formerly-ignored families still unresolved: blk_gunMachine_BOTTOM, blk_mushroom, blk_waggon
+    ! blk_beacon_base: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:391-404 does not contain 'case .beaconBase:'
+    ! blk_beacon_base: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
+    ! blk_beam_down: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:367-371 does not contain 'case .forceField:'
+    ! blk_beam_down: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
+    ! blk_beam_up: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:367-371 does not contain 'case .forceField:'
+    ! blk_beam_up: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
+    ! blk_blinker: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:377-379 does not contain 'case .blinker:'
+    ! blk_blinker: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
+    ! blk_changing_room: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:382-390 does not contain 'case .changingRoom:'
+    ! blk_changing_room: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
+    ! blk_control_beacon: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:405-417 does not contain 'case .controlBeacon:'
+    ! blk_control_beacon: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
+    ! blk_gunMachine_BOTTOM: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:427-434 does not contain 'case .unconfirmedAction:'
+    ! blk_gunMachine_BOTTOM: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
+    ! blk_mushroom: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:418-426 does not contain 'case .inertScenery:'
+    ! blk_mushroom: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
+    ! blk_stage_end: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:380-381 does not contain 'case .stageEnd:'
+    ! blk_stage_end: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
+    ! blk_topdown_electro: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:372-376 does not contain 'case .highVoltage:'
+    ! blk_topdown_electro: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
+    ! blk_waggon: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:418-426 does not contain 'case .inertScenery:'
+    ! blk_waggon: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
+    ! AC-002 is not product-executed on this host (product build failed: Label)")
+31 | }
+
+/tmp/wave-c-swift-6ea2p5d8/main.swift:33:17: error: cannot find 'TMXSourceMarkerKind' in scope
+31 | }
+32 | for block in blockCount.keys.sorted() {
+33 |     let cells = TMXSourceMarkerKind.safeModelFootprintCells(sourceBlock: block)
+   |                 `- error: cannot find 'TMXSourceMarkerKind' in scope
+34 |     print("FOOTPRINT\t\(block)\t\(cells.width)x\(cells.height)")
+35 | }
+)
+    citations_verified               22
+    classifier_kinds                 []
+    controls                         {"bogus_count_rejected": true, "bogus_kind_rejected": true, "bogus_substring_rejected": true, "out_of_range_citation_rejected": true, "product_table_agrees": false, "stale_citation_rejected": true}
+    dispositions_committed           11
+    distinct_in_corpus               11
+    formerly_ignored_resolved        {"blk_gunMachine_BOTTOM": false, "blk_mushroom": false, "blk_waggon": false}
+    safe_model_families              ["blk_gunMachine_BOTTOM", "blk_mushroom", "blk_waggon"]
+level_pair_manifest_pinned   PASS
+    background_identical_pairs       [["L02S04", "L05S04"], ["L02S16", "L05S16"], ["L02S22", "L05S22"], ["L02S23", "L05S23"]]
+    controls                         {"changed_tile_flips_digest": true, "divergent_fixture_flips_pin": true, "extra_object_flips_digest": true, "new_collision_flips_pin": true, "untouched_copy_is_stable": true}
+    declared_pairs                   24
+    maps                             125
+    pair_violations                  []
+    undeclared_collisions            []
+    unique_declared                  101
+    unique_recomputed                101
+manifest_selfcheck           PASS
+    binding                          "keyed sha256 over the body (embedded constant) + live re-derivation of every data claim; all tamper controls are re-sealed before being judged"
+    binding_limit                    "honest and stated: a forger who reads INTEGRITY_BIND and re-seals can still edit prose fields (ruling text, notes). Data fields cannot be forged this way because they are re-derived from Exolon/Resources on every run; narrative wording is covered by level_pair_manifest_pinned asserting the disclosure exists, not by this digest. Do not cite body_sha256 as protection for wording...
+    body_sha256                      "13b3f1f2dd314863866c074cc1032ee4f0cf2bcbdf21f941ef60a3566cd22cfa"
+    tamper_controls                  {"add_undeclared_pair_rejected": true, "declare_nonidentical_pair_rejected": true, "drop_background_layer_claim_rejected": true, "drop_one_pair_rejected": true, "fabricate_background_digest_rejected": true, "flip_one_map_digest_rejected": true, "honest_manifest_accepted": true, "rewrite_unique_count_rejected": true, "swap_background_file_rejected": true, "unkeyed_reseal_rejecte...
+    tamper_victim_map                "L02S16"
+marker_baseline_reproduced   PASS
+    baseline_expected                {"control_drop_all_lost": 127, "control_drop_beam_lost": 71, "distinct_source_blocks": 11, "lost_kind_maps": {"blk_gunMachine_BOTTOM": 15, "blk_mushroom": 6, "blk_waggon": 14}, "lost_kinds": {"blk_gunMachine_BOTTOM": 18, "blk_mushroom": 9, "blk_waggon": 24}, "lost_maps": 32, "markers_covered": 76, "markers_lost": 51, "markers_total": 127}
+    controls                         {"drop_all_loses_everything": true, "drop_beam_raises_lost_to_71": true, "narrower_table_cannot_lose_less": true}
+    distinct_source_blocks           11
+    lost_kind_maps                   {"blk_gunMachine_BOTTOM": 15, "blk_mushroom": 6, "blk_waggon": 14}
+    lost_kinds                       {"blk_gunMachine_BOTTOM": 18, "blk_mushroom": 9, "blk_waggon": 24}
+    lost_maps                        32
+    markers_covered                  76
+    markers_lost                     51
+    markers_total                    127
+    measured_with_legacy_table       true
+    stale_mirrors                    {"baseline_agrees": true, "mirrors": []}
+marker_coverage_all_maps     FAIL
+    ! 3 of 11 distinct sourceBlock values are unclaimed: blk_gunMachine_BOTTOM, blk_mushroom, blk_waggon
+    ! 51 of 127 markers resolve to nothing, on 32 maps
+    ! the source_marker case has no unmatchedSourceMarkers.append path: an unmatched marker is still dropped without a signal
+    ! the runtime declares no observable unmatched marker collection
+    ! AC-001 is not product-executed on this host (product build failed: Label)")
+31 | }
+
+/tmp/wave-c-swift-6ea2p5d8/main.swift:33:17: error: cannot find 'TMXSourceMarkerKind' in scope
+31 | }
+32 | for block in blockCount.keys.sorted() {
+33 |     let cells = TMXSourceMarkerKind.safeModelFootprintCells(sourceBlock: block)
+   |                 `- error: cannot find 'TMXSourceMarkerKind' in scope
+34 |     print("FOOTPRINT\t\(block)\t\(cells.width)x\(cells.height)")
+35 | }
+); structural checks only
+    ! blk_beam_up: the product has no kind 'forceField' to compare the disposition against
+    ! blk_beam_down: the product has no kind 'forceField' to compare the disposition against
+    ! blk_beacon_base: the product has no kind 'beaconBase' to compare the disposition against
+    ! blk_control_beacon: the product has no kind 'controlBeacon' to compare the disposition against
+    ! blk_changing_room: the product has no kind 'changingRoom' to compare the disposition against
+    ! blk_stage_end: the product has no kind 'stageEnd' to compare the disposition against
+    ! blk_blinker: the product has no kind 'blinker' to compare the disposition against
+    ! blk_topdown_electro: the product has no kind 'highVoltage' to compare the disposition against
+    ! blk_mushroom: the product has no kind 'inertScenery' to compare the disposition against
+    ! blk_waggon: the product has no kind 'inertScenery' to compare the disposition against
+    ! blk_gunMachine_BOTTOM: the product has no kind 'unconfirmedAction' to compare the disposition against
+    claimed_by_matcher               ["beacon_base", "beam_", "blinker", "changing_room", "control_beacon", "stage_end", "topdown_electro"]
+    controls                         {"meter_reads_the_product_not_itself": true, "missing_recorder_flips_probe": true, "safe_relabelled_as_typed_reddens_coverage": true, "synthetic_unclaimed_detected": false}
+    distinct_claimed                 8
+    distinct_source_blocks           11
+    lost_maps                        32
+    markers_covered                  76
+    markers_lost                     51
+    markers_total                    127
+    product_executed                 false
+    silent_drop_path_removed         false
+    unclaimed                        ["blk_gunMachine_BOTTOM", "blk_mushroom", "blk_waggon"]
+no_invented_content          PASS
+    controls                         {"deleted_file_detected": true, "invented_file_detected": true, "new_texture_literal_detected": true, "rewritten_file_detected": true, "uniqueness_shift_detected": true}
+    deleted                          []
+    identical_pairs_now              24
+    invented                         []
+    new_image_literals               []
+    resource_files_base              282
+    resource_files_working           282
+    rewritten                        []
+    unique_maps_now                  101
+safe_models_are_labeled      FAIL
+    ! blk_mushroom: product classifier maps 'mushroom' to None, table says 'inertScenery'
+    ! blk_mushroom: kind 'inertScenery' is not declared by TMXSourceMarkerKind (no enum found)
+    ! blk_mushroom: kind 'inertScenery' has no safeModelLabel literal in the product source
+    ! blk_mushroom: no runtime branch for kind 'inertScenery' (marker is still dropped)
+    ! blk_waggon: product classifier maps 'waggon' to None, table says 'inertScenery'
+    ! blk_waggon: kind 'inertScenery' is not declared by TMXSourceMarkerKind (no enum found)
+    ! blk_waggon: kind 'inertScenery' has no safeModelLabel literal in the product source
+    ! blk_waggon: no runtime branch for kind 'inertScenery' (marker is still dropped)
+    ! blk_gunMachine_BOTTOM: product classifier maps 'gunMachine_BOTTOM' to None, table says 'unconfirmedAction'
+    ! blk_gunMachine_BOTTOM: kind 'unconfirmedAction' is not declared by TMXSourceMarkerKind (no enum found)
+    ! blk_gunMachine_BOTTOM: kind 'unconfirmedAction' has no safeModelLabel literal in the product source
+    ! blk_gunMachine_BOTTOM: no runtime branch for kind 'unconfirmedAction' (marker is still dropped)
+    ! no appendSafeModelMarker helper exists to label the record
+    ! TMXSafeModelMarker carries no label field
+    ! FORBID-002 is not product-executed on this host (product build failed: Label)")
+31 | }
+
+/tmp/wave-c-swift-6ea2p5d8/main.swift:33:17: error: cannot find 'TMXSourceMarkerKind' in scope
+31 | }
+32 | for block in blockCount.keys.sorted() {
+33 |     let cells = TMXSourceMarkerKind.safeModelFootprintCells(sourceBlock: block)
+   |                 `- error: cannot find 'TMXSourceMarkerKind' in scope
+34 |     print("FOOTPRINT\t\(block)\t\(cells.width)x\(cells.height)")
+35 | }
+)
+    ! blk_beam_up: the product has no kind 'forceField' to compare the disposition against
+    ! blk_beam_down: the product has no kind 'forceField' to compare the disposition against
+    ! blk_beacon_base: the product has no kind 'beaconBase' to compare the disposition against
+    ! blk_control_beacon: the product has no kind 'controlBeacon' to compare the disposition against
+    ! blk_changing_room: the product has no kind 'changingRoom' to compare the disposition against
+    ! blk_stage_end: the product has no kind 'stageEnd' to compare the disposition against
+    ! blk_blinker: the product has no kind 'blinker' to compare the disposition against
+    ! blk_topdown_electro: the product has no kind 'highVoltage' to compare the disposition against
+    ! blk_mushroom: the product has no kind 'inertScenery' to compare the disposition against
+    ! blk_waggon: the product has no kind 'inertScenery' to compare the disposition against
+    ! blk_gunMachine_BOTTOM: the product has no kind 'unconfirmedAction' to compare the disposition against
+    ! GameScene.swift never reads safeModelMarkers: a recorded safe model has no debug rendering (FORBID-002 "in debug rendering")
+    classifier_kinds                 []
+    controls                         {"bogus_substring_rejected": true, "honest_overlay_binding_accepted": false, "overlay_deletion_detected": true, "overlay_label_strip_detected": true, "parse_gate_detects_a_broken_file": true, "safe_relabelled_as_typed_rejected": true, "typed_promoted_to_safe_rejected": true, "undeclared_kind_rejected": true, "unlabeled_placeholder_rejected": true}
+    labels                           {}
+    markers_covered_by_safe_models   51
+    product_labels                   {}
+    rendering_evidence_limit         "source-structure only: SpriteKit cannot be compiled or run on Linux (`import SpriteKit` fails at TMXLevelRuntime.swift:1), so the on-screen outline itself still needs the macOS spot in test-plan.md"
+    safe_model_families              ["blk_gunMachine_BOTTOM", "blk_mushroom", "blk_waggon"]
+    swift_parse                      {"GameScene.swift": "ok", "TMXLevelRuntime.swift": "ok", "TMXMapLoader.swift": "ok"}
+unchanged_marker_output      PASS
+    beam_rect_pinned                 ["x: sx, y: max(0, bottomY - 240), width: 48, height: 272"]
+    branches_changed_vs_base         []
+    branches_located                 ["beacon_base", "beam_", "blinker", "changing_room", "control_beacon", "stage_end", "topdown_electro"]
+    compared_against                 "295690b7fc72 (TMXLevelRuntime.swift)"
+    controls                         {"branch_comment_edit_ignored": true, "branch_rect_height_edit_detected": true, "branch_rect_width_edit_detected": true, "branch_statement_added_detected": true, "bucket_change_detected": true, "deviation_cannot_wildcard": true, "deviation_exact_and_cited_honored": true, "deviation_uncited_rejected": true, "deviation_wrong_target_rejected": true, "geometry_change_detected": tru...
+    covered_maps                     37
+    covered_markers                  76
+    data_digest                      "545e281f470c09002c2f5b2b1c87fa97c819aa0841c52b6d05321f7717a50564"
+    deviations_honored               []
+    golden_digest                    "545e281f470c09002c2f5b2b1c87fa97c819aa0841c52b6d05321f7717a50564"
+zone_index_formula           PASS
+    controls                         {"formula_distinguishes_base_zero_from_base_one": true, "naive_filename_compare_would_false_positive": true, "naive_one_based_would_false_positive": true}
+    false_mismatches_if_1_based      117
+    false_mismatches_if_filename     117
+    keyless_maps                     ["L01S01", "L01S02", "L01S03", "L01S04", "L01S05", "L01S06", "L01S07", "L01S08"]
+    maps_with_zone_number            117
+RESULT: WAVE_C_PROBES_FAIL | probes=9 failed=3 ignored_types_disposition,marker_coverage_all_maps,safe_models_are_labeled
+rc=1
+
+## Why THIS run carries 57 named controls and the green run 59
+At base the meter's own Swift probe program does not COMPILE: it calls
+TMXSourceMarkerKind.classify, which the pre-fix loader does not define. So
+swift_product_evidence() returns None and marker_coverage_all_maps omits its two
+execution controls (product_execution_agrees, product_negative_control_holds) while
+appending the problem 'AC-001 is not product-executed on this host'. The meter refuses to
+publish an executed product number it cannot execute - it does not fall back to a quiet
+Python replica and call it green. Same reason the same probe is RED here.

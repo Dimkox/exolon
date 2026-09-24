@@ -1,0 +1,66 @@
+{
+  "allowed_agents": [
+    "repo_explorer",
+    "architect",
+    "docs_researcher",
+    "code_reviewer",
+    "test_reviewer",
+    "general_implementer"
+  ],
+  "analysis_agents": [
+    "repo_explorer",
+    "architect",
+    "docs_researcher"
+  ],
+  "base_commit": "295690b7fc724e57b37b5fac86b71c1da7d8b032",
+  "base_fingerprint": "5b47433c632563d73e2d3147d71bcb605c8d3bbbf0059cfa8e0cb5557f0e1ad3",
+  "complexity": "standard",
+  "created_at": "2026-09-24T19:41:56+00:00",
+  "delivery_expected": true,
+  "domains": [
+    "generic"
+  ],
+  "human_gates": [],
+  "intent": "test",
+  "primary_skill": "adaptive-delivery",
+  "quality_profiles": [
+    "base"
+  ],
+  "rationale": [
+    "bounded change without high-risk signals",
+    "intent=test",
+    "domains=generic",
+    "repository=generic",
+    "write-owner=general_implementer",
+    "analysis-wave=3/10"
+  ],
+  "repo": {
+    "bitrix_modules": [],
+    "domains": [],
+    "kind": "generic",
+    "languages": [],
+    "package_scripts": [],
+    "signals": []
+  },
+  "required_evidence": [
+    "verification",
+    "code_review",
+    "test_review"
+  ],
+  "review_agents": [
+    "code_reviewer",
+    "test_reviewer"
+  ],
+  "risk": "low",
+  "route_id": "f2d90a858699",
+  "schema_version": 1,
+  "session_id": "manual",
+  "status": "routed",
+  "task": "Close wave-C content and factory audit findings in the Exolon repository: P1-7 (of 127 source_marker values only 76 are covered by the level factory matcher; blk_waggon, blk_gunMachine_BOTTOM and blk_mushroom are silently ignored on 32 maps - add the factory types or an explicit safe visual-object model) and P1-12 (only 101 of 125 maps are unique: 23 L02/L05 pairs and L03S09/L04S11 are identical - rule on intentionality explicitly, pin the identity with a committed digest manifest test and document it in the level spec).",
+  "task_domains": [],
+  "workflow_skills": [
+    "adaptive-delivery",
+    "verification-evidence"
+  ],
+  "write_agent": "general_implementer"
+}

@@ -1,0 +1,2095 @@
+{
+  "background_identical_pairs": [
+    [
+      "L02S04",
+      "L05S04"
+    ],
+    [
+      "L02S16",
+      "L05S16"
+    ],
+    [
+      "L02S22",
+      "L05S22"
+    ],
+    [
+      "L02S23",
+      "L05S23"
+    ]
+  ],
+  "canonicalization": {
+    "authority": "level-graph.md \"tiles + objects\" slice; proven to reproduce its 101/125 count, its 24 groups and its 4 fully-identical pairs",
+    "excludes": [
+      "map properties (nextLevel, zoneNumber, zoneSource, provenance keys)",
+      "imagelayer references and backdrop bytes (recorded per pair instead, as background_identical)",
+      "tileset declarations and their resolution"
+    ],
+    "id": "wave-c-canonical-1",
+    "includes": [
+      "every <layer> tile array, decoded with the product loader semantics (base64 -> little-endian uint32, csv -> split on \", \\n \\r \\t space\")",
+      "layer name/width/height/x/y attributes",
+      "every <object> in every objectgroup: name, type, x, y, width, height and its sorted <property> name/value pairs"
+    ],
+    "serialization": "json.dumps([...], sort_keys=True) -> sha256 hex"
+  },
+  "canonicalization_version": "wave-c-canonical-1",
+  "contract": "level-content-v1",
+  "duplicate_group_count": 24,
+  "generated_from_commit": "295690b7fc724e57b37b5fac86b71c1da7d8b032",
+  "identical_pairs": [
+    {
+      "a": "L02S03",
+      "b": "L05S03",
+      "background_a": "zone_027_original.png",
+      "background_b": "zone_102_original.png",
+      "background_identical": false,
+      "sha256": "25fa25b47a385fb2d4f3a233a512958d71e7b5a19d6beb6e695dee0327538c6c",
+      "stage_axis": "L02->L05",
+      "zone_a": 27,
+      "zone_b": 102
+    },
+    {
+      "a": "L02S04",
+      "b": "L05S04",
+      "background_a": "zone_028_original.png",
+      "background_b": "zone_103_original.png",
+      "background_identical": true,
+      "sha256": "ec656f8fa717870ed624e93a5ca850efb8b86ad769cfd9f403cd0c06cb32492d",
+      "stage_axis": "L02->L05",
+      "zone_a": 28,
+      "zone_b": 103
+    },
+    {
+      "a": "L02S05",
+      "b": "L05S05",
+      "background_a": "zone_029_original.png",
+      "background_b": "zone_104_original.png",
+      "background_identical": false,
+      "sha256": "feac6e5d29a1aea983077001b05b65f3c1824306283e5c8630632ad382b69f89",
+      "stage_axis": "L02->L05",
+      "zone_a": 29,
+      "zone_b": 104
+    },
+    {
+      "a": "L02S06",
+      "b": "L05S06",
+      "background_a": "zone_030_original.png",
+      "background_b": "zone_105_original.png",
+      "background_identical": false,
+      "sha256": "3eb8eecb3e859ec115bfb40dc2e31001ada6ae7a2d5fa67df5f28a2ee69f1d2e",
+      "stage_axis": "L02->L05",
+      "zone_a": 30,
+      "zone_b": 105
+    },
+    {
+      "a": "L02S07",
+      "b": "L05S07",
+      "background_a": "zone_031_original.png",
+      "background_b": "zone_106_original.png",
+      "background_identical": false,
+      "sha256": "e9cf3a259b1ce0941a9e7ccf64b89c19c55190276a2e001d3dae51735bf193d3",
+      "stage_axis": "L02->L05",
+      "zone_a": 31,
+      "zone_b": 106
+    },
+    {
+      "a": "L02S08",
+      "b": "L05S08",
+      "background_a": "zone_032_original.png",
+      "background_b": "zone_107_original.png",
+      "background_identical": false,
+      "sha256": "d460011e6b1682f758e6a890c78187784740d8b7205b824ee1de9b4dc3fcc2c9",
+      "stage_axis": "L02->L05",
+      "zone_a": 32,
+      "zone_b": 107
+    },
+    {
+      "a": "L02S09",
+      "b": "L05S09",
+      "background_a": "zone_033_original.png",
+      "background_b": "zone_108_original.png",
+      "background_identical": false,
+      "sha256": "7ffacf05fcd139ebb84245914622fd25896249a4a512d4ce7db4f0b5b7db5816",
+      "stage_axis": "L02->L05",
+      "zone_a": 33,
+      "zone_b": 108
+    },
+    {
+      "a": "L02S10",
+      "b": "L05S10",
+      "background_a": "zone_034_original.png",
+      "background_b": "zone_109_original.png",
+      "background_identical": false,
+      "sha256": "50bbb4717fc37706ab04f6ef125b1a45d2b784fa36a94705c0200ca8d7c8c5f5",
+      "stage_axis": "L02->L05",
+      "zone_a": 34,
+      "zone_b": 109
+    },
+    {
+      "a": "L02S11",
+      "b": "L05S11",
+      "background_a": "zone_035_original.png",
+      "background_b": "zone_110_original.png",
+      "background_identical": false,
+      "sha256": "c584edacb85df12cbc7ebecbe83fc420532cc64de010a3a4c4b8b17c693c7822",
+      "stage_axis": "L02->L05",
+      "zone_a": 35,
+      "zone_b": 110
+    },
+    {
+      "a": "L02S12",
+      "b": "L05S12",
+      "background_a": "zone_036_original.png",
+      "background_b": "zone_111_original.png",
+      "background_identical": false,
+      "sha256": "239f08a92b86dd81a4b7b80a93d69fd1b559aa1a47d339aa8b075cab10923425",
+      "stage_axis": "L02->L05",
+      "zone_a": 36,
+      "zone_b": 111
+    },
+    {
+      "a": "L02S13",
+      "b": "L05S13",
+      "background_a": "zone_037_original.png",
+      "background_b": "zone_112_original.png",
+      "background_identical": false,
+      "sha256": "64ab780a4314dd08e9f3c1904edeeb2831dc7cf7336f20594f52deea42d984a4",
+      "stage_axis": "L02->L05",
+      "zone_a": 37,
+      "zone_b": 112
+    },
+    {
+      "a": "L02S14",
+      "b": "L05S14",
+      "background_a": "zone_038_original.png",
+      "background_b": "zone_113_original.png",
+      "background_identical": false,
+      "sha256": "297d279548d28dfe9bebda6fc1daf74f2f6d30b5afe8d02765644942750c1600",
+      "stage_axis": "L02->L05",
+      "zone_a": 38,
+      "zone_b": 113
+    },
+    {
+      "a": "L02S15",
+      "b": "L05S15",
+      "background_a": "zone_039_original.png",
+      "background_b": "zone_114_original.png",
+      "background_identical": false,
+      "sha256": "ae3481ef24528f226a69890b28d658956f720e18970e96ddb1dc50f1f759682e",
+      "stage_axis": "L02->L05",
+      "zone_a": 39,
+      "zone_b": 114
+    },
+    {
+      "a": "L02S16",
+      "b": "L05S16",
+      "background_a": "zone_040_original.png",
+      "background_b": "zone_115_original.png",
+      "background_identical": true,
+      "sha256": "1fa0a045ac4f32d6d44060cc3abe48a38455a73b0d4f7420e2d864a6a021e204",
+      "stage_axis": "L02->L05",
+      "zone_a": 40,
+      "zone_b": 115
+    },
+    {
+      "a": "L02S17",
+      "b": "L05S17",
+      "background_a": "zone_041_original.png",
+      "background_b": "zone_116_original.png",
+      "background_identical": false,
+      "sha256": "1e31219f805fa50ef6cbbc5784668e0a4d2a18b4bc8ad368e19fb12325fb86e0",
+      "stage_axis": "L02->L05",
+      "zone_a": 41,
+      "zone_b": 116
+    },
+    {
+      "a": "L02S18",
+      "b": "L05S18",
+      "background_a": "zone_042_original.png",
+      "background_b": "zone_117_original.png",
+      "background_identical": false,
+      "sha256": "1f4fefa03803cca67e0c467cdeb2ce82b8ca63ad89e73e0ce15b942aeaef5cad",
+      "stage_axis": "L02->L05",
+      "zone_a": 42,
+      "zone_b": 117
+    },
+    {
+      "a": "L02S19",
+      "b": "L05S19",
+      "background_a": "zone_043_original.png",
+      "background_b": "zone_118_original.png",
+      "background_identical": false,
+      "sha256": "89ee6b239e8db9e18eb42e6ab5f5cf01b9cdb158b4bac0b9048361762847c92f",
+      "stage_axis": "L02->L05",
+      "zone_a": 43,
+      "zone_b": 118
+    },
+    {
+      "a": "L02S20",
+      "b": "L05S20",
+      "background_a": "zone_044_original.png",
+      "background_b": "zone_119_original.png",
+      "background_identical": false,
+      "sha256": "6b2713c0dde328f13978c48c8fa92ed38b9c72c2d1507b50d998c213c32c9723",
+      "stage_axis": "L02->L05",
+      "zone_a": 44,
+      "zone_b": 119
+    },
+    {
+      "a": "L02S21",
+      "b": "L05S21",
+      "background_a": "zone_045_original.png",
+      "background_b": "zone_120_original.png",
+      "background_identical": false,
+      "sha256": "12c1b543d404ad67256ffaeea53054425d8c816c7d581676efc018bd2cad574b",
+      "stage_axis": "L02->L05",
+      "zone_a": 45,
+      "zone_b": 120
+    },
+    {
+      "a": "L02S22",
+      "b": "L05S22",
+      "background_a": "zone_046_original.png",
+      "background_b": "zone_121_original.png",
+      "background_identical": true,
+      "sha256": "2c2ac5505ac42f10bdf7022956b7e869f907cd1449e70991d44bb19617db8e7f",
+      "stage_axis": "L02->L05",
+      "zone_a": 46,
+      "zone_b": 121
+    },
+    {
+      "a": "L02S23",
+      "b": "L05S23",
+      "background_a": "zone_047_original.png",
+      "background_b": "zone_122_original.png",
+      "background_identical": true,
+      "sha256": "76aea2bdb9ffdd6a7fc7d6f98953cc83750410fbf1fb3167f365281483530ad0",
+      "stage_axis": "L02->L05",
+      "zone_a": 47,
+      "zone_b": 122
+    },
+    {
+      "a": "L02S24",
+      "b": "L05S24",
+      "background_a": "zone_048_original.png",
+      "background_b": "zone_123_original.png",
+      "background_identical": false,
+      "sha256": "4e69ac41b93e08214611f254ef0bec3e2ce78ae9350006a89eb84b176e7e0623",
+      "stage_axis": "L02->L05",
+      "zone_a": 48,
+      "zone_b": 123
+    },
+    {
+      "a": "L02S25",
+      "b": "L05S25",
+      "background_a": "zone_049_original.png",
+      "background_b": "zone_124_original.png",
+      "background_identical": false,
+      "sha256": "3418dc573267c725aff516252206edbf34654103c55b29b5decbb6af9c757251",
+      "stage_axis": "L02->L05",
+      "zone_a": 49,
+      "zone_b": 124
+    },
+    {
+      "a": "L03S09",
+      "b": "L04S11",
+      "background_a": "zone_058_original.png",
+      "background_b": "zone_085_original.png",
+      "background_identical": false,
+      "note": "L03S09/L04S11",
+      "ruling_ground": "already identical in the shipped data; the recolored-stage-2 premise does not reach this pair",
+      "sha256": "1a91d3e79a277fbd297c12e3a192d3e7ec6c16bf8a28094e70496f2749187a98",
+      "stage_axis": "other (see pair_notes)",
+      "zone_a": 58,
+      "zone_b": 85
+    }
+  ],
+  "map_count": 125,
+  "maps": {
+    "L01S01": {
+      "background": "",
+      "background_count": 0,
+      "background_sha256": "",
+      "object_layers": [
+        "Object Layer 1"
+      ],
+      "scene": 1,
+      "sha256": "3fef19ced7822d1c86e4946ea089a8b3395b587d01557598c3095e2beb4eccf3",
+      "stage": 1,
+      "tile_layer_count": 2,
+      "zone_index": 0,
+      "zone_number_property": null
+    },
+    "L01S02": {
+      "background": "",
+      "background_count": 0,
+      "background_sha256": "",
+      "object_layers": [
+        "Object Layer 1"
+      ],
+      "scene": 2,
+      "sha256": "3fe48fb9eaf4df7298b57e8343890decc1e74599dd85acabc2ac10d55288ec51",
+      "stage": 1,
+      "tile_layer_count": 2,
+      "zone_index": 1,
+      "zone_number_property": null
+    },
+    "L01S03": {
+      "background": "",
+      "background_count": 0,
+      "background_sha256": "",
+      "object_layers": [
+        "Object Layer 1"
+      ],
+      "scene": 3,
+      "sha256": "b39348c781afa331bed7a320913bb0ca0b1f948f6dfe5f37d6de7ba05e71b65e",
+      "stage": 1,
+      "tile_layer_count": 2,
+      "zone_index": 2,
+      "zone_number_property": null
+    },
+    "L01S04": {
+      "background": "",
+      "background_count": 0,
+      "background_sha256": "",
+      "object_layers": [
+        "Object Layer 1"
+      ],
+      "scene": 4,
+      "sha256": "8b90c9bf50e816efceb8b7a775facf77e7166c15cd23af5a6fb9db697829b771",
+      "stage": 1,
+      "tile_layer_count": 4,
+      "zone_index": 3,
+      "zone_number_property": null
+    },
+    "L01S05": {
+      "background": "zone004_scenery.png",
+      "background_count": 1,
+      "background_sha256": "a149168f45c88655656f4cace8897d8854c3de29fd1f0cc97c46a01169d6a347",
+      "object_layers": [
+        "Object Layer 1"
+      ],
+      "scene": 5,
+      "sha256": "d7d67da385179bb9fdb2171f562e9e91101a1e9ece714ec0948404587fc2b94b",
+      "stage": 1,
+      "tile_layer_count": 4,
+      "zone_index": 4,
+      "zone_number_property": null
+    },
+    "L01S06": {
+      "background": "zone005_scenery.png",
+      "background_count": 1,
+      "background_sha256": "86b09ccea7f806b5ce280d08e2786b6cff5c1ae649639e919dbf68617628f5dd",
+      "object_layers": [
+        "Object Layer 1"
+      ],
+      "scene": 6,
+      "sha256": "a654e6befec16c3238b042c8a5440e69b89305ec49d5dff26cca347cab1c1d47",
+      "stage": 1,
+      "tile_layer_count": 4,
+      "zone_index": 5,
+      "zone_number_property": null
+    },
+    "L01S07": {
+      "background": "",
+      "background_count": 0,
+      "background_sha256": "",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 7,
+      "sha256": "9d7f23aa4d17cbc4a66db423cff1939b4e37c9078f694cb3001ba918887932e9",
+      "stage": 1,
+      "tile_layer_count": 2,
+      "zone_index": 6,
+      "zone_number_property": null
+    },
+    "L01S08": {
+      "background": "zone_007_original.png",
+      "background_count": 1,
+      "background_sha256": "a9ba7b398e5fe9fa11f0b43e4293334aff5d941be6bc9e7f4689a1c26e3029d8",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 8,
+      "sha256": "f18f992a11a1e510558ea3f9ab78615ee05b3511b8c0dd328c74ed9662f26422",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 7,
+      "zone_number_property": null
+    },
+    "L01S09": {
+      "background": "zone_008_original.png",
+      "background_count": 1,
+      "background_sha256": "d8c62d90403367e2fdeb36880f21f5d8876ee0cd6659d7b0d5c048795d888ba6",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 9,
+      "sha256": "f5f9673feb6b16d7531b93b8ec46363a9f5f74b3e4d0c1bc7cc953e2d728f2fc",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 8,
+      "zone_number_property": "008"
+    },
+    "L01S10": {
+      "background": "zone_009_original.png",
+      "background_count": 1,
+      "background_sha256": "c77d9c32113c4247c5c7fdd8385128bf2ddb542b8010c00e204d39325f1deb15",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 10,
+      "sha256": "7429b050c4922857a7fe12650f392d0d6fb9ab9cf2103a918d6372dbcf3a0074",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 9,
+      "zone_number_property": "009"
+    },
+    "L01S11": {
+      "background": "zone_010_original.png",
+      "background_count": 1,
+      "background_sha256": "8bf251b882ffa2ae2876d8fde309898782e8d844f0ae6aa743573b7fb9ca0f4e",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 11,
+      "sha256": "35b0adda495ebca453b5561d49e631320543d7b8311729f874de6081fa5ec4f7",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 10,
+      "zone_number_property": "010"
+    },
+    "L01S12": {
+      "background": "zone_011_original.png",
+      "background_count": 1,
+      "background_sha256": "bc0a61b5a6d0dd415789497a223198ea09d9170939540bcc326d5567d1bb1be6",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 12,
+      "sha256": "3ab101cefde7c026e9202258ea37470103f8d87dbe8f48fe7f9f9ab54f778620",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 11,
+      "zone_number_property": "011"
+    },
+    "L01S13": {
+      "background": "zone_012_original.png",
+      "background_count": 1,
+      "background_sha256": "9c3fefcfd512d3046192d8532da8822b475da18fca3512eb93fdf0713178ce5a",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 13,
+      "sha256": "6969b039f4a14ac9fe95b9148aceed0bf16fa16297141314954898afa7ee8c4c",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 12,
+      "zone_number_property": "012"
+    },
+    "L01S14": {
+      "background": "zone_013_original.png",
+      "background_count": 1,
+      "background_sha256": "28e88bb572e29e420c32abd4409b81ef934fc229a04bf0b3840a8a76956a0541",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 14,
+      "sha256": "862446f067fba549bdaf0c5378491b5dab66cb79237461b0bf6f782a0ea529f1",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 13,
+      "zone_number_property": "013"
+    },
+    "L01S15": {
+      "background": "zone_014_original.png",
+      "background_count": 1,
+      "background_sha256": "0bf0f59e55eb03539db09d2bf7c0c314dda6cf66a1967976c2a71ca38c524908",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 15,
+      "sha256": "c27470cc6d8e174d88d516bdc15b0f6af628524e98b57189ca15e5ecddbc9662",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 14,
+      "zone_number_property": "014"
+    },
+    "L01S16": {
+      "background": "zone_015_original.png",
+      "background_count": 1,
+      "background_sha256": "6d4bb88b0bec2b73b1cc5eda9b604da63b51bd3b84513d0e7a0967a90d9ebfdb",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 16,
+      "sha256": "6df482f782841741ea805c0ebdebbd8b9f3f63b9d5261f287e26799c0d8a0a0c",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 15,
+      "zone_number_property": "015"
+    },
+    "L01S17": {
+      "background": "zone_016_original.png",
+      "background_count": 1,
+      "background_sha256": "0d508d17376e31736b477379d634ebdbd41af64eb659671e5a8bd7aa7c2dfba5",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 17,
+      "sha256": "7c5f348873310e3a7380ab580da9c32e999e2006e68805237a8bedb124063749",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 16,
+      "zone_number_property": "016"
+    },
+    "L01S18": {
+      "background": "zone_017_original.png",
+      "background_count": 1,
+      "background_sha256": "fc860540574f92608adff193cfd9e72015138f86474b3787c195f0203e8aacd6",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 18,
+      "sha256": "f1923ab11393098e4b73717d9f433517bf335b6b8db944cca2b204dc0666c198",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 17,
+      "zone_number_property": "017"
+    },
+    "L01S19": {
+      "background": "zone_018_original.png",
+      "background_count": 1,
+      "background_sha256": "2dbc4567c1e65983705c1123f2e36fc49bc16e737f40909c6f09f8b7fb9f8d22",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 19,
+      "sha256": "e053692b5d6ccdcc8114b14fc6b60caa82b78ce982f17927e101bbfa6f427331",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 18,
+      "zone_number_property": "018"
+    },
+    "L01S20": {
+      "background": "zone_019_original.png",
+      "background_count": 1,
+      "background_sha256": "458cd736e81b518fa108e29d76d3549d303f1691e4466763f3709ab904c8218c",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 20,
+      "sha256": "721208194a13d748471472db3f252a7031fafac23668ea26a882a36891302a20",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 19,
+      "zone_number_property": "019"
+    },
+    "L01S21": {
+      "background": "zone_020_original.png",
+      "background_count": 1,
+      "background_sha256": "9d91a55492f7008e931407fbfb580223947fad27e539234447d891c1efc5127d",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 21,
+      "sha256": "3a804c8d530391b02ee238a7a582afa163e9bbc6ee8516dd0e1c9c3cf7d68e30",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 20,
+      "zone_number_property": "020"
+    },
+    "L01S22": {
+      "background": "zone_021_original.png",
+      "background_count": 1,
+      "background_sha256": "54e895529eef760307f273b7620faeedc260b92440cb4d9cc6f8d98998207f71",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 22,
+      "sha256": "d12520948668baba1b9fa6a8f8c88d27af3d5860df427935da052d4a5f8a4059",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 21,
+      "zone_number_property": "021"
+    },
+    "L01S23": {
+      "background": "zone_022_original.png",
+      "background_count": 1,
+      "background_sha256": "0f1d11431a9866f70c0bcffe17352347fe58ad41fe9dbde1242f95cf9bef6400",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 23,
+      "sha256": "1fed1f6e4276b112daa9a52aed819424355c9f38eda7d13983ef1c6d977861b9",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 22,
+      "zone_number_property": "022"
+    },
+    "L01S24": {
+      "background": "zone_023_original.png",
+      "background_count": 1,
+      "background_sha256": "37a076c43b1f07f67dc577b2d334c7c73af695e325629df5b18927c0a59f6bfa",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 24,
+      "sha256": "608aa0a9b4bd07bdcbf0138b92d6b9b39d3a10e6874c99d22300977a174fee2f",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 23,
+      "zone_number_property": "023"
+    },
+    "L01S25": {
+      "background": "zone_024_original.png",
+      "background_count": 1,
+      "background_sha256": "46cd7f6f477616d441cc5a595f03389523662b30e3be12659dd01a794f21d70f",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 25,
+      "sha256": "b6e7df9ca8bafb30cf64471dc511492fd5d1a97b870826af931abffa75f01ce5",
+      "stage": 1,
+      "tile_layer_count": 1,
+      "zone_index": 24,
+      "zone_number_property": "024"
+    },
+    "L02S01": {
+      "background": "zone_025_original.png",
+      "background_count": 1,
+      "background_sha256": "bc01374a174ae5327e274047d5bc429af7e031998ae6a7bc023c8c05b0652edd",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 1,
+      "sha256": "241cc918020f233abd3a335927bfde8a3126b8a099875199c484327ef3b35319",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 25,
+      "zone_number_property": "025"
+    },
+    "L02S02": {
+      "background": "zone_026_original.png",
+      "background_count": 1,
+      "background_sha256": "2db5bca79611c625f8af37c907fe5e8f0b921a0d3329a6cd951c21b5f6a654de",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 2,
+      "sha256": "082ade541de1f57851fd415ae6da0a17e800bcbb43f5520eba3ae9ec15d8ede7",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 26,
+      "zone_number_property": "026"
+    },
+    "L02S03": {
+      "background": "zone_027_original.png",
+      "background_count": 1,
+      "background_sha256": "e96918e3b5a7cea67566ae60a453aa36026fde4c1c2bcf1d1565aa3fbdc69055",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 3,
+      "sha256": "25fa25b47a385fb2d4f3a233a512958d71e7b5a19d6beb6e695dee0327538c6c",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 27,
+      "zone_number_property": "027"
+    },
+    "L02S04": {
+      "background": "zone_028_original.png",
+      "background_count": 1,
+      "background_sha256": "3ca00bb3c156b17378817c852e5a02d75408b1acaef8245cad379f32cd6aa09f",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 4,
+      "sha256": "ec656f8fa717870ed624e93a5ca850efb8b86ad769cfd9f403cd0c06cb32492d",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 28,
+      "zone_number_property": "028"
+    },
+    "L02S05": {
+      "background": "zone_029_original.png",
+      "background_count": 1,
+      "background_sha256": "d31ca02816187b7c2d804c809c5a613d537b03608214d2a8c02e07bf74414f34",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 5,
+      "sha256": "feac6e5d29a1aea983077001b05b65f3c1824306283e5c8630632ad382b69f89",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 29,
+      "zone_number_property": "029"
+    },
+    "L02S06": {
+      "background": "zone_030_original.png",
+      "background_count": 1,
+      "background_sha256": "f87b68433952be96f64be883f18188afa5687c8f3e22bdfb83e0745f43b01c98",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 6,
+      "sha256": "3eb8eecb3e859ec115bfb40dc2e31001ada6ae7a2d5fa67df5f28a2ee69f1d2e",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 30,
+      "zone_number_property": "030"
+    },
+    "L02S07": {
+      "background": "zone_031_original.png",
+      "background_count": 1,
+      "background_sha256": "c8e7a064f851e54f5f30c79e525aabee6ca6ef2b13be227781f76e9232c5d9b0",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 7,
+      "sha256": "e9cf3a259b1ce0941a9e7ccf64b89c19c55190276a2e001d3dae51735bf193d3",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 31,
+      "zone_number_property": "031"
+    },
+    "L02S08": {
+      "background": "zone_032_original.png",
+      "background_count": 1,
+      "background_sha256": "8bf6e4679a4be5804b708b1610757d765c417c5e563371a91379cceb481c665e",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 8,
+      "sha256": "d460011e6b1682f758e6a890c78187784740d8b7205b824ee1de9b4dc3fcc2c9",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 32,
+      "zone_number_property": "032"
+    },
+    "L02S09": {
+      "background": "zone_033_original.png",
+      "background_count": 1,
+      "background_sha256": "4e2e03f3b2bf871d3356fa016868aab8d9161c9326b15dc4016ae6960d249c36",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 9,
+      "sha256": "7ffacf05fcd139ebb84245914622fd25896249a4a512d4ce7db4f0b5b7db5816",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 33,
+      "zone_number_property": "033"
+    },
+    "L02S10": {
+      "background": "zone_034_original.png",
+      "background_count": 1,
+      "background_sha256": "ef3156b6d5442e2ad2c7d8fd892b7f5b205cd0f8a18030b08c3ed04edfcc39b2",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 10,
+      "sha256": "50bbb4717fc37706ab04f6ef125b1a45d2b784fa36a94705c0200ca8d7c8c5f5",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 34,
+      "zone_number_property": "034"
+    },
+    "L02S11": {
+      "background": "zone_035_original.png",
+      "background_count": 1,
+      "background_sha256": "cbd56c26f801754a759f1bdb5144db3d9cf896bf6e05ec74e9d2569709de4fbb",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 11,
+      "sha256": "c584edacb85df12cbc7ebecbe83fc420532cc64de010a3a4c4b8b17c693c7822",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 35,
+      "zone_number_property": "035"
+    },
+    "L02S12": {
+      "background": "zone_036_original.png",
+      "background_count": 1,
+      "background_sha256": "043746b033f0463b3e35743a2296e7e762adbc03650ba3433ad52e2fbbf9d364",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 12,
+      "sha256": "239f08a92b86dd81a4b7b80a93d69fd1b559aa1a47d339aa8b075cab10923425",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 36,
+      "zone_number_property": "036"
+    },
+    "L02S13": {
+      "background": "zone_037_original.png",
+      "background_count": 1,
+      "background_sha256": "46e862930e5acc2c84fb7f2f217a905f55954d08ab5ecd8bbb4776ae6ba60605",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 13,
+      "sha256": "64ab780a4314dd08e9f3c1904edeeb2831dc7cf7336f20594f52deea42d984a4",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 37,
+      "zone_number_property": "037"
+    },
+    "L02S14": {
+      "background": "zone_038_original.png",
+      "background_count": 1,
+      "background_sha256": "13b2d30f0d0195b82a85801813ed2af53d5e86f8e9049ee8de9c7e0967c6baf7",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 14,
+      "sha256": "297d279548d28dfe9bebda6fc1daf74f2f6d30b5afe8d02765644942750c1600",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 38,
+      "zone_number_property": "038"
+    },
+    "L02S15": {
+      "background": "zone_039_original.png",
+      "background_count": 1,
+      "background_sha256": "23c44b5c35b0d96ede9cc5fc4ac5e16850c8aceae48556649edb0ead762d0d25",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 15,
+      "sha256": "ae3481ef24528f226a69890b28d658956f720e18970e96ddb1dc50f1f759682e",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 39,
+      "zone_number_property": "039"
+    },
+    "L02S16": {
+      "background": "zone_040_original.png",
+      "background_count": 1,
+      "background_sha256": "60d81c4d0bb11cf4f07df019bfee3cc3e9688c10721e7e9265a626e5d30ed5d6",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 16,
+      "sha256": "1fa0a045ac4f32d6d44060cc3abe48a38455a73b0d4f7420e2d864a6a021e204",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 40,
+      "zone_number_property": "040"
+    },
+    "L02S17": {
+      "background": "zone_041_original.png",
+      "background_count": 1,
+      "background_sha256": "de7bbf586f6408763960a553c432d04f47b4db7872d608d409a7f5ecb76328b3",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 17,
+      "sha256": "1e31219f805fa50ef6cbbc5784668e0a4d2a18b4bc8ad368e19fb12325fb86e0",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 41,
+      "zone_number_property": "041"
+    },
+    "L02S18": {
+      "background": "zone_042_original.png",
+      "background_count": 1,
+      "background_sha256": "e790eac8745e6c3a79d69e373ef407751e564400161698d41cd1f0b87fb226ab",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 18,
+      "sha256": "1f4fefa03803cca67e0c467cdeb2ce82b8ca63ad89e73e0ce15b942aeaef5cad",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 42,
+      "zone_number_property": "042"
+    },
+    "L02S19": {
+      "background": "zone_043_original.png",
+      "background_count": 1,
+      "background_sha256": "c486a452b7cade84d3eb813e46110ef060741eb06c36c7d66f1f644b136c7be9",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 19,
+      "sha256": "89ee6b239e8db9e18eb42e6ab5f5cf01b9cdb158b4bac0b9048361762847c92f",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 43,
+      "zone_number_property": "043"
+    },
+    "L02S20": {
+      "background": "zone_044_original.png",
+      "background_count": 1,
+      "background_sha256": "67972782c2a675adef04be758136aea520fda8e08e03665bb9013f7dfde9b499",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 20,
+      "sha256": "6b2713c0dde328f13978c48c8fa92ed38b9c72c2d1507b50d998c213c32c9723",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 44,
+      "zone_number_property": "044"
+    },
+    "L02S21": {
+      "background": "zone_045_original.png",
+      "background_count": 1,
+      "background_sha256": "5e158d7b8946877dc7edf8b6ae17e19dc212de2d9ba6b76c9c4d794190121b18",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 21,
+      "sha256": "12c1b543d404ad67256ffaeea53054425d8c816c7d581676efc018bd2cad574b",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 45,
+      "zone_number_property": "045"
+    },
+    "L02S22": {
+      "background": "zone_046_original.png",
+      "background_count": 1,
+      "background_sha256": "cba253c960f3f12110b79609e8fca215f5fce901b8fcdbdff92935cd01afabc6",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 22,
+      "sha256": "2c2ac5505ac42f10bdf7022956b7e869f907cd1449e70991d44bb19617db8e7f",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 46,
+      "zone_number_property": "046"
+    },
+    "L02S23": {
+      "background": "zone_047_original.png",
+      "background_count": 1,
+      "background_sha256": "41a6deef7da762e1af86cc0d57f699aae5138a95e818cf819094bf195bb21c2d",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 23,
+      "sha256": "76aea2bdb9ffdd6a7fc7d6f98953cc83750410fbf1fb3167f365281483530ad0",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 47,
+      "zone_number_property": "047"
+    },
+    "L02S24": {
+      "background": "zone_048_original.png",
+      "background_count": 1,
+      "background_sha256": "2d3dee1908f73865781302d3ba795d63bd18f1d7945b1ff2a1caea605dbbf266",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 24,
+      "sha256": "4e69ac41b93e08214611f254ef0bec3e2ce78ae9350006a89eb84b176e7e0623",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 48,
+      "zone_number_property": "048"
+    },
+    "L02S25": {
+      "background": "zone_049_original.png",
+      "background_count": 1,
+      "background_sha256": "1e3b82a1cf2eac8567d2defd3bbd8602dbf7d401be4edf754f3eea7cb828c673",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 25,
+      "sha256": "3418dc573267c725aff516252206edbf34654103c55b29b5decbb6af9c757251",
+      "stage": 2,
+      "tile_layer_count": 1,
+      "zone_index": 49,
+      "zone_number_property": "049"
+    },
+    "L03S01": {
+      "background": "zone_050_original.png",
+      "background_count": 1,
+      "background_sha256": "db2a6b2749075cfcace77a93cb52fd46b836dc041f4d92fbe32dbdce29f2aa28",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 1,
+      "sha256": "5c36a2fedda6df42cfc5cde063e8c05780704a2f5b12d38dddfa45c9b84cdb5a",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 50,
+      "zone_number_property": "050"
+    },
+    "L03S02": {
+      "background": "zone_051_original.png",
+      "background_count": 1,
+      "background_sha256": "f2fe7ed3939ce8d6548219962af5b86b258dd8570f787adc893e3af262fbbb5c",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 2,
+      "sha256": "526e8569e2f7ecddef13337ae9cbc35a2dc236e0f65e8163c3ee52a0af31b8b1",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 51,
+      "zone_number_property": "051"
+    },
+    "L03S03": {
+      "background": "zone_052_original.png",
+      "background_count": 1,
+      "background_sha256": "6271a3c3f45280222149d6630a7e7e12137108333bdbf475636d7f97389cd707",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 3,
+      "sha256": "b8c7e8c7752d99bc81d8906bc9c45a6e554275a55e179e3b3eb614c3db811f16",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 52,
+      "zone_number_property": "052"
+    },
+    "L03S04": {
+      "background": "zone_053_original.png",
+      "background_count": 1,
+      "background_sha256": "bb00f86eba32bf64573c29bd04c042b777163f69c46c5b9956e1b877a843d236",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 4,
+      "sha256": "d44197c972d0dc3a9fadd4019735a67629467adc69e522aa7f1f23b35cb33f11",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 53,
+      "zone_number_property": "053"
+    },
+    "L03S05": {
+      "background": "zone_054_original.png",
+      "background_count": 1,
+      "background_sha256": "0ab70eb537f5c0b2465cfe6fc332904950ad14298476889d111d2b1a147f36eb",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 5,
+      "sha256": "72b7544885df8c782c6483bb8068726c34e356b2a8aff35185c66cce87b96ac0",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 54,
+      "zone_number_property": "054"
+    },
+    "L03S06": {
+      "background": "zone_055_original.png",
+      "background_count": 1,
+      "background_sha256": "97ac30af495598fef9cf48882c44b21fb7f14e3f5fdd4dbd5f08af5ac67708fa",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 6,
+      "sha256": "72a1b84a7b37f600dc18f5f39f4d2a5c9392c9a41a5383c46315f09d14edcd1e",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 55,
+      "zone_number_property": "055"
+    },
+    "L03S07": {
+      "background": "zone_056_original.png",
+      "background_count": 1,
+      "background_sha256": "1af0bb4d200b51af48fa266b040a16ef4cb19ee88ac6c29702e6e99cdd135854",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 7,
+      "sha256": "4bc16216161ed053e1061f79a83cfd6c3e8eecb92f19d8c8020d9bb10da8b675",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 56,
+      "zone_number_property": "056"
+    },
+    "L03S08": {
+      "background": "zone_057_original.png",
+      "background_count": 1,
+      "background_sha256": "ce8aba0603aa10beef715b0d388a8491cff0f817722fa749cc4c435dc50cd4e2",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 8,
+      "sha256": "57af3ef2eec26726798110a56aa18eb4d15112c94b0a29d63790cd9a1677598d",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 57,
+      "zone_number_property": "057"
+    },
+    "L03S09": {
+      "background": "zone_058_original.png",
+      "background_count": 1,
+      "background_sha256": "b3983af6c4f66f79ef9833e498a02922b2d547793c10b75328a84fe3d715f4fa",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 9,
+      "sha256": "1a91d3e79a277fbd297c12e3a192d3e7ec6c16bf8a28094e70496f2749187a98",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 58,
+      "zone_number_property": "058"
+    },
+    "L03S10": {
+      "background": "zone_059_original.png",
+      "background_count": 1,
+      "background_sha256": "ac763a79b19330c6a010fdf134197f00be8ad813b7a0a039cd0583f12154eee7",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 10,
+      "sha256": "5dedadd3a3802c1f2d46740162a2dc88f5feb1da5647aefe8beb5f5cf879ffa5",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 59,
+      "zone_number_property": "059"
+    },
+    "L03S11": {
+      "background": "zone_060_original.png",
+      "background_count": 1,
+      "background_sha256": "857e014a324887eb092516a64081485535c4fcfe8d9f36196f3ee2c3002aaaf0",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 11,
+      "sha256": "7fb10bc2a95cbe33bea2f43b787b1cc9ce1e2de18a6e72d10a23d54877e3295e",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 60,
+      "zone_number_property": "060"
+    },
+    "L03S12": {
+      "background": "zone_061_original.png",
+      "background_count": 1,
+      "background_sha256": "0fc31ec9c1d042e67f8f231114fee2485330d2dc856653eab86ee86380e13116",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 12,
+      "sha256": "be6221ff19766c2096026aad2b5f86fe55dec48d16841ae4c49e381ac7c51264",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 61,
+      "zone_number_property": "061"
+    },
+    "L03S13": {
+      "background": "zone_062_original.png",
+      "background_count": 1,
+      "background_sha256": "c8b75ca9c80339d75f8344e4d16f62bf5f2b61781d456555c7139b0245196947",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 13,
+      "sha256": "81d63f5e4cfc412faf75ffbfd0b850f9a9c2a6a52b553a4a2552f8442e764fd6",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 62,
+      "zone_number_property": "062"
+    },
+    "L03S14": {
+      "background": "zone_063_original.png",
+      "background_count": 1,
+      "background_sha256": "e45de1ecb1c13103b159968518a0be4d49ce25b6b18204a635dcd01f64419c86",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 14,
+      "sha256": "b54a72d9358bc5e84ca64bf9e19295aef328f37ea5323985f31cc475620bb135",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 63,
+      "zone_number_property": "063"
+    },
+    "L03S15": {
+      "background": "zone_064_original.png",
+      "background_count": 1,
+      "background_sha256": "1f3cb9d58bc1e6163c33642571fc5d9dcf2e6381e1c2c56de0e5029d80460477",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 15,
+      "sha256": "298170dd4bdef358842afc7217c9e22d6cc5978721c88318569c7eaa3d83ebdf",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 64,
+      "zone_number_property": "064"
+    },
+    "L03S16": {
+      "background": "zone_065_original.png",
+      "background_count": 1,
+      "background_sha256": "57d6cd6cbc159815ccb03efbe1323f4138915d21a6dd3c1d20169b21ddbd92db",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 16,
+      "sha256": "9bef2af50abcd754da7c1fdc5a4d8b1fff3f1fb3683cf916b484b1c13aa31e90",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 65,
+      "zone_number_property": "065"
+    },
+    "L03S17": {
+      "background": "zone_066_original.png",
+      "background_count": 1,
+      "background_sha256": "83a9af682a59e6bde639622afd579e1220af7d6a54e3e1c58de0e90cdfb063ff",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 17,
+      "sha256": "c022635ba4f58a3607a01f9f1a445083e713dd9968327dc8e91fa4629ece0cac",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 66,
+      "zone_number_property": "066"
+    },
+    "L03S18": {
+      "background": "zone_067_original.png",
+      "background_count": 1,
+      "background_sha256": "22111a2fed6e447fc34f96c504ae2a509fff79194c01c5c33b238e7903035e83",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 18,
+      "sha256": "104db1ac8d81522bf58e17f4f900d74ea93d5f8c815291064f790240fafb5a26",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 67,
+      "zone_number_property": "067"
+    },
+    "L03S19": {
+      "background": "zone_068_original.png",
+      "background_count": 1,
+      "background_sha256": "0d68582689675fc90fcd7418ae113ffe0fd9f60ad9fa363907ffbbd74948c509",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 19,
+      "sha256": "4fc2c45045f7cdf52e248c0068c941859ff9472d44739e88472bd63790c868be",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 68,
+      "zone_number_property": "068"
+    },
+    "L03S20": {
+      "background": "zone_069_original.png",
+      "background_count": 1,
+      "background_sha256": "7e56f646e227bae818ef23f4a09a0f9a736e0af70b5318fc0d67a5dd297f98c1",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 20,
+      "sha256": "1d515a4542fe441e79cf37c0ce27f9dce8615020cafc5e8e6027c20a9a15665b",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 69,
+      "zone_number_property": "069"
+    },
+    "L03S21": {
+      "background": "zone_070_original.png",
+      "background_count": 1,
+      "background_sha256": "f9e230143d58198824688309041e3177a1a1863a6d16689e4791bd947cdba29d",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 21,
+      "sha256": "8658de90f9d3f12a96170f2ec96521a264fdbf8585f09546803b8db39a92d88e",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 70,
+      "zone_number_property": "070"
+    },
+    "L03S22": {
+      "background": "zone_071_original.png",
+      "background_count": 1,
+      "background_sha256": "0ac6b72e01dd6783009c7a4b38f37bbc15b96782db3c6e2c681e027d774f0926",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 22,
+      "sha256": "86b99c6c599cc9af8e816fd8223b170e953ce31f5de67554e1a652bf73e7a2c1",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 71,
+      "zone_number_property": "071"
+    },
+    "L03S23": {
+      "background": "zone_072_original.png",
+      "background_count": 1,
+      "background_sha256": "ff7585f12d842e549c6b52d6982bd20b4efa0c3baf8bc6e417f0730fb60faf6e",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 23,
+      "sha256": "5f6e892446fbd10f38149a0e6378bb99fbddb30a91658f900010c92f613e76cc",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 72,
+      "zone_number_property": "072"
+    },
+    "L03S24": {
+      "background": "zone_073_original.png",
+      "background_count": 1,
+      "background_sha256": "434894152c05df71af4645e8d024c52aa0f56c89bb65d56af6f4f82f0f8f6458",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 24,
+      "sha256": "7f9c699aa82581add86fb38e4423e33193bdcae470a0ddabe6932757d27649f5",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 73,
+      "zone_number_property": "073"
+    },
+    "L03S25": {
+      "background": "zone_074_original.png",
+      "background_count": 1,
+      "background_sha256": "05d41fb556207a5fd2bde563e6cd0138116dc99910c0b187d26e340d0c9a3e88",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 25,
+      "sha256": "2a8f3ddf5048ba9216559a83c4532bcf99748e821d0618f9bbd7a3d3c3e76936",
+      "stage": 3,
+      "tile_layer_count": 1,
+      "zone_index": 74,
+      "zone_number_property": "074"
+    },
+    "L04S01": {
+      "background": "zone_075_original.png",
+      "background_count": 1,
+      "background_sha256": "27919161f08a86c78e8420133e0ff2e5b238735ff2557764367cb6eb28d3ead9",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 1,
+      "sha256": "2bcbc484baa29d811daba84df3f5b9c73ca40c8a44cb51e1fd33ebfcb46b0f6c",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 75,
+      "zone_number_property": "075"
+    },
+    "L04S02": {
+      "background": "zone_076_original.png",
+      "background_count": 1,
+      "background_sha256": "407310a113b6ff9481f73a742d7089a224851bec2bdcc384ea14f052bbd955d9",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 2,
+      "sha256": "ac83a582c520515599a632e214ea43607d63429f74aa3ab0bd4e4a97ea2dba20",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 76,
+      "zone_number_property": "076"
+    },
+    "L04S03": {
+      "background": "zone_077_original.png",
+      "background_count": 1,
+      "background_sha256": "da6d0e65dead416e28af71660a54c2b4fd20f2dc0da3b6d879ed1a13fab383f3",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 3,
+      "sha256": "869e2fb6166399ba589f9e37e9b9c97e9eb57c64c977dd35f746abfdfb30e770",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 77,
+      "zone_number_property": "077"
+    },
+    "L04S04": {
+      "background": "zone_078_original.png",
+      "background_count": 1,
+      "background_sha256": "d245ab691f8a832b50b4b5fc96e1c933d0c29f32e6957d2eabd6596018525a07",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 4,
+      "sha256": "3fba32f96d43351799f133d01d11a92d268840f75788acc063b8a987cc086733",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 78,
+      "zone_number_property": "078"
+    },
+    "L04S05": {
+      "background": "zone_079_original.png",
+      "background_count": 1,
+      "background_sha256": "3954436fc6139051f382bc5110c7eb2cc18f758ac1245e593eb378c0baa695ee",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 5,
+      "sha256": "92ef76f0358b89a7f1c2b1e6c67a3763c9aa63769cc16b9d523169382e46de18",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 79,
+      "zone_number_property": "079"
+    },
+    "L04S06": {
+      "background": "zone_080_original.png",
+      "background_count": 1,
+      "background_sha256": "2cdf653062f332d67ecb29981d1827f045bf6a6302f219b228b0e2d49ed22ed7",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 6,
+      "sha256": "d014ce0a615ff67e3c28769045d82dbf503245f60ed65bf546d33cc9829f4d44",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 80,
+      "zone_number_property": "080"
+    },
+    "L04S07": {
+      "background": "zone_081_original.png",
+      "background_count": 1,
+      "background_sha256": "fcf6403bcc17811d4bbee77b59a40a6689ac4507986aac9c83fd29dccb0bd627",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 7,
+      "sha256": "894813aa4a53f120e68cb0dec0400e324f92a80e63ac616549f0d755bce7f44b",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 81,
+      "zone_number_property": "081"
+    },
+    "L04S08": {
+      "background": "zone_082_original.png",
+      "background_count": 1,
+      "background_sha256": "ff1a09ea037eef912dfe1b974798b868dc2fab69c9997a7c332121a3ef0b20b7",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 8,
+      "sha256": "63c4d88aedd6a87db742e13209aafc6f9d1988525337561bcc3147a5820961db",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 82,
+      "zone_number_property": "082"
+    },
+    "L04S09": {
+      "background": "zone_083_original.png",
+      "background_count": 1,
+      "background_sha256": "9402487e00e9fcf114d361bb47da806271b95d04490859a4e3cd8b36c046f87f",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 9,
+      "sha256": "5d86d3183dffc246a6360d2eb1d1a95d48a47d5ff182f668941d5e78a51bbcb0",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 83,
+      "zone_number_property": "083"
+    },
+    "L04S10": {
+      "background": "zone_084_original.png",
+      "background_count": 1,
+      "background_sha256": "e0cd92348c1270fe7a01d73465a86a727b09c21f215ca93a520a705b9a2a8ab9",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 10,
+      "sha256": "6c9906a94a4843ba3836b5387f1cd7ceb182fd7e1aa27c4cef988edd1656714e",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 84,
+      "zone_number_property": "084"
+    },
+    "L04S11": {
+      "background": "zone_085_original.png",
+      "background_count": 1,
+      "background_sha256": "1f8d31ee05e7867bab1f0c02a4e756bbc288f68155f09969e8ceff48d07f26db",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 11,
+      "sha256": "1a91d3e79a277fbd297c12e3a192d3e7ec6c16bf8a28094e70496f2749187a98",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 85,
+      "zone_number_property": "085"
+    },
+    "L04S12": {
+      "background": "zone_086_original.png",
+      "background_count": 1,
+      "background_sha256": "6c75b4dc85a4a7b5e5928061f29986e87df1bee60fcc1b4161b94444c98851e8",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 12,
+      "sha256": "2c7a37a63b2d273e3793179ec8ca59ed31248c93e0bd38d8e43ed3d9cd454932",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 86,
+      "zone_number_property": "086"
+    },
+    "L04S13": {
+      "background": "zone_087_original.png",
+      "background_count": 1,
+      "background_sha256": "4c3411520f80e80c13d1bacc6175b1ffaa73f1da46f2cbc87ebdb3bde080c7b4",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 13,
+      "sha256": "51f3718d2767992fb198da4f5c6e07b81385d69ff1704995e8e13404e28958fb",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 87,
+      "zone_number_property": "087"
+    },
+    "L04S14": {
+      "background": "zone_088_original.png",
+      "background_count": 1,
+      "background_sha256": "cfb994c304d408dfcc24fb8130151fe3adfed07d7dfb4c6ba23fe5edaa01b84e",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 14,
+      "sha256": "fefe50220bc07939f2758132564722c87869716447e75189be3e124031b1245a",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 88,
+      "zone_number_property": "088"
+    },
+    "L04S15": {
+      "background": "zone_089_original.png",
+      "background_count": 1,
+      "background_sha256": "4bf4b863fa751a5cd69fbb3e7d5cd95d45bda568b32adf8d46999f8ea84fa691",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 15,
+      "sha256": "0d828c1fdeaa1e98119804f47b0ca07689d22f60e0cf6ecb2367b251c3a82ca0",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 89,
+      "zone_number_property": "089"
+    },
+    "L04S16": {
+      "background": "zone_090_original.png",
+      "background_count": 1,
+      "background_sha256": "16222b4f414772b0306c20f98acdd357bb2e9d890fb4a7d0c503dd7577fafb08",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 16,
+      "sha256": "0148060f21f2ab660e7610772a331e64255db20691976ada363303e3de4baa8c",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 90,
+      "zone_number_property": "090"
+    },
+    "L04S17": {
+      "background": "zone_091_original.png",
+      "background_count": 1,
+      "background_sha256": "69fcd036f1b9cf69a552b5d3600480a6760f28216beb82ca83072cb7999d9bb1",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 17,
+      "sha256": "85b8ce80d2886c177e4b1ce53e731490f93cbfb85bef518f7342b06ee03d22df",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 91,
+      "zone_number_property": "091"
+    },
+    "L04S18": {
+      "background": "zone_092_original.png",
+      "background_count": 1,
+      "background_sha256": "b5ffad5e0db88585fe24ae79076e2f2704528662ded4d0d72e8f707f4fbbbb4f",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 18,
+      "sha256": "eff9aeb0893b1662a8f7658f51ef817e768fac55ed9d3563b473602cf678057d",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 92,
+      "zone_number_property": "092"
+    },
+    "L04S19": {
+      "background": "zone_093_original.png",
+      "background_count": 1,
+      "background_sha256": "d97fe86d2814263d30863776f417694877b34940a2c15b8c6d12e145c518b1c3",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 19,
+      "sha256": "91d78f1ce64b719c047f1d93f2a0283f7127b5ec525d9253b37cbf3c075a0fef",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 93,
+      "zone_number_property": "093"
+    },
+    "L04S20": {
+      "background": "zone_094_original.png",
+      "background_count": 1,
+      "background_sha256": "d78b961aded865acae25952e8725bf5a812ed23cbc0f0081d4789899d5f2cd42",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 20,
+      "sha256": "be59c5c796a88dd169fe10889df5eea26d9236448d4ed6bbb471fcdb4a86f6da",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 94,
+      "zone_number_property": "094"
+    },
+    "L04S21": {
+      "background": "zone_095_original.png",
+      "background_count": 1,
+      "background_sha256": "2c50a9126e402e4126566a0d0b0e91c6bfe822fc552cc1957a2b558325ee8532",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 21,
+      "sha256": "f31ad7ebe53ccc3977c20b17eec64360138ca6c578fc45b8d83e26c4497fad96",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 95,
+      "zone_number_property": "095"
+    },
+    "L04S22": {
+      "background": "zone_096_original.png",
+      "background_count": 1,
+      "background_sha256": "dd255f7ff0e4603716dd0ceb6ce9bbb6442ca43492b81199033858397a22bd52",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 22,
+      "sha256": "d626059a3f40f67d641f8929f1f512c3b328aae19450126f597cd6c1fe1ab961",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 96,
+      "zone_number_property": "096"
+    },
+    "L04S23": {
+      "background": "zone_097_original.png",
+      "background_count": 1,
+      "background_sha256": "511e486c384a370bfe44f68e01752e2c27dcabd6b858e02046ce768de912abb7",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 23,
+      "sha256": "6ff35eb16f4e322d33c1bd755921837f022a98289245d79ca65044f3cd53eade",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 97,
+      "zone_number_property": "097"
+    },
+    "L04S24": {
+      "background": "zone_098_original.png",
+      "background_count": 1,
+      "background_sha256": "57d284587502be606e7872697602a7139ca31cdbe1802793cfbd92c6114b5681",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 24,
+      "sha256": "bb21129eba199b046a78edd11a61a5cfd6ca1edd4ee4065c57aaac289cfaf45e",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 98,
+      "zone_number_property": "098"
+    },
+    "L04S25": {
+      "background": "zone_099_original.png",
+      "background_count": 1,
+      "background_sha256": "7222b1f23a82430c82a37cd7a96c79d35aaa6dedb2a539953d954021ae673980",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 25,
+      "sha256": "f7cef3003a357984ea070c8fc9769085dcf8a1a161c515fb39472968553533d8",
+      "stage": 4,
+      "tile_layer_count": 1,
+      "zone_index": 99,
+      "zone_number_property": "099"
+    },
+    "L05S01": {
+      "background": "zone_100_original.png",
+      "background_count": 1,
+      "background_sha256": "30b6ec0d00aeb0f811af465f13505deb6676889c56581c15627a1b389eafb18a",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 1,
+      "sha256": "691210d5aaf1c9f0bd60ea4f79079cd28565f73cd84c32ca6e8acf61d95647af",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 100,
+      "zone_number_property": "100"
+    },
+    "L05S02": {
+      "background": "zone_101_original.png",
+      "background_count": 1,
+      "background_sha256": "43102971a58007180aced9d3178e5c5d6abd2a695ba194505bca10e53f6c087f",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 2,
+      "sha256": "48a68e5e81609dac4f892bcb7f9123a36fe1cce8651594038f9c34924941eb0e",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 101,
+      "zone_number_property": "101"
+    },
+    "L05S03": {
+      "background": "zone_102_original.png",
+      "background_count": 1,
+      "background_sha256": "9671ef24b23c7c114f9ea811553cdbeeeceff3a687a4e669e835dbcffc6da12b",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 3,
+      "sha256": "25fa25b47a385fb2d4f3a233a512958d71e7b5a19d6beb6e695dee0327538c6c",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 102,
+      "zone_number_property": "102"
+    },
+    "L05S04": {
+      "background": "zone_103_original.png",
+      "background_count": 1,
+      "background_sha256": "3ca00bb3c156b17378817c852e5a02d75408b1acaef8245cad379f32cd6aa09f",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 4,
+      "sha256": "ec656f8fa717870ed624e93a5ca850efb8b86ad769cfd9f403cd0c06cb32492d",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 103,
+      "zone_number_property": "103"
+    },
+    "L05S05": {
+      "background": "zone_104_original.png",
+      "background_count": 1,
+      "background_sha256": "c5a3ffec1fbf444fe5983bb7e16d96acc6dc65f368f488108c80cc2b564c2686",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 5,
+      "sha256": "feac6e5d29a1aea983077001b05b65f3c1824306283e5c8630632ad382b69f89",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 104,
+      "zone_number_property": "104"
+    },
+    "L05S06": {
+      "background": "zone_105_original.png",
+      "background_count": 1,
+      "background_sha256": "38d52b0418b52454c3a328faa77305bb41c33885e9a1b3875ddabc0d433a81cc",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 6,
+      "sha256": "3eb8eecb3e859ec115bfb40dc2e31001ada6ae7a2d5fa67df5f28a2ee69f1d2e",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 105,
+      "zone_number_property": "105"
+    },
+    "L05S07": {
+      "background": "zone_106_original.png",
+      "background_count": 1,
+      "background_sha256": "c52aed73f23e2b30938a708db14960e35bda5aa5abc34d9e0f51f64bb2719896",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 7,
+      "sha256": "e9cf3a259b1ce0941a9e7ccf64b89c19c55190276a2e001d3dae51735bf193d3",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 106,
+      "zone_number_property": "106"
+    },
+    "L05S08": {
+      "background": "zone_107_original.png",
+      "background_count": 1,
+      "background_sha256": "3883505c28a39ac085a04ec5b7e88ccbe6f8f8e4207b134e277433da870d74a1",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 8,
+      "sha256": "d460011e6b1682f758e6a890c78187784740d8b7205b824ee1de9b4dc3fcc2c9",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 107,
+      "zone_number_property": "107"
+    },
+    "L05S09": {
+      "background": "zone_108_original.png",
+      "background_count": 1,
+      "background_sha256": "f087dbc4680a20dc25dc0c5f6912a0435d7e62d59c9587a5589557fc0b20681c",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 9,
+      "sha256": "7ffacf05fcd139ebb84245914622fd25896249a4a512d4ce7db4f0b5b7db5816",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 108,
+      "zone_number_property": "108"
+    },
+    "L05S10": {
+      "background": "zone_109_original.png",
+      "background_count": 1,
+      "background_sha256": "1b8f112837fbb708f244e4ea04a57ad3ca716e11b502b1a5926bf670b2857669",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 10,
+      "sha256": "50bbb4717fc37706ab04f6ef125b1a45d2b784fa36a94705c0200ca8d7c8c5f5",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 109,
+      "zone_number_property": "109"
+    },
+    "L05S11": {
+      "background": "zone_110_original.png",
+      "background_count": 1,
+      "background_sha256": "a936ee19de0929d31df80bf17f7a3da8102267f6fda89924ef45255eee8f9c19",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 11,
+      "sha256": "c584edacb85df12cbc7ebecbe83fc420532cc64de010a3a4c4b8b17c693c7822",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 110,
+      "zone_number_property": "110"
+    },
+    "L05S12": {
+      "background": "zone_111_original.png",
+      "background_count": 1,
+      "background_sha256": "7d1dcd43c1623c1f9afea572c7536cf85b66a215d8b880862ac0b38b22fd856a",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 12,
+      "sha256": "239f08a92b86dd81a4b7b80a93d69fd1b559aa1a47d339aa8b075cab10923425",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 111,
+      "zone_number_property": "111"
+    },
+    "L05S13": {
+      "background": "zone_112_original.png",
+      "background_count": 1,
+      "background_sha256": "c3dff024fdc9e5600fa9a5645127c1f9c4b5dc3e1127bd674030e13b5964a459",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 13,
+      "sha256": "64ab780a4314dd08e9f3c1904edeeb2831dc7cf7336f20594f52deea42d984a4",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 112,
+      "zone_number_property": "112"
+    },
+    "L05S14": {
+      "background": "zone_113_original.png",
+      "background_count": 1,
+      "background_sha256": "cfca011113930e0d0e7046d95d4a5862efc454392683514fc7c76e8d602347b6",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 14,
+      "sha256": "297d279548d28dfe9bebda6fc1daf74f2f6d30b5afe8d02765644942750c1600",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 113,
+      "zone_number_property": "113"
+    },
+    "L05S15": {
+      "background": "zone_114_original.png",
+      "background_count": 1,
+      "background_sha256": "9ae08c31fdbd53621000847f77ffc5973927a50d7a0c105545007aaed54b9eb2",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 15,
+      "sha256": "ae3481ef24528f226a69890b28d658956f720e18970e96ddb1dc50f1f759682e",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 114,
+      "zone_number_property": "114"
+    },
+    "L05S16": {
+      "background": "zone_115_original.png",
+      "background_count": 1,
+      "background_sha256": "60d81c4d0bb11cf4f07df019bfee3cc3e9688c10721e7e9265a626e5d30ed5d6",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 16,
+      "sha256": "1fa0a045ac4f32d6d44060cc3abe48a38455a73b0d4f7420e2d864a6a021e204",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 115,
+      "zone_number_property": "115"
+    },
+    "L05S17": {
+      "background": "zone_116_original.png",
+      "background_count": 1,
+      "background_sha256": "076d124e41e15ea642f6fb46f7859339ea979949fe74394a18a2ee1d9ed699b6",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 17,
+      "sha256": "1e31219f805fa50ef6cbbc5784668e0a4d2a18b4bc8ad368e19fb12325fb86e0",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 116,
+      "zone_number_property": "116"
+    },
+    "L05S18": {
+      "background": "zone_117_original.png",
+      "background_count": 1,
+      "background_sha256": "fbf41c6483566254fae856c7ec593d8b49fcda15bcad36169cef38f4f6d61398",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 18,
+      "sha256": "1f4fefa03803cca67e0c467cdeb2ce82b8ca63ad89e73e0ce15b942aeaef5cad",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 117,
+      "zone_number_property": "117"
+    },
+    "L05S19": {
+      "background": "zone_118_original.png",
+      "background_count": 1,
+      "background_sha256": "a7b6d937d53ee876f28ffef2a77b3a5bfba1713248abf6918a7bc47c993ea41b",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 19,
+      "sha256": "89ee6b239e8db9e18eb42e6ab5f5cf01b9cdb158b4bac0b9048361762847c92f",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 118,
+      "zone_number_property": "118"
+    },
+    "L05S20": {
+      "background": "zone_119_original.png",
+      "background_count": 1,
+      "background_sha256": "2b9df575b28665d03c663e67a371e8de204170aca2e73157b17ce4247e41568e",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 20,
+      "sha256": "6b2713c0dde328f13978c48c8fa92ed38b9c72c2d1507b50d998c213c32c9723",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 119,
+      "zone_number_property": "119"
+    },
+    "L05S21": {
+      "background": "zone_120_original.png",
+      "background_count": 1,
+      "background_sha256": "6ebb4b4da0b841e645ada9e850b5ce77749b1ae487d2e98915e9c7a98689f1dd",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 21,
+      "sha256": "12c1b543d404ad67256ffaeea53054425d8c816c7d581676efc018bd2cad574b",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 120,
+      "zone_number_property": "120"
+    },
+    "L05S22": {
+      "background": "zone_121_original.png",
+      "background_count": 1,
+      "background_sha256": "cba253c960f3f12110b79609e8fca215f5fce901b8fcdbdff92935cd01afabc6",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 22,
+      "sha256": "2c2ac5505ac42f10bdf7022956b7e869f907cd1449e70991d44bb19617db8e7f",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 121,
+      "zone_number_property": "121"
+    },
+    "L05S23": {
+      "background": "zone_122_original.png",
+      "background_count": 1,
+      "background_sha256": "41a6deef7da762e1af86cc0d57f699aae5138a95e818cf819094bf195bb21c2d",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 23,
+      "sha256": "76aea2bdb9ffdd6a7fc7d6f98953cc83750410fbf1fb3167f365281483530ad0",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 122,
+      "zone_number_property": "122"
+    },
+    "L05S24": {
+      "background": "zone_123_original.png",
+      "background_count": 1,
+      "background_sha256": "5a0e27bf01e9dc7df1202853301bf5c38c8d362c5ab97069353466d259533652",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 24,
+      "sha256": "4e69ac41b93e08214611f254ef0bec3e2ce78ae9350006a89eb84b176e7e0623",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 123,
+      "zone_number_property": "123"
+    },
+    "L05S25": {
+      "background": "zone_124_original.png",
+      "background_count": 1,
+      "background_sha256": "33bf16cc3ed5fb7ea6b90c8dbc3e56258db9d4917db820583e50050a4879d1fa",
+      "object_layers": [
+        "Objects"
+      ],
+      "scene": 25,
+      "sha256": "3418dc573267c725aff516252206edbf34654103c55b29b5decbb6af9c757251",
+      "stage": 5,
+      "tile_layer_count": 1,
+      "zone_index": 124,
+      "zone_number_property": "124"
+    }
+  },
+  "maps_covered_by_duplicates": 48,
+  "pair_notes": {
+    "L03S09/L04S11": {
+      "caveat": "the solid= column matches no TMX-derived metric in this corpus (0 of 125 screens equal, 6 within +-5 cells), so it cannot prove unique data was lost either; both action lists are empty",
+      "consequence": "for this pair the ruling rests only on \"already identical in the shipped data\"; the claim \"no unique data was lost\" is UNSUPPORTED here and is deliberately not made",
+      "if_owner_rejects": "this pair is the one worth regenerating first, and it needs the external data_zone_data.asm to say what zone 58 or 85 originally held",
+      "shipped_data": "the two files are content-identical under wave-c-canonical-1 (same digest) and both have 64 nonzero Collision cells",
+      "source_tension": "LEVEL_COMPILER_AUDIT.md records \"058 L03S09 solid=140 actions=\" and \"085 L04S11 solid=128 actions=\" \u2014 different originals for maps that shipped identical",
+      "why_separate": "this pair is stage 3 -> stage 4 (zones 58 and 85), not the stage 2 -> stage 5 axis, so the recolored-stage-2 premise does not explain it"
+    }
+  },
+  "resource_directory": "Exolon/Resources",
+  "ruling": {
+    "decision": "RULED intentional original content, closed by pinning \u2014 a ruling, not a sourced fact",
+    "escape_hatch": "this manifest lists exactly which 48 files the 24 pairs cover; a future owner-authorized regeneration is a one-command query over identical_pairs",
+    "finding": "P1-12 / issue #16: 24 duplicate pairs (48 maps) leave 101 unique of 125",
+    "forbidden": "authoring new tile/object content to dissolve these pairs (FORBID-001)",
+    "not_sourced": "no primary states the duplication was intentional; issue #16 explicitly leaves the choice open (\"\u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044c \u043d\u0430\u043c\u0435\u0440\u0435\u043d\u043d\u043e\u0441\u0442\u044c \u0438\u043b\u0438 \u0432\u043e\u0441\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u044c \u0443\u043d\u0438\u043a\u0430\u043b\u044c\u043d\u044b\u0435 \u0434\u0430\u043d\u043d\u044b\u0435\"). Intentionality is this change's decision.",
+    "premise_citations": [
+      "ORIGINAL_MECHANICS.md:166 \u2014 \"Zones 100-124 repeat the structural pattern of 25-49 with cosmetic changes after 101\" (OM ranks that source as a cross-check only)",
+      "engineering/reports/exolon-full-audit-20260920-v3.md:37 \u2014 P1-12 row: \"\u0441\u0442\u0430\u0434\u0438\u044f 5 = \u043f\u0435\u0440\u0435\u043a\u0440\u0430\u0441\u043a\u0430 \u0441\u0442\u0430\u0434\u0438\u0438 2\"",
+      "engineering/changes/20260919-exolon-initial-code-audit-7db1f3/evidence/perfile/level-graph.md:36 \u2014 \"\u0421\u0442\u0430\u0434\u0438\u044f 5 (\u0437\u043e\u043d\u044b 102\u2026124) \u2014 \u044d\u0442\u043e \u043f\u0435\u0440\u0435\u043a\u0440\u0430\u0448\u0435\u043d\u043d\u0430\u044f \u0441\u0442\u0430\u0434\u0438\u044f 2 (27\u202649)\"",
+      "LEVEL_COMPILER_AUDIT.md \u2014 the imported 1987 per-screen records are identical (solid= and the whole action list) for both members of 23 of the 24 pairs, while L05S01/L05S02 differ from L02S01/L02S02: the repetition starts at zone 102, exactly where the walkthrough says it does"
+    ],
+    "reason": "stage 5 (zones 102..124) repeats stage 2 (zones 27..49) with a recolored backdrop: the repetition is in the imported source data, not produced by the factory (no generator and no .asm exists in this tree), so there is no factory defect to fix",
+    "reason_scope": "the reason below is carried by the primaries for the 23 L02/L05 pairs; it does NOT reach the 24th pair \u2014 see pair_notes",
+    "status": "resolved by ruling pending PR merge; issue #16 stays OPEN and labeled blocked-on-owner until the owner accepts the ruling"
+  },
+  "self_check": {
+    "binding": "sha256(INTEGRITY_BIND + json.dumps(body, sort_keys=True)); the constant lives in wave_c_check.py, so a plain recomputation of the body digest does not re-seal the contract",
+    "body_sha256": "13b3f1f2dd314863866c074cc1032ee4f0cf2bcbdf21f941ef60a3566cd22cfa",
+    "regenerate_with": "python3 wave_c_check.py --write-manifest"
+  },
+  "unique_count": 101,
+  "zone_index_formula": "int(zoneNumber) == (stage-1)*25 + (scene-1); 0-based; the 8 maps without the property are L01S01..L01S08 (zones 000..007)"
+}

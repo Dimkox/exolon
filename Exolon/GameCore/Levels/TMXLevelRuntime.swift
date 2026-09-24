@@ -51,6 +51,14 @@ final class TMXLevelRuntime {
     // or neighbouring platforms.
     private var missileGuidanceBaseCollisionRects: [CGRect] = []
     private(set) var homingMissiles: [HomingMissile] = []
+    // Content-factory accounting. A source marker that cannot become a gameplay object without
+    // inventing behaviour is recorded here as a labeled safe model, and a marker the matcher does
+    // not recognize at all is recorded in `unmatchedSourceMarkers`. Both exist so that "the map
+    // lost content" is impossible without leaving evidence. Neither array feeds physics, damage,
+    // scoring or spawning: `safeModelMarkers` is consumed only by the hitbox debug overlay in
+    // `GameScene`, and `unmatchedSourceMarkers` only by the coverage meter.
+    private(set) var safeModelMarkers: [TMXSafeModelMarker] = []
+    private(set) var unmatchedSourceMarkers: [String] = []
 
     /// Gameplay event sink, injected by `GameScene`. `nil` = no emission (harness/unit default).
     var events: (any GameplayEventSink)?
@@ -402,20 +410,23 @@ final class TMXLevelRuntime {
                 let sx = CGFloat(Int(object.properties["sourceX"] ?? "") ?? 0) * 16
                 let syTop = CGFloat(Int(object.properties["sourceY"] ?? "") ?? 0) * 16
                 let bottomY = map.pixelHeight - syTop - 32
-                if source.contains("beam_") {
+                // Exhaustive over TMXSourceMarkerKind with no `default:` arm: a marker that
+                // resolves to nothing lands in the `nil` case and is recorded, never dropped.
+                switch TMXSourceMarkerKind.classify(sourceBlock: source) {
+                case .forceField:
                     let box = CGRect(x: sx, y: max(0, bottomY - 240), width: 48, height: 272)
                     beamBoxes.append(box)
-                } else if source.contains("topdown_electro") {
+                case .highVoltage:
                     // High-voltage is animated from the action table. The
                     // original update routine does not call KillPlayer; do not
                     // turn the visual marker into a blanket lethal rectangle.
                     break
-                } else if source.contains("blinker") {
+                case .blinker:
                     // Blinker is an attribute-flash action, not a damage zone.
                     break
-                } else if source.contains("stage_end") {
+                case .stageEnd:
                     stageExitMarkers.append(CGRect(x: sx, y: max(0, bottomY - 64), width: 96, height: 128))
-                } else if source.contains("changing_room") {
+                case .changingRoom:
                     let trigger = CGRect(x: sx, y: max(0, bottomY - 64), width: 80, height: 96)
                     changingRooms.append(trigger)
                     changingRoomCollisionExclusions.append(CGRect(
@@ -424,7 +435,7 @@ final class TMXLevelRuntime {
                         width: trigger.width + 32,
                         height: trigger.height + 32
                     ))
-                } else if source.contains("beacon_base") {
+                case .beaconBase:
                     // blk_beacon_base is exactly four character cells wide and
                     // three cells high in the imported collision layer.  It is
                     // solid while the guidance tower exists, then becomes
@@ -438,7 +449,7 @@ final class TMXLevelRuntime {
                         height: 48
                     )
                     missileGuidanceBaseCollisionRects.append(baseRect)
-                } else if source.contains("control_beacon") {
+                case .controlBeacon:
                     // Original DestroyableBlockSizeTable entry for block 31:
                     // x = sourceX-1 for 6 chars, y = sourceY-2 for 6 chars.
                     let sourceY = CGFloat(Int(object.properties["sourceY"] ?? "") ?? 0)
@@ -451,6 +462,27 @@ final class TMXLevelRuntime {
                     let guidance = GreenMissileGuidance(hitbox: box)
                     missileGuidance.append(guidance)
                     rootNode.addChild(guidance.coverNode)
+                case .inertScenery:
+                    // blk_mushroom and blk_waggon are imported static scenery: already solid in
+                    // the Collision layer at their own cell and already drawn by the baked
+                    // Original Static Scenery image layer. The source table records no action at
+                    // any of the 33 cells, so the factory must not invent behaviour here; the
+                    // defect being fixed is that the marker used to vanish without a trace.
+                    // The record is read only by the debug overlay, so no gameplay path changes.
+                    appendSafeModelMarker(kind: .inertScenery, sourceBlock: source,
+                                          sx: sx, bottomY: bottomY)
+                case .unconfirmedAction:
+                    // blk_gunMachine_BOTTOM is the only formerly-dropped family with a positive
+                    // action record (type 11 at its own cell), but the type cannot be identified
+                    // from anything in this repository: 56 type-11 actions exist and only 18 are
+                    // exported here, and the other 38 sit in maps with no BOTTOM marker at all.
+                    // So the marker is recorded and labeled, and deliberately not armed.
+                    appendSafeModelMarker(kind: .unconfirmedAction, sourceBlock: source,
+                                          sx: sx, bottomY: bottomY)
+                case nil:
+                    // The matcher met nothing. Record the name so the coverage meter fails on it
+                    // instead of the map silently losing content.
+                    unmatchedSourceMarkers.append(source)
                 }
 
             default:
@@ -502,6 +534,23 @@ final class TMXLevelRuntime {
             sprite.zPosition = 0.5
             rootNode.addChild(sprite)
         }
+    }
+
+    /// Record a source marker that the factory can only express as a labeled safe model. The
+    /// footprint is the measured cell box converted to pixels the same way `beaconBase` converts
+    /// its own (4x3 cells -> 64x48 pt), anchored so its top edge sits at the marker's source row.
+    private func appendSafeModelMarker(kind: TMXSourceMarkerKind, sourceBlock: String,
+                                       sx: CGFloat, bottomY: CGFloat) {
+        let cells = TMXSourceMarkerKind.safeModelFootprintCells(sourceBlock: sourceBlock)
+        let width = CGFloat(cells.width) * 16
+        let height = CGFloat(cells.height) * 16
+        safeModelMarkers.append(TMXSafeModelMarker(
+            kind: kind,
+            sourceBlock: sourceBlock,
+            label: kind.safeModelLabel,
+            rect: CGRect(x: sx, y: max(0, bottomY - height), width: width, height: height),
+            mapResource: name
+        ))
     }
 
     private func addDestructible(name: String, image: String, size: CGSize, bottom: CGPoint, hitbox: CGRect) {

@@ -1,0 +1,144 @@
+# GREEN meter run — change f2d90a (post test-review fix cycle)
+# tree: /home/pall/projects/.exolon-wave-c/exolon   route base: 295690b
+# command: python3 wave_c_check.py    (stdlib only; timed below)
+# checker sha256: 5ad27c981b33a67984b9b089930c5b3e0e47baeeba9891164fe92bc4401edbc0
+# the SAME bytes produced baseline-meter-red.txt, so artifact and checker agree (test review F7)
+#
+# AC-001 127/127 marker objects (11/11 distinct sourceBlock values), silent-drop path removed and
+#   disposition column enforced as a normative equivalence (test review G1/G2 repro red);
+# AC-002 machine-reread file:line citations; AC-003 manifest pinned; AC-004 every tamper RE-SEALED
+#   before judgement, incl. the reviewer's C10/C11 and keyed K10-K12 (see f1-tamper-proof.txt);
+# AC-005 balanced-paren rect capture + git-blob-derived base (7 controls); FORBID-001/002;
+# FORBID-002's debug-rendering clause now covered by overlay_deletion_detected (reviewer case R2).
+
+ignored_types_disposition    PASS
+    citations_verified               22
+    classifier_kinds                 ["forceField", "highVoltage", "blinker", "stageEnd", "changingRoom", "beaconBase", "controlBeacon", "inertScenery", "unconfirmedAction"]
+    controls                         {"bogus_count_rejected": true, "bogus_kind_rejected": true, "bogus_substring_rejected": true, "out_of_range_citation_rejected": true, "product_table_agrees": true, "stale_citation_rejected": true}
+    dispositions_committed           11
+    distinct_in_corpus               11
+    formerly_ignored_resolved        {"blk_gunMachine_BOTTOM": true, "blk_mushroom": true, "blk_waggon": true}
+    safe_model_families              ["blk_gunMachine_BOTTOM", "blk_mushroom", "blk_waggon"]
+level_pair_manifest_pinned   PASS
+    background_identical_pairs       [["L02S04", "L05S04"], ["L02S16", "L05S16"], ["L02S22", "L05S22"], ["L02S23", "L05S23"]]
+    controls                         {"changed_tile_flips_digest": true, "divergent_fixture_flips_pin": true, "extra_object_flips_digest": true, "new_collision_flips_pin": true, "untouched_copy_is_stable": true}
+    declared_pairs                   24
+    maps                             125
+    pair_violations                  []
+    undeclared_collisions            []
+    unique_declared                  101
+    unique_recomputed                101
+manifest_selfcheck           PASS
+    binding                          "keyed sha256 over the body (embedded constant) + live re-derivation of every data claim; all tamper controls are re-sealed before being judged"
+    binding_limit                    "honest and stated: a forger who reads INTEGRITY_BIND and re-seals can still edit prose fields (ruling text, notes). Data fields cannot be forged this way because they are re-derived from Exolon/Resources on every run; narrative wording is covered by level_pair_manifest_pinned asserting the disclosure exists, not by this digest. Do not cite body_sha256 as protection for wording...
+    body_sha256                      "13b3f1f2dd314863866c074cc1032ee4f0cf2bcbdf21f941ef60a3566cd22cfa"
+    tamper_controls                  {"add_undeclared_pair_rejected": true, "declare_nonidentical_pair_rejected": true, "drop_background_layer_claim_rejected": true, "drop_one_pair_rejected": true, "fabricate_background_digest_rejected": true, "flip_one_map_digest_rejected": true, "honest_manifest_accepted": true, "rewrite_unique_count_rejected": true, "swap_background_file_rejected": true, "unkeyed_reseal_rejecte...
+    tamper_victim_map                "L02S16"
+marker_baseline_reproduced   PASS
+    baseline_expected                {"control_drop_all_lost": 127, "control_drop_beam_lost": 71, "distinct_source_blocks": 11, "lost_kind_maps": {"blk_gunMachine_BOTTOM": 15, "blk_mushroom": 6, "blk_waggon": 14}, "lost_kinds": {"blk_gunMachine_BOTTOM": 18, "blk_mushroom": 9, "blk_waggon": 24}, "lost_maps": 32, "markers_covered": 76, "markers_lost": 51, "markers_total": 127}
+    controls                         {"drop_all_loses_everything": true, "drop_beam_raises_lost_to_71": true, "narrower_table_cannot_lose_less": true}
+    distinct_source_blocks           11
+    lost_kind_maps                   {"blk_gunMachine_BOTTOM": 15, "blk_mushroom": 6, "blk_waggon": 14}
+    lost_kinds                       {"blk_gunMachine_BOTTOM": 18, "blk_mushroom": 9, "blk_waggon": 24}
+    lost_maps                        32
+    markers_covered                  76
+    markers_lost                     51
+    markers_total                    127
+    measured_with_legacy_table       true
+    stale_mirrors                    {"baseline_agrees": true, "divergence": ["v3_measurements.py still reports 76/127 (rc=0) about a tree where the product resolves 127/127; owner-route cleanup owed, see tasks.md R1", "linux_static_audit.py still reports 76/127 (rc=0) about a tree where the product resolves 127/127; owner-route cleanup owed, see tasks.md R1"], "mirrors": [{"file": "engineering/changes/20260919-ex...
+marker_coverage_all_maps     PASS
+    claimed_by_matcher               ["beacon_base", "beam_", "blinker", "changing_room", "control_beacon", "gunMachine_BOTTOM", "mushroom", "stage_end", "topdown_electro", "waggon"]
+    controls                         {"meter_reads_the_product_not_itself": true, "missing_recorder_flips_probe": true, "product_execution_agrees": true, "product_negative_control_holds": true, "safe_relabelled_as_typed_reddens_coverage": true, "synthetic_unclaimed_detected": true}
+    distinct_claimed                 11
+    distinct_source_blocks           11
+    lost_maps                        0
+    markers_covered                  127
+    markers_lost                     0
+    markers_total                    127
+    product_executed                 true
+    silent_drop_path_removed         true
+    unclaimed                        []
+no_invented_content          PASS
+    controls                         {"deleted_file_detected": true, "invented_file_detected": true, "new_texture_literal_detected": true, "rewritten_file_detected": true, "uniqueness_shift_detected": true}
+    deleted                          []
+    identical_pairs_now              24
+    invented                         []
+    new_image_literals               []
+    resource_files_base              282
+    resource_files_working           282
+    rewritten                        []
+    unique_maps_now                  101
+safe_models_are_labeled      PASS
+    classifier_kinds                 ["forceField", "highVoltage", "blinker", "stageEnd", "changingRoom", "beaconBase", "controlBeacon", "inertScenery", "unconfirmedAction"]
+    controls                         {"bogus_substring_rejected": true, "honest_overlay_binding_accepted": true, "overlay_deletion_detected": true, "overlay_label_strip_detected": true, "parse_gate_detects_a_broken_file": true, "safe_relabelled_as_typed_rejected": true, "typed_promoted_to_safe_rejected": true, "undeclared_kind_rejected": true, "unlabeled_placeholder_rejected": true}
+    labels                           {"blk_gunMachine_BOTTOM": "SAFE-MODEL unconfirmed-action: a distinct source action cell exists but its type is not identifiable in-tree; behaviour deliberately NOT implemented", "blk_mushroom": "SAFE-MODEL inert-scenery: imported static artwork, no action in the source table", "blk_waggon": "SAFE-MODEL inert-scenery: imported static artwork, no action in the source table"}
+    markers_covered_by_safe_models   51
+    product_labels                   {"forceField": "", "inertScenery": "SAFE-MODEL inert-scenery: imported static artwork, no action in the source table", "unconfirmedAction": "SAFE-MODEL unconfirmed-action: a distinct source action cell exists but its type is not identifiable in-tree; behaviour deliberately NOT implemented"}
+    rendering_evidence_limit         "source-structure only: SpriteKit cannot be compiled or run on Linux (`import SpriteKit` fails at TMXLevelRuntime.swift:1), so the on-screen outline itself still needs the macOS spot in test-plan.md"
+    safe_model_families              ["blk_gunMachine_BOTTOM", "blk_mushroom", "blk_waggon"]
+    swift_parse                      {"GameScene.swift": "ok", "TMXLevelRuntime.swift": "ok", "TMXMapLoader.swift": "ok"}
+unchanged_marker_output      PASS
+    beam_rect_pinned                 ["x: sx, y: max(0, bottomY - 240), width: 48, height: 272"]
+    branches_changed_vs_base         []
+    branches_located                 ["beacon_base", "beam_", "blinker", "changing_room", "control_beacon", "stage_end", "topdown_electro"]
+    compared_against                 "295690b7fc72 (TMXLevelRuntime.swift)"
+    controls                         {"branch_comment_edit_ignored": true, "branch_rect_height_edit_detected": true, "branch_rect_width_edit_detected": true, "branch_statement_added_detected": true, "bucket_change_detected": true, "deviation_cannot_wildcard": true, "deviation_exact_and_cited_honored": true, "deviation_uncited_rejected": true, "deviation_wrong_target_rejected": true, "geometry_change_detected": tru...
+    covered_maps                     37
+    covered_markers                  76
+    data_digest                      "545e281f470c09002c2f5b2b1c87fa97c819aa0841c52b6d05321f7717a50564"
+    deviations_honored               []
+    golden_digest                    "545e281f470c09002c2f5b2b1c87fa97c819aa0841c52b6d05321f7717a50564"
+zone_index_formula           PASS
+    controls                         {"formula_distinguishes_base_zero_from_base_one": true, "naive_filename_compare_would_false_positive": true, "naive_one_based_would_false_positive": true}
+    false_mismatches_if_1_based      117
+    false_mismatches_if_filename     117
+    keyless_maps                     ["L01S01", "L01S02", "L01S03", "L01S04", "L01S05", "L01S06", "L01S07", "L01S08"]
+    maps_with_zone_number            117
+WARNING (not a failure of this change): v3_measurements.py still reports 76/127 (rc=0) about a tree where the product resolves 127/127; owner-route cleanup owed, see tasks.md R1
+WARNING (not a failure of this change): linux_static_audit.py still reports 76/127 (rc=0) about a tree where the product resolves 127/127; owner-route cleanup owed, see tasks.md R1
+RESULT: ALL_WAVE_C_PROBES_PASS | probes=9 failed=0
+
+real	0m2.632s
+user	0m2.118s
+sys	0m0.530s
+rc=0
+
+## Control census (measured from --json, not copied from a previous revision)
+  ignored_types_disposition    PASS controls= 6  all_true=True
+  level_pair_manifest_pinned   PASS controls= 5  all_true=True
+  manifest_selfcheck           PASS controls=11  all_true=True
+  marker_baseline_reproduced   PASS controls= 3  all_true=True
+  marker_coverage_all_maps     PASS controls= 6  all_true=True
+  no_invented_content          PASS controls= 5  all_true=True
+  safe_models_are_labeled      PASS controls= 9  all_true=True
+  unchanged_marker_output      PASS controls=11  all_true=True
+  zone_index_formula           PASS controls= 3  all_true=True
+  TOTAL: 59 named controls, 59 true
+
+## Stale-mirror cross-check emitted on every run (test review F5; not a failure of this change)
+WARNING (not a failure of this change): v3_measurements.py still reports 76/127 (rc=0) about a tree where the product resolves 127/127; owner-route cleanup owed, see tasks.md R1
+WARNING (not a failure of this change): linux_static_audit.py still reports 76/127 (rc=0) about a tree where the product resolves 127/127; owner-route cleanup owed, see tasks.md R1
+
+## Product execution contour
+committed harness run.sh: REAL MAPS ok=125/125 failures=0, delta = exactly 1 import line, no-shim build still fails
+meter swift_product_evidence(): compiled+EXECUTED classify, loaded 125/125, unmatched {}
+swiftc -frontend -parse executed by the meter for: TMXMapLoader.swift, TMXLevelRuntime.swift, GameScene.swift
+NOT type-checked on Linux (measured, disclosed in test-plan.md): TMXLevelRuntime.swift, GameScene.swift (no SpriteKit module)
+
+## git status
+ M Exolon/GameCore/GameScene.swift
+ M Exolon/GameCore/Levels/TMXLevelRuntime.swift
+ M Exolon/GameCore/Levels/TMXMapLoader.swift
+ M README.md
+?? engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/
+?? engineering/contracts/
+?? engineering/reports/level-content-uniqueness-v1.md
+
+## diffstat vs route base
+ Exolon/GameCore/GameScene.swift              | 14 ++++-
+ Exolon/GameCore/Levels/TMXLevelRuntime.swift | 63 ++++++++++++++++---
+ Exolon/GameCore/Levels/TMXMapLoader.swift    | 92 ++++++++++++++++++++++++++++
+ README.md                                    |  7 +++
+ 4 files changed, 168 insertions(+), 8 deletions(-)
+
+## pbxproj (wave-A 4-edit rule; nothing listed = untouched)
