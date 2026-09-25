@@ -1,6 +1,8 @@
 # вывод evidence/harness/run.sh (scrubbed: абсолютные пути и PID-временные каталоги заменены;
 # хвостовые пробелы в строках вывода сняты — иначе они роняют git-diff-check)
-# HEAD=52795d1  дата=2026-09-20T06:43:45Z  rc=0
+# HEAD=0b0dea9  дата=2026-09-25T04:40:04Z  rc=0  — пересоздано в wave E1 (engineering/tools/wave_scan.py):
+# к списку файлов шага 4 добавлен Exolon/GameCore/GameConstants.swift, см. «E1 provenance»
+# в run.sh. Записано на рабочем дереве wave E1 поверх HEAD (не закоммиченным на момент записи).
 == 1. стаб модуля CoreGraphics (только переименование типов, логики нет) ==
 shim built: <build-tmp>/libCoreGraphics.so
 
@@ -37,4 +39,4 @@ L01S10 obj piston x=192.0 y=320.0 w=48.0 h=64.0 mode=- bottomLeft=CGPoint(x: 192
 L01S10 obj piston x=64.0 y=320.0 w=48.0 h=64.0 mode=- bottomLeft=CGPoint(x: 64.0, y: 64.0) pixelH=384.0
 
 == 6. негативный контроль: без стаба сборка обязана упасть ==
-OK: без стаба не собирается (<build-tmp>/TMXMapLoader.swift:1:8: error: no such module 'CoreGraph)
+OK: без стаба не собирается (<build-tmp>/TMXMapLoader.swift:1:8: error: no such module 'CoreGrap)

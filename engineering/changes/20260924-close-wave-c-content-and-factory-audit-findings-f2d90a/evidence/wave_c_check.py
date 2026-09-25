@@ -1065,8 +1065,11 @@ def stale_mirror_report():
         report['mirrors'].append(entry)
         if entry['stale']:
             report.setdefault('divergence', []).append(
-                '%s still reports %d/%d (rc=0) about a tree where the product resolves %d/%d; '
-                'owner-route cleanup owed, see tasks.md R1'
+                '%s keeps a hand-copied copy of the matcher: it accounts %d/%d markers while the '
+                'product resolves %d/%d, so that number describes the pre-fix tree, not this one. '
+                'The maintained truth is this meter; v3_measurements.py additionally declares '
+                'itself frozen-historical in its own header (wave E1, issue #22 item 2), so this '
+                'WARNING is a pointer and not a cleanup this route owes'
                 % (Path(rel).name, still_covers, total,
                    entry['product_actually_covers'], total))
         if set(tupled) != set(LEGACY_SUBSTRINGS):

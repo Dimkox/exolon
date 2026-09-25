@@ -6,6 +6,12 @@
 # Продуктовые исходники НЕ изменяются: из репозитарного файла делается сборочная
 # копия, в которую добавляется ровно одна строка импорта (дельта проверяется).
 #
+# E1 provenance: список файлов шага 4 дополнен Exolon/GameCore/GameConstants.swift
+# (wave E1 #21/T1, 2026-09-25). С wave B (коммит 6c7dfe5) TMXMapLoader.swift обращается
+# к GameConstants напрямую, поэтому два файла трансляции больше не собираются: контур
+# краснел с «cannot find 'GameConstants' in scope». Это правка контура, а не продукта:
+# добавлен третий, уже существующий в репозитории исходник, байты продукта не менялись.
+#
 # Запуск: ./run.sh            (артефакты сборки — во временном каталоге)
 #         ./run.sh | tee last-run.txt
 set -euo pipefail
@@ -48,7 +54,7 @@ python3 "$HERE/gen_fixtures.py"
 
 printf '\n== 4. сборка контура ==\n'
 swiftc -I "$BUILD" -L "$BUILD" -lCoreGraphics \
-  "$BUILD/TMXMapLoader.swift" "$HERE/main.swift" -o "$BUILD/loader"
+  "$BUILD/TMXMapLoader.swift" "$HERE/main.swift" "$ROOT/Exolon/GameCore/GameConstants.swift" -o "$BUILD/loader"
 printf 'built: %s/loader\n' "$BUILD"
 
 printf '\n== 5. прогон: фикстуры + весь корпус + геометрия зоны 009 ==\n'

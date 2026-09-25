@@ -625,6 +625,59 @@ def timed_ladder_deterministic(root: pathlib.Path) -> None:
         raise CheckFailure("control did not flip: the ladder's extremes are identical")
 
 
+def _pbx_objects(pbx: str) -> dict:
+    """guid -> raw block body for every top-level OpenStep object (tab-depth reader, stdlib).
+
+    The same shape as the merged release-layer checker's reader, written locally on purpose: a
+    security gate must not import another package's file to know what it is asserting about.
+    """
+    pattern = re.compile(r"(?ms)^\t\t([0-9A-F]{24})(?: /\*[^*]*\*/)? = \{\n"
+                         r"((?:(?!^\t\t[0-9A-F]{24}).)*?)^\t\t\};\n")
+    return {match.group(1): match.group(2) for match in pattern.finditer(pbx)}
+
+
+def _pbx_build_configs(pbx: str) -> dict:
+    """guid -> {'name', 'settings'} for every XCBuildConfiguration block."""
+    configs = {}
+    for guid, body in _pbx_objects(pbx).items():
+        if "isa = XCBuildConfiguration;" not in body:
+            continue
+        name = re.search(r"^\t\t\tname = ([^;]+);", body, re.M)
+        settings = dict(re.findall(r"^\t{4}([A-Za-z0-9_]+) = (.*?);$", body, re.M))
+        configs[guid] = {"name": (name.group(1).strip() if name else "").strip('"'),
+                         "settings": settings}
+    return configs
+
+
+def _pbx_owner_config_guids(pbx: str) -> dict:
+    """{'project': [guid..], 'target': [guid..]} derived from the objects, never from comments.
+
+    PBXProject/PBXNativeTarget -> buildConfigurationList -> its buildConfigurations array. A project
+    renumbering moves the answer with it, which a hard-coded ``800...00x`` prefix does not - that
+    hard-coding is exactly the blind spot review-security-1 measured (a DEBUG move into the TARGET
+    Release block passed ``warp_debug_only`` and was caught only by a different script).
+    """
+    objects = _pbx_objects(pbx)
+    lists = {}
+    for guid, body in objects.items():
+        if "isa = XCConfigurationList;" not in body:
+            continue
+        array = re.search(r"buildConfigurations = \((.*?)\n\t\t\t\);", body, re.S)
+        lists[guid] = re.findall(r"([0-9A-F]{24})(?: /\*[^*]*\*/)?,?", array.group(1)) if array else []
+    owners = {"project": [], "target": []}
+    for guid, body in objects.items():
+        if "isa = PBXProject;" in body:
+            kind = "project"
+        elif "isa = PBXNativeTarget;" in body:
+            kind = "target"
+        else:
+            continue
+        ref = re.search(r"buildConfigurationList = ([0-9A-F]{24})", body)
+        if ref:
+            owners[kind] += lists.get(ref.group(1), [])
+    return owners
+
+
 def warp_debug_only(root: pathlib.Path) -> None:
     """AC-007: the bounded debug warp is Debug-compiled, inert when unset, and real-path."""
     scene = rd(root, GAME_SCENE_REL)
@@ -654,9 +707,36 @@ def warp_debug_only(root: pathlib.Path) -> None:
     if pbx.count("SWIFT_ACTIVE_COMPILATION_CONDITIONS") != 1:
         v.append("SWIFT_ACTIVE_COMPILATION_CONDITIONS must be declared exactly once (project Debug); "
                  "a Release copy would compile the warp into the shipped binary")
-    if re.search(r"800000000000000000000002 /\* Release \*/[\s\S]{0,800}?"
-                 r"SWIFT_ACTIVE_COMPILATION_CONDITIONS", pbx):
-        v.append("the project Release configuration defines SWIFT_ACTIVE_COMPILATION_CONDITIONS")
+    # review-security-1 (wave D) + wave E1 #22 item 6: the binding is by OWNING BLOCK, derived from
+    # the project objects - not by a hard-coded GUID prefix over the project Release block only.
+    setting = "SWIFT_ACTIVE_COMPILATION_CONDITIONS"
+    configs = _pbx_build_configs(pbx)
+    owners = _pbx_owner_config_guids(pbx)
+    if len(configs) < 4 or not owners["project"] or not owners["target"]:
+        v.append(f"the pbxproj reader is vacuous (configs={len(configs)}, "
+                 f"project={len(owners['project'])}, target={len(owners['target'])}) - the GUID "
+                 "binding below would assert on nothing")
+    else:
+        declared = sorted(guid for guid, cfg in configs.items() if setting in cfg["settings"])
+        project = set(owners["project"])
+        for guid in declared:
+            cfg = configs[guid]
+            where = f"{'project' if guid in project else 'target'} {cfg['name'] or '?'} ({guid})"
+            if guid not in project or cfg["name"] != "Debug":
+                v.append(f"{setting}={cfg['settings'][setting]} is declared in the {where} "
+                         "configuration; the debug warp must be compiled by the PROJECT Debug block "
+                         "alone - anywhere else (target Debug, target Release, project Release) lets "
+                         "a shipped Release build compile the warp in")
+            if cfg["settings"][setting].strip('"') != "DEBUG":
+                v.append(f"{where} declares {setting}={cfg['settings'][setting]!r}, not DEBUG")
+        absent = [f"{'project' if guid in project else 'target'} {configs[guid]['name']}"
+                  for guid in sorted(configs) if guid not in declared]
+        if len(declared) != 1:
+            v.append(f"{setting} must be declared in exactly one configuration block, found "
+                     f"{len(declared)}: {declared}")
+        bound = ", ".join("%s (%s)" % (configs[g]["name"], g) for g in declared)
+        print("  DEBUG binds to the owning block: %s; absent from %d other build "
+              "configurations: %s" % (bound, len(absent), ", ".join(absent) or "none"))
     if v:
         raise CheckFailure(" | ".join(v)[:900])
 

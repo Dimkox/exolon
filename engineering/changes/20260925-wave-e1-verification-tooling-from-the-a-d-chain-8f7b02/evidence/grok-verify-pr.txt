@@ -1,0 +1,18 @@
+# python3 scripts/grok_verify.py --mode pr --no-record (2026-09-25T06:12:45Z)  rc=0  wall=181s
+# final run after the last tasks.md edit; nothing else writes during it
+PASS git-diff-check: 4/4 checks passed; bases=route:0b0dea97997aa675dd6216284bda2d3476e10bbc,pr-target:0b0dea97997aa675dd6216284bda2d3476e10bbc
+     INFO route.base_commit: checked 0b0dea97997aa675dd6216284bda2d3476e10bbc..HEAD
+     INFO refs/remotes/origin/main: checked 0b0dea97997aa675dd6216284bda2d3476e10bbc..HEAD
+PASS change-spec: 1 specs checked; exempt=False
+SKIP architecture: architecture is not configured
+SKIP governance: governance is not configured
+SKIP workflow-artifacts: workflow artifacts are not configured
+PASS secret-scan: 0 potential secrets
+PASS contract-structure: 0 contracts checked
+PASS sql-safety: 0 unsafe SQL findings
+PASS ruff: exit=0
+PASS bandit: exit=0
+PASS factory-unit: exit=0
+PASS factory-postgres-exit: exit=0
+PASS source-stability: repository fingerprint remained stable
+RESULT: PASS | profiles=base,frontend | changed=28

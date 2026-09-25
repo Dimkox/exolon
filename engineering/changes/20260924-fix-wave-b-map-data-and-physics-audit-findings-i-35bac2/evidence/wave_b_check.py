@@ -645,19 +645,52 @@ def git_show_base(rel: str):
 
 def wave_base() -> str:
     """База added-lines скана: актуальный rebase-base ветки (merge-base с
-    origin/main после перестановки на серию A→B→…), fallback — исторический
-    295690b. Иначе чужие волновые строки (например merge'нутый wave-A)
-    считались бы «нашими добавленными» и размывали атрибуцию FORBID-001.
+    origin/main после перестановки на серию A→B→…). Иначе чужие волновые строки
+    (например merge'нутый wave-A) считались бы «нашими добавленными» и размывали
+    атрибуцию FORBID-001.
     Base-порт renderer'а и TMX-манифест ПРИНЦИПИАЛЬНО остаются на 295690b —
-    это якоря бейса (git show / blob-хэши), а не diff-scope."""
+    это якоря бейса (git show / blob-хэши), а не diff-scope.
+
+    Два правила wave E1 (issue #21/#22 item 4), измеренных ревью серии:
+    1. молчаливо-широкого fallback больше нет. Если refs/remotes/origin/main
+       отсутствует (голый clone без remote-tracking ref'а), скан НЕ уезжает на
+       295690b и не зелёный «впустую»: это FAIL-CLOSED с exit 4. Ревью release
+       поймало на этом ложно-зелёный прогон (2938 строк вместо дельта волны).
+    2. если merge-base(HEAD, origin/main) == HEAD, то у этой ветви НЕТ собственного
+       продуктового дельта (инструментальная волна поверх main, либо ветка == main).
+       Пустой скан красным делать нечем (это не поиск дефекта, а шум), поэтому база
+       перепривязывается к корневой базе 295690b — т.е. скан становится ШИРЕ, а не
+       уже: накопленный дельта A..HEAD снова поличится здесь (и в wave_scan.py),
+       а non-vacuity guard (файлов>=7, строк>=150) остаётся и по-прежнему краснеет.
+       Причина печатается, молчаливости нет."""
+    probe = subprocess.run(["git", "-C", str(ROOT), "show-ref", "--verify", "--quiet",
+                            "refs/remotes/origin/main"], capture_output=True, text=True,
+                           timeout=30, check=False)
+    if probe.returncode != 0:
+        print("FAIL-CLOSED: refs/remotes/origin/main отсутствует — базу added-lines скана "
+              "определить нечем; молчаливый откат на широкую базу 295690b убран в wave E1 "
+              "(он давал ложно-зелёный прогон в clone без remote-tracking ref'а). "
+              "Запустите git fetch origin main (или прогоните engineering/tools/wave_scan.py, "
+              "у которого база якорная).", file=sys.stderr)
+        raise SystemExit(4)
     try:
         proc = subprocess.run(["git", "-C", str(ROOT), "merge-base", "HEAD", "origin/main"],
                               capture_output=True, text=True, timeout=30, check=False)
-        if proc.returncode == 0 and proc.stdout.strip():
-            return proc.stdout.strip()
+        head = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"],
+                              capture_output=True, text=True, timeout=30, check=False)
+        base = proc.stdout.strip() if proc.returncode == 0 else ""
     except (OSError, subprocess.TimeoutExpired):
-        pass
-    return "295690b"
+        base = ""
+    if not base:
+        print("FAIL-CLOSED: git merge-base HEAD origin/main не вернул базу — "
+              "added-lines скан не может быть вычислен.", file=sys.stderr)
+        raise SystemExit(4)
+    if base == head.stdout.strip():
+        print("  wave_base: merge-base(HEAD, origin/main) == HEAD — собственного продуктового "
+              "дельта у этой ветви нет; added-lines скан перепривязан к корневой базе "
+              "295690b (шире, не уже; issue #21)")
+        return "295690b"
+    return base
 
 
 def git_added_lines(base: str):
