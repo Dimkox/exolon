@@ -1441,7 +1441,7 @@
 		800000000000000000000003 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = Exolon/Resources/Exolon.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Exolon/Exolon.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1462,7 +1462,7 @@
 		800000000000000000000004 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = Exolon/Resources/Exolon.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Exolon/Exolon.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;

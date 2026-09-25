@@ -78,13 +78,13 @@ in-memory stripped tree inside `cutover_set_exact`.
 | item | state after D-1 | Linux-decidable by |
 | --- | --- | --- |
 | `ENABLE_HARDENED_RUNTIME = YES` | both target configs, byte-equal settings | merged checker (`hardened_symmetric=1`, `target_cfg_symmetric=1`) + `cutover_set_exact` |
-| `Exolon/Resources/Exolon.entitlements` | tracked, `plistlib`-parses, **empty key set**, therefore no debugger entitlement | `component_stream_identity` neighbours it; plist parse is below |
+| `Exolon/Exolon.entitlements` | tracked, `plistlib`-parses, **empty key set**, therefore no debugger entitlement | `component_stream_identity` neighbours it; plist parse is below |
 | `CODE_SIGN_ENTITLEMENTS` | both target configs, exact path | merged checker's reader (block-bound, not `grep -c`) |
 | `SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG` | project **Debug** block only — deliberately asymmetric, because the two target blocks must stay equal, and because a Release copy would compile the debug warp into the shipped binary | `warp_debug_only` (asserts exactly one occurrence and no Release copy) |
 | signing identity, `DEVELOPMENT_TEAM`, any certificate, any profile | **unchanged and out of scope forever** (`CODE_SIGN_IDENTITY = "-"`, `Manual`, empty team) | nothing — and no Linux verdict may claim otherwise |
 
 ```
-$ python3 -c 'import plistlib,pathlib; d=plistlib.loads(pathlib.Path("Exolon/Resources/Exolon.entitlements").read_bytes()); print(sorted(d))'
+$ python3 -c 'import plistlib,pathlib; d=plistlib.loads(pathlib.Path("Exolon/Exolon.entitlements").read_bytes()); print(sorted(d))'
 []
 ```
 

@@ -56,7 +56,7 @@ LEDGER_REL = "Exolon/GameCore/Diagnostics/StageBoundaryLedger.swift"
 PR3_DIR = "engineering/changes/20260921-close-audit-finding-p1-11-release-layer-for-the-2e7698"
 MERGED_CHECKER_REL = f"{PR3_DIR}/evidence/release_layer_check.py"
 PBXPROJ_REL = "Exolon.xcodeproj/project.pbxproj"
-ENTITLEMENTS_REL = "Exolon/Resources/Exolon.entitlements"
+ENTITLEMENTS_REL = "Exolon/Exolon.entitlements"
 CODE_SIGN_SENTINEL = 'CODE_SIGN_IDENTITY = "-";'
 SCHEMA_ID = "exolon.macos-probe-report/1"
 STACK_UTIL_REL = ".grok-stack/adaptive_grok/util.py"

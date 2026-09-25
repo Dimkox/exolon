@@ -49,16 +49,31 @@ promise about a future run).
 - A report whose `archive_rc` is non-zero must classify the failure: `NO_SCHEME` next to
   `showdestinations_rc=0` is a contradiction and is rejected; `SIGNING` keeps the signing clause
   open without blaming the scheme.
-- **Line-number drift (documentation-only, recorded so the next audit pass does not reopen it as
-  a new citation defect).** Phase D-2 appended the Track A/B sections to
-  `engineering/runbooks/macos-probe.sh` (210 lines at base, 788 after), so the probe line numbers
-  quoted by dated evidence moved: `macos-probe.sh:119-123` (the codesign-flags comment) is now in
-  section B, `:132-142` (the old optional archive) is section B2, and the citations
-  `…7db1f3/evidence/perfile/citation-integrity.md:14,45,48` and
-  `engineering/reports/exolon-full-audit-20260920-v3.md:189` refer to pre-extension offsets. Those
-  files are append-only dated evidence and were **not** edited; `runbook_archive_step_present`
-  and `runbook_stale_gap_claims` stay green because the merged checker reads text, not lines
-  (verified: the unmodified `release_layer_check.py` still reports `RELEASE_LAYER_READY`,
+- **Citation rebind (documentation-only; no dated file was edited).** This route was cut at
+  base `295690b` and has been rebased twice since (wave A, then waves B+C). Every line number
+  quoted by the brief/analysis documents of this package still describes the **base** tree, so
+  they are listed here with their current positions instead of being rewritten in place:
+
+  | cited fact | base `295690b` | this branch |
+  | --- | --- | --- |
+  | `applyOriginalStageBoundaryIfNeeded` (the 3/6 clause body, "deliberately dormant") | `GameScene.swift:622-631` | `:825-856` (now the ledger seam; the false comment is gone, the frozen table is `evidence/l0-before-d1.txt`) |
+  | lives x 1000 award / borrowed life cap | `GameScene.swift:627` / `:628` | moved into `StageBoundaryLedger.outcome` |
+  | points ceiling literal `999_999` | `GameScene.swift:662` | `:910` (still a literal; read from the source by the verifier) |
+  | screen-exit trigger `x > 510` | `GameScene.swift:610` | `:794` (now `GameConstants.screenExitX` at the emit site) |
+  | `includedLevels` 125-level set | `GameScene.swift:53` | `:99` |
+  | pickup refills as bare `10` / `99` | `GameScene.swift:526` / `:533` | `:687-708`, now `GameState.startingGrenades` / `startingAmmo` |
+  | only `setExoskeleton(false)` (restart) | `GameScene.swift:963` | `:1245`, plus the new boundary clear at `:852` and the activation edge at `:367` |
+  | `toggleExoskeleton` / `setExoskeleton` | `Player.swift:243-246` / `:248-250` | `:274-278` / `:280-284` |
+  | `startingAmmo/Grenades/Lives = 99/10/9` | `GameState.swift:81-83` | unchanged, `:81-83` |
+  | probe size | `macos-probe.sh` 210 lines | 789 lines |
+  | codesign-flags observation comment | `macos-probe.sh:119-123` | `:375-377` (section B) |
+  | archive step (was optional) | `macos-probe.sh:132-142` | `:388-403` (section B2, mandatory) |
+
+  `ORIGINAL_MECHANICS.md` is byte-identical to the base (verified), so every `OM:` citation in
+  this package still resolves unchanged. The verification the drift note promised is re-asserted
+  on every run: the unmodified `release_layer_check.py` still measures the release layer of the
+  extended probe (red only on the declared cutover member, `evidence/cutover.md`).
+
   29/29 controls, on the extended tree).
 
 

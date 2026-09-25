@@ -222,8 +222,8 @@ final class GameScene: SKScene {
         guard environment["EXOLON_DEBUG_WARP"] != nil else { return }
         guard let target = GameScene.debugWarpTarget(environment: environment,
                                                     allowed: includedLevels) else {
-            fputs("EXOLON_DEBUG_WARP ignored: the value must be one of the shipped level names "
-                  + "(L01S01...L05S25)\n", stderr)
+            fputs("EXOLON_DEBUG_WARP ignored: the value must be one of the shipped level "
+                  + "names, format LxxSyy\n", stderr)
             return
         }
         let flowBefore = flowState
