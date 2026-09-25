@@ -74,9 +74,6 @@ promise about a future run).
   on every run: the unmodified `release_layer_check.py` still measures the release layer of the
   extended probe (red only on the declared cutover member, `evidence/cutover.md`).
 
-  29/29 controls, on the extended tree).
-
-
 ## Governance context
 
 Canonical governance JSON under `governance/` remains separately reviewed authority. Any rule, example, debt, or digest named here is non-authoritative context until the verifier rederives current governance evidence.

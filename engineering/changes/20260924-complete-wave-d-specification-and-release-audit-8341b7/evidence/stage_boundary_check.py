@@ -478,6 +478,14 @@ def lives_and_refill_semantics(root: pathlib.Path) -> None:
         v.append("the boundary no longer writes lives at all")
     if "clearsExoskeleton: true" not in ledger:
         v.append("the ledger no longer declares that a boundary clears the suit")
+    # OM:144's +1 life currently rides inside OM:146's refill guard (deviation 15), and the only
+    # thing that keeps that correct is this flag being unconditionally true at the ledger. Bind it:
+    # if a future component ever makes `refillsAmmoAndGrenades` conditional, this reddens here
+    # instead of the boundary quietly stopping to grant lives - GameScene cannot execute on Linux,
+    # so an unwatched coupling would surface only in play observation E16.
+    if "refillsAmmoAndGrenades: true" not in ledger:
+        v.append("the ledger no longer hard-codes refillsAmmoAndGrenades: true while the scene "
+                 "gates the +1 life on it - see Deviation 15")
     if "player.setExoskeleton(false, cause: .stageBoundary)" not in boundary:
         v.append("the scene does not clear the exoskeleton at the boundary")
     if v:
@@ -488,6 +496,12 @@ def lives_and_refill_semantics(root: pathlib.Path) -> None:
                                "awardPoints(award.points, reason: .stageBoundary)", 1)
     swapped = swapped.replace("gameState.lives = award.livesAfter", "__MOVED__", 1)
     swapped = swapped.replace("__APPLY_LIVES__", "gameState.lives = award.livesAfter")
+    unguarded = ledger.replace("refillsAmmoAndGrenades: true",
+                              "refillsAmmoAndGrenades: award.refills")
+    if unguarded == ledger:
+        raise CheckFailure("control impossible: the refill flag is not a literal in the ledger")
+    if "refillsAmmoAndGrenades: true" in unguarded:
+        raise CheckFailure("control did not flip: a conditional refill flag stays invisible")
     if swapped.index("gameState.lives = award.livesAfter") > swapped.index(
             "awardPoints(award.points"):
         raise CheckFailure("control impossible: the award/+1 order cannot be inverted in text")

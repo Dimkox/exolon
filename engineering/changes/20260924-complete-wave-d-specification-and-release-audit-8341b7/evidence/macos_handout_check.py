@@ -152,8 +152,15 @@ FORBIDDEN_FLAGS = (
     "security unlock-keychain", "xcrun altool",
 )
 
-# FORBID-002: the exact expected post-D-1 red set of the merged checker.
-DECLARED_CUTOVER_SET = frozenset({"hardened_runtime_key_count", "hardened_deferral_recorded"})
+# FORBID-002, quoted from change-spec.yaml: "expected post-D-1 reds of the merged checker are
+# exactly the MEASURED set {hardened_runtime_key_count} - hardened_deferral_recorded cannot flip
+# without editing dated plan text (forbidden) and is therefore declared non-red; the checker
+# enforces observed subset-of-declared, non-emptiness and liveness of each member; any other
+# cutover red is a regression."
+DECLARED_CUTOVER_SET = frozenset({"hardened_runtime_key_count"})
+# Declared NON-red by the same clause, and still required to be a live key (so the declaration is
+# about this tree, not about a detector that can never fire).
+DECLARED_NON_RED_KEYS = frozenset({"hardened_deferral_recorded"})
 
 # Measured in D-2 (before the pbxproj edit) and re-measured after it: control 8 of the merged
 # checker, `hardened_key_mutation_detected`, installs the key with
@@ -1534,15 +1541,19 @@ def cutover_set_exact(root: pathlib.Path) -> None:
     if undeclared:
         raise CheckFailure(f"the declared cutover set is wrong: the D-1 shape reddens "
                            f"{sorted(undeclared)}, which FORBID-002 does not declare")
+    # Every declared member must be live, and every declared non-red key must be non-red HERE
+    # while still being a live key: otherwise "declared non-red" would describe a dead detector
+    # rather than the immutability of PR #3's plan text (FORBID-002's exact reasoning).
     red_rec = red_keys(mod, mod.measure(mod.undo_records(ctx))[0])
-    if "hardened_deferral_recorded" not in red_rec:
-        raise CheckFailure("the declared cutover member hardened_deferral_recorded is not a live "
-                           "key: the merged checker cannot turn it red")
-    # Measured truth about that second member: the pbxproj repayment alone does NOT redden it,
-    # because it reads PR #3's immutable plan text. The cutover registry says so explicitly.
-    if already and "hardened_deferral_recorded" in red_sym:
-        raise CheckFailure("hardened_deferral_recorded reddened on the real tree; the registry "
-                           "in evidence/cutover.md is now wrong")
+    for key in sorted(DECLARED_CUTOVER_SET | DECLARED_NON_RED_KEYS):
+        if key not in red_rec:
+            raise CheckFailure(f"declared key {key} is not live: the merged checker can never "
+                               "turn it red, so the declaration is prose")
+    still_declared_non_red = {k for k in DECLARED_NON_RED_KEYS if k not in red_sym}
+    if already and still_declared_non_red != DECLARED_NON_RED_KEYS:
+        raise CheckFailure(f"the tree reddens {sorted(red_sym)}; change-spec FORBID-002 declares "
+                           f"{sorted(DECLARED_NON_RED_KEYS)} non-red, so the registry in "
+                           "evidence/cutover.md is now wrong")
     # A one-sided key - installing it in one config on a pre-edit tree, or dropping it from one
     # config on a repaid tree - is a regression class, never a declared cutover.
     if already:

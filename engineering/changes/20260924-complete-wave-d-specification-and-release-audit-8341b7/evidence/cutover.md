@@ -26,29 +26,42 @@ that nothing else moved: re-measuring the same tree with those two lines removed
 text gives `red = []` and every other control green (this is asserted by
 `macos_handout_check.py::cutover_set_exact`, not promised here).
 
-## 2. `hardened_runtime_key_count` — the declared cutover, and only half of it
+## 2. `hardened_runtime_key_count` — the declared cutover set, exactly as the spec states it
 
-`change-spec.yaml` FORBID-002 declares the post-D-1 red set as
-`{hardened_runtime_key_count, hardened_deferral_recorded}`. Measured on the real tree the set is
-`{hardened_runtime_key_count}`:
+`change-spec.yaml`, `forbidden_outcomes[FORBID-002].statement`, verbatim:
+
+> Merged historical evidence (engineering/changes/20260921-*) is immutable; expected post-D-1 reds
+> of the merged checker are exactly the MEASURED set {hardened_runtime_key_count} —
+> hardened_deferral_recorded cannot flip without editing dated plan text (forbidden) and is
+> therefore declared non-red; the checker enforces observed subset-of-declared, non-emptiness and
+> liveness of each member; any other cutover red is a regression.
+
+Measured on this tree: `red = {hardened_runtime_key_count}`. That is the declared set itself, not
+a subset of a larger claim.
 
 * `hardened_runtime_key_count` — the key count is an EXPECTED value pinned to the deferral
-  (`0 # DELIBERATELY DEFERRED`), so repaying the deferral must redden it. Declared, expected,
-  correct.
-* `hardened_deferral_recorded` — **cannot** redden through this change, and the declaration
-  overstates it. The detector is
-  `int("ENABLE_HARDENED_RUNTIME" in plan_text)`, where `plan_text` is PR #3's *own* plan files
-  (`CHANGE_DIR` is hard-coded to the 2e7698 package). Those files are immutable dated evidence:
-  the only mutation that turns this key red is editing PR #3's record of the deferral, which is
-  exactly what FORBID-002 and the append-only rule forbid. The key's liveness is not in doubt —
-  the merged checker's own `undo_records` control reddens it by blanking `plan_text` in memory,
-  and `cutover_set_exact` asserts that on every run — but on any tree this change can produce,
-  it stays green.
+  (`0 # DELIBERATELY DEFERRED`), so repaying the deferral must redden it. Declared, measured,
+  non-empty.
+* `hardened_deferral_recorded` — **declared non-red**, for a reason that is in the tree rather
+  than in interpretation: its detector is `int("ENABLE_HARDENED_RUNTIME" in plan_text)`, where
+  `plan_text` is PR #3's *own* plan files (`CHANGE_DIR` is hard-coded to the 2e7698 package).
+  Reddening it requires editing dated evidence, which FORBID-002 and the append-only rule forbid.
+* `cutover_set_exact` enforces the four clauses of that sentence: observed ⊆ declared, observed
+  non-empty, **liveness of every declared key including the non-red one** (the merged checker's own
+  `undo_records` path reddens `hardened_deferral_recorded` by blanking `plan_text` in memory, so
+  "non-red" is a statement about this tree and not about a dead detector), and any red outside the
+  declared set fails the check.
 
-Ruling recorded: the enforceable content of FORBID-002 is *"no red outside the declared set"*,
-which `cutover_set_exact` checks literally, plus *"every declared member is live"*, which it
-checks through the merged checker's own revert path. The literal reading *"exactly these two
-red"* is unreachable without rewriting dated evidence and is not claimed.
+### Limits of this registry, stated plainly
+
+* The phase is read from the tree (`detect_phase`: wave A's ledger file present **and** at least
+  two hardened settings), so on a hypothetical de-repaid tree `cutover_set_exact` runs in its D-2
+  posture where "the cutover has not triggered yet" is trivially true. That posture is not a
+  release claim and it is not the only line of defence: `entitlements_and_hardening_shape` still
+  demands the key in both target blocks, `hardened_symmetric`/`target_cfg_symmetric` keep the
+  merged checker honest, and the AC moves green→red→green with any real removal.
+* Nothing here observes a built bundle. The `runtime` flag on a signed archive stays unobserved
+  on this hardware — section 6.
 
 ## 3. `hardened_key_mutation_detected` — an instrument that only exists pre-repayment
 

@@ -102,12 +102,23 @@
    certified on) and `GameScene` names `GameplayStageComponentSequence.waveD` at the boundary
    call. `waveA` therefore remains a real, reachable configuration rather than dead code — which
    is what makes "the sequence is data" more than a phrase.
-9. **FORBID-002's declared cutover set is a superset of the reachable one.** Measured on this
-   tree: `hardened_runtime_key_count` reddens; `hardened_deferral_recorded` cannot (it reads PR
-   #3's immutable plan text), and PR #3's control `hardened_key_mutation_detected` becomes
-   unsatisfiable for the structural reason in `evidence/cutover.md`. Enforced instead: no red and
-   no lost control outside the declared sets, each declared member proven live through the merged
-   checker's own in-memory revert. The spec text was not silently "fixed"; this is the record.
+9. **My documents misquoted my own typed spec; the spec never changed.** Release review finding 4
+   checked `change-spec.yaml` `forbidden_outcomes[FORBID-002]` at **every** commit of this branch
+   (`e0169e5`, `68eda03`, `c402526`, `7929818`, `84b7813`) and it declares the one-member measured
+   set in all of them: "expected post-D-1 reds of the merged checker are exactly the MEASURED set
+   {hardened_runtime_key_count} — hardened_deferral_recorded cannot flip without editing dated plan
+   text (forbidden) and is therefore declared non-red; the checker enforces observed
+   subset-of-declared, non-emptiness and liveness of each member; any other cutover red is a
+   regression". Wave D-1's prose (here and in `evidence/cutover.md` §2) and, worse, the checker
+   constant `DECLARED_CUTOVER_SET` carried the second key as if the spec had declared it red too -
+   i.e. the code was **looser** than the typed authority, and the earlier sentence "the spec text
+   was not silently fixed" described an edit that never happened. Both are corrected: the constant
+   is now `frozenset({"hardened_runtime_key_count"})` plus an explicit
+   `DECLARED_NON_RED_KEYS = {"hardened_deferral_recorded"}`, `cutover_set_exact` checks every clause
+   of the spec sentence (observed ⊆ declared, non-empty, liveness of *all* declared keys including
+   the declared non-red one, and this tree must keep that key green), and `cutover.md` §2 quotes the
+   statement verbatim. Nothing could be laundered by the old wording - the direction of error was
+   safe - but an unanchored deviation record is its own defect.
 10. **`waveA` context carries no clock observation, so the ladder pays zero rather than guessing.**
     `StageBoundaryContext.stageElapsedSteps` is optional and `nil` means "unobserved". Without it a
     default context would silently compute phase 0 = 7 000 points and wave A's certified numbers
@@ -137,6 +148,24 @@
     rebase onto main that diff *is* wave D alone - 5 files, 124 code lines - so the floor
     describes the wrong wave by construction (their D28 note). All 8 B probes that measure
     behaviour pass; B's package was not touched.
+15. **`+1 life` travels with the refill under one flag (recorded, not silently gated).**
+    `StageBoundaryAward.refillsAmmoAndGrenades` is the single switch the scene checks before
+    applying `livesAfter`, `startingAmmo` and `startingGrenades` together, because wave A introduced
+    it for the refill pair and D-1 reused the existing branch instead of widening the award struct's
+    contract. Behaviour is what the norm lists (`:144` then `:146`, both unconditional at a stage
+    end), so the flag is never false for a real boundary; the cost is that turning the refill off
+    would also stop the life. Splitting them means a new award field plus a new wave-A-side
+    assertion - a wider contract change than P1-10 needs, and it is left as the honest statement
+    here rather than a half-made refactor. What review finding 6 correctly called out is that no
+    Linux control could *see* the coupling, so `lives_and_refill_semantics` now asserts it
+    explicitly: the award applies all three writes in the norm's order, the ledger hard-codes
+    `refillsAmmoAndGrenades: true` on every awarded boundary, and if a future component ever makes
+    that flag conditional the check reddens instead of the boundary quietly stopping to grant
+    lives. The product shape is unchanged (no new award field, no widened wave-A contract).
+16. **Accepted nit: `cutover_set_exact`'s D-2 posture is trivially satisfied on a de-repaid tree**
+    (phase is auto-detected from the tree). Stated once in `evidence/cutover.md` §2 "Limits", with
+    the checks that still hold there (`entitlements_and_hardening_shape`, the merged checker's own
+    symmetry keys). No code change: the alternative is a phase flag that can lie.
 
 ## Final rebase (waves B+C, 2026-09-25)
 
@@ -171,9 +200,10 @@ rebase (`evidence/ledger-xcheck-executed.txt`).
 6. `ladder_is_declared_deviation` needs `PHASE_TICKS = 1_800` in `GameConstants.swift` with the
    owner-deviation comment; the deviation comment is what the check reads, not the number.
 7. pbxproj/entitlements (task 10) then re-check `cutover_set_exact --phase D1`: the declared
-   set is {hardened_runtime_key_count, hardened_deferral_recorded}; `hardened_deferral_recorded`
-   is proven live through the merged checker's own `undo_records` path, because the 2e7698 plan
-   text is immutable and cannot itself be rewritten to make that key red.
+   set is {hardened_runtime_key_count} and `hardened_deferral_recorded` is declared **non-red**
+   (change-spec FORBID-002 verbatim). That key's liveness is still proven through the merged
+   checker's own `undo_records` path, because "non-red" must mean "this tree does not redden it",
+   not "the detector is dead".
 8. `engineering/contracts/schemas/` merges next to the other waves' `contracts/` subdirs
    (main already has `asyncapi/`, `openapi/`; wave C adds `level-content-v1.json`): no filename
    collision, but the rebase must not drop `macos-probe-report-v1.schema.json`, because the
@@ -214,8 +244,8 @@ the compiled ledger) — wave A's file was **not** edited to get there.
   the Swift type produces is therefore the table the Python verifier models.
 * Cutover measured, not quoted: the merged checker's diff is exactly
   `red_ac = {hardened_runtime_key_count}` plus the control `hardened_key_mutation_detected`
-  structurally unable to pass on a repaid tree. Both, and the reason `hardened_deferral_recorded`
-  cannot redden at all, are in `evidence/cutover.md`.
+  structurally unable to pass on a repaid tree. Both, and the reason `hardened_deferral_recorded` is
+  declared non-red by the typed spec itself, are in `evidence/cutover.md` §2-§3.
 
 ## macOS-side validation is permanently out of reach for this repository
 

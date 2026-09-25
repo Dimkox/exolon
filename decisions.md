@@ -38,7 +38,7 @@ Wave A's gameplay event log measured three shapes before committing to one: a si
 `engineering/runbooks/macos-probe.sh` gained Track A archive inspection, a Track-B gate, a flush
 barrier and out-of-tree build roots without losing a single consumer: `macos_handout_check.py`
 extracts the emit-keys of `git show HEAD:<probe>` and requires every one of them to still be
-emitted (46 before, 126 after, zero lost), because measurement M-7 proved that renaming one
+emitted (46 before, 127 after, zero lost (re-measured on head `84b7813`: the D-2 draft said 126)), because measurement M-7 proved that renaming one
 detector token (`EXOLON_FORBIDDEN_ARGV`) reddens exactly one AC of the merged verifier - a guard
 string is product surface, not prose. The same rule applies to the tool's own assertions: a shell
 probe must pass operator-shaped patterns to `grep -e` (a pattern starting with `-` is parsed as an
