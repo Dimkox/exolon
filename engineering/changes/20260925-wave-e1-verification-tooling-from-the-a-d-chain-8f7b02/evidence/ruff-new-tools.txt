@@ -1,5 +1,6 @@
 # ruff check with the repository's own ruff.toml (select E4,E7,E9,F; line-length 120; target py310)
-# head=32e61e8fd49abb94730371682229e518abd4188a  date=2026-09-25T08:05:54Z  dirty=16
+# head=7653f3381d65abab0c3095ceb773bbc826a464da  date=2026-09-25T10:20:24Z  dirty=12
+# certified_head=7653f3381d65abab0c3095ceb773bbc826a464da  cert_digest=d4a5d82ff4fc6cc2  certified_files=23  tree_fingerprint=6e765c91853335122e1150c6bf8a2bc5cbf8f3e9de1016103a23ccec0fa13559
 # NOTE: ruff.toml excludes engineering/, so the files are passed explicitly.
 
 ## 1. wave E1's new tools (must be clean)

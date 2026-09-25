@@ -74,6 +74,11 @@ CHANGE_BASE_SHORT = CHANGE_BASE[:7]
 # pass, so a run whose head differs from them is a stale certification - M3).
 FREEZE_ARTIFACTS = ('wave-scan-end-to-end.txt', 'wave-e1-check-green.txt', 'wave-e1-check.json',
                     'ruff-new-tools.txt', 'grok-verify-pr.txt')
+# Derived files, excluded from the certified content digest: what the freeze writes and what the
+# reviewers write. Anything that hashes itself would make certification an infinite regress.
+CERT_EXCLUDED = set(FREEZE_ARTIFACTS) | {
+    'freeze.sh', 'review-code.md', 'review-test.md', 'review-code-recheck.md',
+    'review-test-recheck.md', 'analysis-repo_explorer.md', '__pycache__'}
 DIAG_LOG = ROOT / 'Exolon' / 'GameCore' / 'Diagnostics' / 'GameplayEventLog.swift'
 
 CHANGES = ROOT / 'engineering' / 'changes'
@@ -592,6 +597,20 @@ def attribution_scan_flips() -> str:
         if want not in seen:
             raise CheckFailure(f'the untracked new-file plant did not surface {want!r}: {seen}')
 
+    # X2, two-sided: the untracked union is product-only now. Before the fix `-- Exolon '*.swift'`
+    # was ORed by git, so ANY untracked *.swift was fed into the product FORBID-001 set - the scan
+    # policed more than it claimed, and an evidence harness naming a map would have reddened the
+    # product gate. Narrowing must be proven, so this plant must stay GREEN and unlisted.
+    outside = clone_tree('ac002-untracked-outside-product')
+    written(outside / 'engineering/scratch/E1Outside.swift',
+            'enum E1Outside { static let bound = 544.0 }\n')
+    outside_att = wave_scan(outside, 'attribution')['attribution']
+    if int(outside_att['violations']) != 0:
+        raise CheckFailure('an untracked NON-product swift still feeds the product FORBID-001 set: '
+                           f'{outside_att["violation_details"][:1]}')
+    if any('E1Outside' in item for item in outside_att.get('untracked_files', [])):
+        raise CheckFailure('the untracked union is still repo-wide while the bucket says product')
+
     # R5: the syntax variants the merged `[-+] ?\b16\b` predicate missed. One plant each.
     variants = (('plus-equals', '        acc += 16'),
                 ('double-space', '        let probe: CGFloat = marker.x +  16'),
@@ -740,9 +759,12 @@ def union_added_code_lines(root: Path, base: str) -> int:
             code = re.sub(r'/\*.*?\*/', '', code, flags=re.S)
             if code.strip():
                 total += 1
-    listed = run(['git', 'ls-files', '--others', '--exclude-standard', '--', 'Exolon', '*.swift'],
+    listed = run(['git', 'ls-files', '--others', '--exclude-standard', '--', 'Exolon'],
                  cwd=root, timeout=120)
-    for rel in sorted(line for line in listed['stdout'].splitlines() if line.strip()):
+    # X2 parity: product-only, because git ORs multiple pathspecs
+    product = [line for line in listed['stdout'].splitlines()
+               if line.startswith('Exolon/') and line.endswith('.swift')]
+    for rel in sorted(product):
         try:
             text = (root / rel).read_text(encoding='utf-8', errors='replace')
         except OSError:
@@ -1446,36 +1468,112 @@ def suite_standalone_agreement() -> str:
 # driver
 # ---------------------------------------------------------------------------
 
-def stale_certification() -> list:
-    """Freeze artifacts whose recorded head is not the head being checked (review-test M3).
+DELETED_MARK = 'DELETED'
 
-    `evidence/freeze.sh` regenerates every artifact in one pass, so a clean pass always ends with
-    all four naming this head. If they name an older one, this certification predates the commit it
-    sits in - which is exactly how the first wave E1 freeze shipped a green bound to `0b0dea9` while
-    the head was `32e61e8`. Reported as a WARNING with the verdict (a probe cannot refuse its own
-    recording pass) and as `stale_certification` in --json, so the freeze script can fail on it.
+
+def _sha256_bytes(data: bytes) -> str:
+    import hashlib
+    return hashlib.sha256(data).hexdigest()
+
+
+def cert_state(root: Path | None = None) -> tuple:
+    """The certified content: every path this change carries, hashed as it stands on disk.
+
+    Binding by content (review-test-recheck §3a) rather than by commit identity. The digest covers
+    `CHANGE_BASE..HEAD ∪ working ∪ untracked`, with the derived artifacts (what the freeze writes and
+    what the reviewers write) excluded - an artifact that hashes itself is the infinite regress the
+    reviewer named. A freeze pass on a dirty parent tree and the clean commit carrying exactly those
+    bytes therefore produce the SAME digest, and any content difference changes it.
     """
-    current = head_sha()
-    recording = os.environ.get('EXOLON_E1_FREEZE') == '1'
-    # Written by this very pass (after it) or by the step that follows it - flagging them as stale
-    # mid-freeze would be noise, and evidence/freeze.sh checks all five at the end anyway.
-    written_later = {'grok-verify-pr.txt', 'wave-e1-check-green.txt', 'wave-e1-check.json'}
-    stale = []
-    for name in FREEZE_ARTIFACTS:
-        if recording and name in written_later:
+    root = root or ROOT
+    paths = set()
+    for args in (['diff', '--name-only', f'{CHANGE_BASE}..HEAD'], ['diff', '--name-only', 'HEAD'],
+                 ['diff', '--name-only', '--cached'], ['ls-files', '--others', '--exclude-standard']):
+        proc = run(['git', *args], cwd=root, timeout=180)
+        if proc['returncode'] != 0:
+            raise CheckFailure(f'git {" ".join(args)}: {proc["stderr"][:160]}')
+        paths.update(line for line in proc['stdout'].splitlines() if line.strip())
+    expanded = set()
+    for listed in paths:                   # untracked dirs collapse in `git status` output
+        full = root / listed
+        if full.is_dir():
+            expanded.update(str(item.relative_to(root)) for item in sorted(full.rglob('*'))
+                            if item.is_file())
+        else:
+            expanded.add(listed)
+    entries = []
+    evidence_prefix = str(PKG.relative_to(ROOT)) + '/evidence/'
+    for changed in sorted(expanded):
+        if changed.startswith(evidence_prefix) and Path(changed).name in CERT_EXCLUDED:
             continue
+        path = root / changed
+        entries.append(changed + '\t' + (DELETED_MARK if not path.is_file()
+                                         else _sha256_bytes(path.read_bytes())))
+    return _sha256_bytes('\n'.join(entries).encode('utf-8'))[:16], len(entries)
+
+
+def tree_fingerprint_now():
+    """The stack's own tree fingerprint, when importable: written into headers for receipt checks."""
+    import sys as _sys
+    path = str(ROOT / '.grok-stack')
+    if path not in _sys.path:
+        _sys.path.insert(0, path)
+    try:
+        from adaptive_grok.util import tree_fingerprint    # the project function, not a copy
+    except Exception:                                     # noqa: BLE001 - optional local tooling
+        return None
+    try:
+        return tree_fingerprint(ROOT)
+    except Exception:                                     # noqa: BLE001
+        return None
+
+
+def _header_field(text: str, key: str) -> str:
+    """Read a binding field in either notation: `key=<hex>` in a header, `"key": "<hex>"."""
+    # `key=<hex>` in a header, `"key": "<hex>"` in JSON: the closing quote of a JSON key sits between
+    # the name and the separator, which the first version of this regex missed (the freeze's own
+    # step-5 self-acceptance check caught it: a bare run refused the JSON artifact it had just written).
+    match = re.search(rf'(?:{re.escape(key)}"?\s*[=:]\s*"?)([0-9a-f]{{7,64}})', text)
+    return match.group(1) if match else ''
+
+
+def certification_status() -> tuple:
+    """(bound, informational-in-freeze-window, stale) - content first, commit identity second.
+
+    rc semantics stay strict outside the freeze window: an artifact that certifies different content
+    than the tree now holds is a red gate, even when HEAD happens to equal the recorded head (a new
+    dirty edit is exactly that case).
+    """
+    digest, _files = cert_state()
+    head = head_sha()
+    recording = os.environ.get('EXOLON_E1_FREEZE') == '1'
+    bound, window, stale = [], [], []
+    for name in FREEZE_ARTIFACTS:
         path = HERE / name
         if not path.is_file():
-            stale.append(f'{name}: missing')
+            (window if recording else stale).append(f'{name}: missing')
             continue
         text = path.read_text(encoding='utf-8', errors='replace')
-        found = re.findall(r'[0-9a-f]{40}', text)
-        recorded = next((sha for sha in found if sha != CHANGE_BASE), '')
-        if not recorded:
-            stale.append(f'{name}: records no head')
-        elif not recorded.startswith(current):
-            stale.append(f'{name}: records {recorded[:7]}, head is {current[:7]}')
-    return stale
+        rec_head = _header_field(text, 'certified_head') or _header_field(text, 'head')
+        rec_digest = _header_field(text, 'cert_digest')
+        if not rec_digest:
+            (window if recording else stale).append(f'{name}: no cert_digest recorded')
+        elif rec_digest == digest and (rec_head == head or _commit_is_ancestor_or_head(rec_head)):
+            bound.append(f'{name}@{rec_head[:7]}:{rec_digest}')
+        elif recording:
+            window.append(f'{name}: certifies {rec_digest}, this state is {digest} (freeze window)')
+        else:
+            stale.append(f'{name}: certifies {rec_digest}@{rec_head[:7]}, this state is {digest}')
+    return bound, window, stale
+
+
+def stale_certification() -> list:
+    """Everything that is not content-bound: the freeze-window notes plus the stale list.
+
+    The verdict itself is decided by `certification_status()`; this is the human-readable
+    summary the transcript and --json print."""
+    _bound, window, stale = certification_status()
+    return window + stale
 
 
 def main(argv=None) -> int:
@@ -1524,26 +1622,46 @@ def main(argv=None) -> int:
               file=sink, flush=True)
 
     failed = sorted(name for name, res in results.items() if not res['pass'])
-    stale = stale_certification()
-    for line in stale:
-        print(f'WARNING stale-certification {line} - re-record with evidence/freeze.sh',
-              file=sys.stderr if args.json else sys.stdout, flush=True)
+    bound, window, uncertified = certification_status()
+    for line in window + uncertified:
+        kind = 'NOTE' if line in window else 'NOT-CERTIFIED'
+        print(f'{kind} certification: {line}', file=sys.stderr if args.json else sys.stdout,
+              flush=True)
+    # rc semantics (review-test-recheck §3a): inside the freeze-on-parent window the notes are
+    # informational, because the artifacts of this very pass are written after it. Outside that
+    # window, content that is not certified by an artifact is a red gate - including the case where
+    # HEAD still equals the recorded head but the working tree has moved on.
+    if uncertified:
+        failed = sorted(set(failed) | {'certification_binding'})
+        results['certification_binding'] = {
+            'binding': 'M3 / review-test-recheck §3a', 'pass': False,
+            'reason': 'no content-bound certification: ' + '; '.join(uncertified)[:900],
+            'seconds': 0.0}
     elapsed = round(time.time() - started, 1)
     if args.json:
         # the human verdict line too, on stderr, so one --json run can produce both transcripts
         print(f'RESULT: {"WAVE_E1_PROBES_FAIL" if failed else "WAVE_E1_PROBES_PASS"} | '
               f'probes={len(results)} failed={len(failed)} seconds={elapsed} '
-              f'stale_certification={len(stale)}', file=sys.stderr, flush=True)
+              f'cert_bound={len(bound)} cert_notes={len(window)} '
+              f'cert_uncertified={len(uncertified)}', file=sys.stderr, flush=True)
+        for name in failed:
+            print(f'  ! {name}: {str(results[name].get("reason", ""))[:300]}',
+                  file=sys.stderr, flush=True)
+        digest, files = cert_state()
         print(json.dumps({'tool': 'wave_e1_check', 'root': str(ROOT), 'head': head_sha(),
                           'change_base': CHANGE_BASE, 'base': ROOT_BASE, 'seconds': elapsed,
-                          'stale_certification': stale, 'checks': len(results),
+                          'cert_digest': digest, 'certified_files': files,
+                          'tree_fingerprint': tree_fingerprint_now(),
+                          'certification_bound': bound, 'certification_notes': window,
+                          'certification_uncertified': uncertified,
+                          'stale_certification': window + uncertified, 'checks': len(results),
                           'failed': len(failed), 'results': results,
                           'result': 'WAVE_E1_PROBES_PASS' if not failed else 'WAVE_E1_PROBES_FAIL'},
                          indent=2, sort_keys=True))
     else:
         print(f'RESULT: {"WAVE_E1_PROBES_FAIL" if failed else "WAVE_E1_PROBES_PASS"} | '
               f'probes={len(results)} failed={len(failed)} seconds={elapsed} '
-              f'stale_certification={len(stale)}')
+              f'cert_bound={len(bound)} cert_notes={len(window)} cert_uncertified={len(uncertified)}')
         for name in failed:
             print(f'  ! {name}: {results[name]["reason"][:300]}')
     if not args.keep_work and WORK.exists():

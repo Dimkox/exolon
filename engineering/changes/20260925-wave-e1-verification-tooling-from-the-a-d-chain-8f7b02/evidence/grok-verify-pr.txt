@@ -1,5 +1,6 @@
 # python3 scripts/grok_verify.py --mode pr --no-record
-# head=32e61e8fd49abb94730371682229e518abd4188a  date=2026-09-25T08:05:54Z  dirty=16  rc=0  wall=184s
+# head=7653f3381d65abab0c3095ceb773bbc826a464da  date=2026-09-25T10:20:24Z  dirty=12  rc=0  wall=184s
+# certified_head=7653f3381d65abab0c3095ceb773bbc826a464da  cert_digest=d4a5d82ff4fc6cc2  certified_files=23  tree_fingerprint=6e765c91853335122e1150c6bf8a2bc5cbf8f3e9de1016103a23ccec0fa13559
 # run last, after every other artifact was written (source-stability is one of its checks)
 PASS git-diff-check: 4/4 checks passed; bases=route:0b0dea97997aa675dd6216284bda2d3476e10bbc,pr-target:0b0dea97997aa675dd6216284bda2d3476e10bbc
      INFO route.base_commit: checked 0b0dea97997aa675dd6216284bda2d3476e10bbc..HEAD
@@ -16,4 +17,4 @@ PASS bandit: exit=0
 PASS factory-unit: exit=0
 PASS factory-postgres-exit: exit=0
 PASS source-stability: repository fingerprint remained stable
-RESULT: PASS | profiles=base,frontend | changed=32
+RESULT: PASS | profiles=base,frontend | changed=34

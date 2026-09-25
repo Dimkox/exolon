@@ -5,7 +5,11 @@
 - [x] Implement the smallest vertical change.
 - [x] Run selected quality profile.
 - [ ] Complete independent reviews.
-- [ ] Bind evidence to the final tree fingerprint.
+- [ ] Bind evidence to the final tree fingerprint. **Mechanism shipped:** every freeze artifact now
+  carries `tree_fingerprint=` (the stack's own `adaptive_grok.util.tree_fingerprint`) plus
+  `certified_head=`/`cert_digest=`/`certified_files=`, and `evidence/freeze.sh` refuses to finish if
+  the digest moved during the pass or if a bare run does not accept the binding it just wrote. The
+  box stays open until the controller records the receipt for the commit that carries this state.
 
 Analysis note (route 8f7b02): the formal analysis waits were skipped for this wave — the
 read-only `repo_explorer` lane confirmed the six targets concurrently and its report
@@ -126,11 +130,14 @@ residuals rather than prose. The typed spec stays the authority; the Markdown on
 - `macos_handout_check.py`/`ledger-xcheck` Track A/B runs and every class-2 macOS fact remain
   permanently external (no Apple host); `vitorc` regeneration (48 maps) and issue #16 acceptance
   are wave E2 / owner calls, untouched here.
-- **README handoff for the controller (AGENTS.md "README before push")**: `README.md` has no
-  "current state" entry for `engineering/tools/` at all, and no wave B/C/D/E1 sections - the file is
-  behind the tree independently of this change. E1's own scope forbids touching anything outside
-  `engineering/tools/`, the three merged touch-points and this package, so the README line for the
-  new root-anchored tool is a PR-body/controller step, not an E1 file edit.
+- **README.md is an authorized wave E1 edit** (M4 / review-code R10, corrected here after the first
+  pass claimed the opposite): AGENTS.md "README before push" requires the file to match the tree, and
+  the section was written by the controller and adopted into this change. `README.md` is listed in
+  `wave_e1_check.py::SANCTIONED_MERGED_EDITS` with an authorization comment, the fix batch aligned its
+  wording with the shipped tool (untracked coverage, the ignore guard, the `WAVE_SCAN_PARTIAL` exit,
+  the one-command `evidence/freeze.sh`), and FORBID-001 reports it among the sanctioned edits with a
+  real base-diff (`README.md:+38/-1` against `0b0dea9`). The product half of FORBID-001 is unaffected:
+  `Exolon/` and `Exolon.xcodeproj` stay byte-identical to the route base.
 ## Fix batch after the first reviews (R1-R11 / M1-M4 at head `32e61e8`)
 
 Both first-pass reviews FAILed the certification (`evidence/review-code.md`,
@@ -199,6 +206,31 @@ The earlier `grok_verify` attempts (two `source-stability` failures while artifa
 written, and the first two `freeze.sh` invocations that failed their own leak/root-path checks) are
 recorded above under "Process facts", not hidden.
 
+## ACCEPTED-GAPS (copied verbatim from `evidence/review-test-recheck.md` §6 "Accepted with
+evidence"; deliberately **not** fixed in wave E1 - each is a named, owned follow-up)
+
+1. `swiftc` version still not recorded in `wave_scan`/evidence JSON (path + broken/good selftest only).
+2. Budget coupling: `BUDGET_SECONDS=600` vs sequential per-meter timeouts up to 400 s; measured suite
+   83.9 s here (7× headroom), whole verifier 235.6 s (recorded 229 s - stable).
+3. Meter roster is duplicated in `wave_scan.py` and `wave_e1_check.py` with no discovery anchor; an
+   absent script or unknown `--meter` name is red, but a *coordinated* roster shrink still passes.
+4. `Exolon/Resources` TMX data is outside the root contour (now explicitly *disclosed* via
+   `not_policed`, and the loader corpus size is pinned at 125 - strictly better than my first pass).
+5. B's re-anchor fires only at `own_delta_code_lines == 0`; a future wave touching 1-149 product code
+   lines reddens B's guard by construction (`requirements.md:60-61` states this is intended policy, so
+   E2 must plan for it).
+6. The `//`-inside-a-string-literal limit in `strip_comments()` (inherited, disclosed).
+
+Plus, from the same re-check: **X2** (untracked union pathspec was repo-wide while labelled product)
+is FIXED in this batch - `untracked_product_swift()` now lists `Exolon` only and the checker's
+independent recount matches it, because git ORs multiple pathspecs (`-- Exolon '*.swift'` pulled in any
+untracked `*.swift` in the repository and fed the product FORBID-001 set). The narrowing is proven
+**two-sided** in AC-002: the untracked *product* plant must still redden, and a planted
+`engineering/scratch/E1Outside.swift` carrying `544.0` must now stay green and unlisted. The asymmetry
+that exposes (parse covers repo-wide Swift, attribution covers product Swift) is stated in the tool's
+own `attribution.not_policed` registry, which `wave_scan` prints on every run and which AC-002
+refuses to let disappear.
+
 ## Exit-code and result vocabulary (so a log line cannot be misread)
 
 - `wave_scan.py`: `WAVE_SCAN_GREEN` (exit 0, the full contour), `WAVE_SCAN_PARTIAL` (exit 3, a
@@ -206,8 +238,13 @@ recorded above under "Process facts", not hidden.
   first `WAVE_SCAN_GREEN_PARTIAL` because that token was a string super-set of `WAVE_SCAN_GREEN` and
   a `grep`-based consumer could read a partial run as the series gate), `WAVE_SCAN_RED` (exit 1, with
   every reason in `problems[]`), usage errors exit 2.
-- `wave_e1_check.py`: `RESULT: WAVE_E1_PROBES_PASS | probes=11 failed=0 stale_certification=0`
-  (exit 0) or `WAVE_E1_PROBES_FAIL` (exit 1); `--json` keeps stdout pure JSON, moves progress to
-  stderr, and carries `head`, `change_base`, `certified_head` (when written by the freeze) and
-  `stale_certification` - the list of freeze artifacts that name a head other than the one under
-  check (review-test M3). `evidence/freeze.sh` fails if that list is not empty at the end.
+- `wave_e1_check.py`: `RESULT: WAVE_E1_PROBES_PASS | probes=11 failed=0 cert_bound=5 cert_notes=0
+  cert_uncertified=0` (exit 0) or `WAVE_E1_PROBES_FAIL` (exit 1); `--json` keeps stdout pure JSON,
+  moves progress to stderr, and carries `head`, `change_base`, `cert_digest`, `certified_files`,
+  `tree_fingerprint`, `certification_bound/_notes/_uncertified`. **Certification binds by content**:
+  an artifact is accepted when its `cert_digest` equals the digest of the current change surface AND
+  its `certified_head` is HEAD or an ancestor of it - which is exactly the freeze-on-parent then
+  commit-once case. Outside the freeze window `cert_uncertified>0` is itself a failed probe
+  (`certification_binding`, rc=1), so a moved tree cannot be read as green; inside the window
+  (`EXOLON_E1_FREEZE=1`, i.e. the pass that is rewriting those artifacts right now) the same facts
+  print as informational notes, because the pass cannot certify itself into existence.

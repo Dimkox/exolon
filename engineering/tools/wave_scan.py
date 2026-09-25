@@ -90,6 +90,10 @@ NOT_POLICED = (
     'no macOS runtime behaviour (class-2 stays external - this host has no Apple toolchain)',
     'the meter roster is the six names in METERS; a new merged meter must be registered here and '
     'in evidence/wave_e1_check.py, and only a coordinated edit to both keeps the suite green',
+    'attribution reads added lines under Exolon/ only (the scope of the merged FORBID-001 '
+    'predicate it re-runs): evidence-harness Swift - the drivers under engineering/changes/*/ - is '
+    'parse-checked but its literals are not attribution-scanned, and untracked non-product Swift is '
+    'deliberately outside the product set',
 )
 
 # (name, script inside the repo, extra argv, expected passing verdicts, verdict tag)
@@ -267,8 +271,13 @@ def untracked_product_swift(root: Path) -> list:
     to a brand-new ``Exolon/**/X.swift`` while its own bucket name promised "working tree + untracked"
     (the parse contour already covered them). Every line of such a file is an added line.
     """
-    listed = git(root, 'ls-files', '--others', '--exclude-standard', '--', 'Exolon', '*.swift')
-    return sorted(line for line in listed.splitlines() if line.strip().endswith('.swift'))
+    # review-code-recheck X2: `-- Exolon '*.swift'` would be ORed by git, so it listed *any*
+    # untracked *.swift in the repository and fed it into the PRODUCT FORBID-001 set (over-policing,
+    # and an evidence harness naming a map would have reddened the product gate). One pathspec plus an
+    # explicit prefix test keeps the claim and the label truthful.
+    listed = git(root, 'ls-files', '--others', '--exclude-standard', '--', 'Exolon')
+    return sorted(line for line in listed.splitlines()
+                  if line.startswith('Exolon/') and line.endswith('.swift'))
 
 
 def ignored_product_swift(root: Path) -> list:
@@ -280,7 +289,7 @@ def ignored_product_swift(root: Path) -> list:
     reddens and names the file: nothing under the product tree may be outside the scan.
     """
     on_disk = {str(path.relative_to(root)) for path in (root / 'Exolon').rglob('*.swift')}
-    known = set(git(root, 'ls-files', '--', 'Exolon', '*.swift').split())
+    known = set(git(root, 'ls-files', '--', 'Exolon').split())
     known.update(untracked_product_swift(root))
     return sorted(on_disk - known)
 

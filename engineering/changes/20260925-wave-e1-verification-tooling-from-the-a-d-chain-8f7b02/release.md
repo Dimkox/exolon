@@ -67,12 +67,27 @@ Go requires **all** of:
 - `ruff check` clean on the two new files (pre-existing findings in the merged tools are listed,
   not silently rewritten) — `evidence/ruff-new-tools.txt`.
 
-No-Go / hold: any meter red at its recorded count (a red merged meter blocks **E1**, per the brief —
-it does not get excused in place); a control that does not flip; an unattributable violation
-(`bucket=unattributed`); an elapsed time over budget; a non-empty `stale_certification` (evidence
-bound to another head); an `Exolon/**.swift` that no git listing reports (the ignore guard).
-Re-certification is one command: `bash evidence/freeze.sh` — it regenerates all five artifacts at the
-current head, each header carrying `head=<sha> dirty=<n>`, and fails if any of them does not name it.
+**How certification is bound (review-test-recheck §3a).** No-Go on: any meter red at its recorded
+count (a red merged meter blocks **E1**, per the brief — it does not get excused in place); a control
+that does not flip; an unattributable violation (`bucket=unattributed`); an elapsed time over budget;
+an `Exolon/**.swift` that no git listing reports (the ignore guard). Evidence is bound **by content,
+not by commit identity**: `bash evidence/freeze.sh` computes one digest over the change surface
+(`route-base..HEAD ∪ working ∪ untracked`, minus the artifacts it writes), stamps
+`certified_head` / `cert_digest` / `certified_files` / the stack `tree_fingerprint` into all five
+artifacts, and fails if the digest moved mid-pass or if a bare `wave_e1_check.py` run then refuses to
+accept the binding it just wrote. So the certified state is *the freeze-on-parent artifacts plus the
+commit that carries exactly those bytes*: `head` names the parent, `dirty=N` lists exactly the files
+the next commit adds, and the digest is what a later run compares - a commit is not a content change,
+so it stays accepted, while any real edit (including an edit made *while* HEAD still equals the
+recorded head) moves the digest and turns the gate red: outside the freeze window
+`cert_uncertified>0` is itself a failed probe (`certification_binding`, rc=1). Inside the freeze window
+(`EXOLON_E1_FREEZE=1`) those same facts are informational, because a pass cannot certify the tree
+containing its own unwritten artifacts - the demanded re-freeze at the head produced by the freeze
+would otherwise be an infinite regress, and this is the honest closure of that loop. Recording a
+fingerprint-bound verification receipt for the commit that carries this state (the controller's gate
+step) re-establishes the chain end to end: `evidence/wave-e1-check.json` carries
+`tree_fingerprint`/`cert_digest`, and the receipt's own `tree_fingerprint` recomputes on the clean
+committed tree.
 
 Permanent residuals that do **not** block and are not hidden: everything class-2/macOS (no Apple
 host, #22 item 6), `vitorc` spawn regeneration for 48 maps (wave E2, needs owner data approval),
