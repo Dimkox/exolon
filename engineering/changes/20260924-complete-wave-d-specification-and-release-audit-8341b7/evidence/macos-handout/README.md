@@ -17,6 +17,25 @@ done, the signing clause is not. No verdict produced on Linux can ever say other
 (PR #3 AC-010), and no report in this directory may state **notarization Accepted**
 without the Apple-side objects that rule 5 of the contract requires.
 
+**Neither track will be run. This is permanent, not a queue.** The owner has no macOS
+hardware and no Developer ID identity, and stated it plainly on 2026-09-25
+("нет у меня маков"). So:
+
+* Track A is **structurally unrunnable** here, not awaiting a schedule. No
+  `probe-report-*.txt`/`.json` will ever land in this directory from this project, and
+  `MACOS_EVIDENCE=ABSENT (unverified)` is the repository's steady state. `absent_is_unverified`
+  exists to keep it that way and to keep absence distinct from a pass.
+* Track B is unrunnable twice over: no hardware, and it needs an identity plus notary
+  credentials that this repository's contract keeps outside any agent's reach permanently.
+* What this protocol **is**: the complete, executable documentation for a hypothetical future
+  Apple access — a machine, an identity, a keychain profile owned by someone else. Run it then,
+  unchanged, and the checker here will consume the result. Nothing in this change claims,
+  predicts, or approximates that result; the Linux-decidable half of the release layer is
+  measured by `macos_handout_check.py` and `stage_boundary_check.py`, and the executed-Swift
+  half by wave A's Linux contour.
+* Consequently no wording like "pending a macOS run" belongs in any artifact of this change:
+  there is no run pending, and there is no date on which one will happen.
+
 ---
 
 ## 0. What you need
@@ -42,7 +61,7 @@ If your shell exports any variable whose *name* contains `PASSWORD`, `SECRET`, `
 deliberate (abort, never redact). Start from a shell without them, for example
 `env -i HOME="$HOME" PATH="$PATH" TERM="$TERM" bash -l`, and re-run.
 
-## 1. Track A — one capture
+## 1. Track A — one capture (unrunnable here; the procedure, verbatim, for a future machine)
 
 Run from the repository root, on a clean checkout of the exact commit under review:
 
@@ -119,7 +138,7 @@ python3 engineering/changes/20260924-complete-wave-d-specification-and-release-a
   checker red; a rule that cannot be violated is treated as a bug in the checker, not as a
   clean bill. Rule 4 is why a Track-A report can never say notarization Accepted.
 
-## 4. Track B — only the owner, only on a terminal
+## 4. Track B — only the owner, only on a terminal (no owner machine exists)
 
 Track B is off by construction. All three conditions must hold, or the probe exits `77`:
 

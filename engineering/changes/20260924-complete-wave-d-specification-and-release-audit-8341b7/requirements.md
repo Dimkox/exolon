@@ -4,7 +4,37 @@
 
 ## Acceptance criteria
 
-- [ ] Given ..., when ..., then ...
+Typed ids live in [`change-spec.yaml`](change-spec.yaml); this is the phase status of each, as
+measured on the current tree (both checkers report per-name `RESULT` lines; nothing here is a
+promise about a future run).
+
+- [x] AC-001 Track A probe contract: mandatory archive + `.xcarchive` inspection, 5-valued
+      `key=value` verdicts, exits 77/78, Darwin guard, merged checker rc-invariant —
+      `macos_handout_check.py::probe_contract_green`.
+- [x] AC-002 M-8 flush barrier and M-9 out-of-tree build roots — `::flush_barrier`,
+      `::build_roots_out_of_tree`.
+- [x] AC-003 handout contract `exolon.macos-probe-report/1`: schema committed, ten rules each with
+      a reddening fixture, binding fields, `ABSENT` distinct from `FAIL` —
+      `::handout_controls_flip`, `::absent_is_unverified`.
+- [x] AC-004 structural agent/human boundary (double gate + tty, abort-not-redact argv/env scan,
+      no credential path, identity only as hashes) — `::agent_boundary`.
+- [x] AC-005 ledger sequence as data, per-boundary identity, award before +1, `maxLives`, exo
+      clear, shared refill constants, clamp case — `stage_boundary_check.py::sequence_components_identity`,
+      `::lives_and_refill_semantics`.
+- [x] AC-006 bravery activation latch + owner-approved deterministic ladder, auditor recomputation
+      — `::bravery_latch_distinguishes`, `::timed_ladder_deterministic`.
+- [x] AC-007 bounded debug warp, Debug-compiled, real `transition(to:)` path, stderr echo
+      — `::warp_debug_only`.
+- [x] INV-001 single `awardPoints` funnel — `::single_funnel`.
+- [x] INV-002 verdicts are `key=value` only — `macos_handout_check.py::verdicts_machine_readable`.
+- [x] FORBID-001 no Track B claim — `::no_track_b_claim`.
+- [x] FORBID-002 cutover set — `::cutover_set_exact`; see Deviation 9 for the measured difference
+      from the literal declaration.
+- [x] FORBID-003 no approximate canonical claim — `::ladder_is_declared_deviation`.
+- [ ] macOS observation (probe C-00/C-10…C-16, Track B) — **permanently out of reach**: no Apple
+      hardware and no Developer ID exist for this project, so `MACOS_EVIDENCE=ABSENT (unverified)`
+      is the steady state and not a to-do. The protocol and the checker stay in the tree for a
+      hypothetical future machine.
 
 ## Failure and edge cases
 

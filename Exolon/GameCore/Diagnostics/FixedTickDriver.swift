@@ -29,6 +29,14 @@ final class FixedTickDriver {
     private(set) var stepsThisFrame = 0
     private(set) var hasReferenceTime = false
 
+    /// Product-owned fixed-step coordinate: incremented exactly once per executed step, at the same
+    /// place the log's `tick` advances, and never reset (the log's tick is process-global too -
+    /// INV-003). The stage-boundary timed ladder reads *this* rather than `events.tick`, because an
+    /// award must not depend on whether diagnostics happen to be injected: with the null sink the
+    /// log reports tick 0, while the step still happened. `stage_boundary_check.py` asserts the 1:1
+    /// increment site, and the auditor recomputes the ladder from the log's relative `tick` deltas.
+    private(set) var stepCount = 0
+
     /// The driver never mutates gameplay; it only decides when a step runs and what the log says
     /// about it. `events` may be nil (no emission, identical stepping), bound at init or later.
     ///
@@ -100,6 +108,7 @@ final class FixedTickDriver {
         guard accumulator >= fixedTimeStep, stepsThisFrame < stepBudget else { return false }
         accumulator -= fixedTimeStep
         stepsThisFrame += 1
+        stepCount += 1
         events?.beginTick(zone: zone)
         return true
     }

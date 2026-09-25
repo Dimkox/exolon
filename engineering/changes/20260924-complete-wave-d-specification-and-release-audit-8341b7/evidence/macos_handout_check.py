@@ -52,8 +52,12 @@ PROBE_REL = "engineering/runbooks/macos-probe.sh"
 SCHEMA_REL = "engineering/contracts/schemas/macos-probe-report-v1.schema.json"
 HANDOUT_REL = f"{CHANGE_DIR}/evidence/macos-handout"
 HANDOUT_README_REL = f"{HANDOUT_REL}/README.md"
+LEDGER_REL = "Exolon/GameCore/Diagnostics/StageBoundaryLedger.swift"
 PR3_DIR = "engineering/changes/20260921-close-audit-finding-p1-11-release-layer-for-the-2e7698"
 MERGED_CHECKER_REL = f"{PR3_DIR}/evidence/release_layer_check.py"
+PBXPROJ_REL = "Exolon.xcodeproj/project.pbxproj"
+ENTITLEMENTS_REL = "Exolon/Resources/Exolon.entitlements"
+CODE_SIGN_SENTINEL = 'CODE_SIGN_IDENTITY = "-";'
 SCHEMA_ID = "exolon.macos-probe-report/1"
 STACK_UTIL_REL = ".grok-stack/adaptive_grok/util.py"
 PENDING_REASON = "pending wave-A merge"
@@ -151,6 +155,15 @@ FORBIDDEN_FLAGS = (
 # FORBID-002: the exact expected post-D-1 red set of the merged checker.
 DECLARED_CUTOVER_SET = frozenset({"hardened_runtime_key_count", "hardened_deferral_recorded"})
 
+# Measured in D-2 (before the pbxproj edit) and re-measured after it: control 8 of the merged
+# checker, `hardened_key_mutation_detected`, installs the key with
+# `replace(anchor, anchor + KEY, 1)` and asserts the result is asymmetric. Once the key is
+# legitimately present in BOTH target configs, that one-sided install is a duplicate of an
+# identical setting - the parsed buildSettings dicts stay equal, so the control can never pass
+# again. It is a pre-repayment instrument, and wave D must not edit PR #3's immutable package to
+# make it look green: it declares it here instead. See evidence/cutover.md.
+DECLARED_CUTOVER_CONTROLS = frozenset({"hardened_key_mutation_detected"})
+
 KV_RE = re.compile(r"^([A-Za-z][A-Za-z0-9_]*)=(.*)$")
 EMIT_RE = re.compile(r"""(?:emit|printf)\s+['"]([A-Za-z][A-Za-z0-9_]*)=""")
 FN_BEGIN = "# >>> probe-check:begin {name}"
@@ -224,6 +237,13 @@ def blob_sha1(data: bytes) -> str:
 
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def detect_phase(root: pathlib.Path) -> str:
+    """D-1 is the phase where wave A's ledger exists AND the hardened repayment landed."""
+    if (root / LEDGER_REL).is_file() and hardened_count_in_tree(root) >= 2:
+        return "D1"
+    return "D2"
 
 
 def tree_fingerprint(root: pathlib.Path) -> str:
@@ -707,7 +727,8 @@ def hardened_count_in_tree(root: pathlib.Path) -> int:
 
 
 def rule_checks(root: pathlib.Path, doc: dict, txt: bytes | None = None,
-                report_path: pathlib.Path | None = None) -> list[str]:
+                report_path: pathlib.Path | None = None,
+                hardened_count: int | None = None) -> list[str]:
     """Integration §6.3 rules 1..10 as decidable predicates, each tagged R<n>."""
     v: list[str] = []
     op = doc.get("operational", {}) or {}
@@ -811,7 +832,8 @@ def rule_checks(root: pathlib.Path, doc: dict, txt: bytes | None = None,
     if verdicts.get("notary_submit") == "INVALID" and verdicts.get("notary_log_committed") is not True:
         v.append("R7 notary_submit=INVALID must be paired with a committed Apple notary log")
 
-    if verdicts.get("hardened_runtime") == "PRESENT" and hardened_count_in_tree(root) == 0:
+    tree_count = hardened_count_in_tree(root) if hardened_count is None else hardened_count
+    if verdicts.get("hardened_runtime") == "PRESENT" and tree_count == 0:
         v.append("R8 the report claims hardened_runtime=PRESENT but the committed "
                  "project.pbxproj has no ENABLE_HARDENED_RUNTIME setting")
 
@@ -834,14 +856,16 @@ def rule_checks(root: pathlib.Path, doc: dict, txt: bytes | None = None,
 
 
 def audit_report(root: pathlib.Path, doc: dict, txt: bytes | None = None,
-                 report_path: pathlib.Path | None = None) -> list[str]:
+                 report_path: pathlib.Path | None = None,
+                 hardened_count: int | None = None) -> list[str]:
     """Schema + the ten rules, everything tagged."""
     try:
         schema = load_schema(root)
     except CheckFailure as exc:
         return [f"R1 {exc}"]
     errs = [f"R1 {e}" for e in schema_validate(doc, schema, defs_root=schema)]
-    return errs + rule_checks(root, doc, txt=txt, report_path=report_path)
+    return errs + rule_checks(root, doc, txt=txt, report_path=report_path,
+                              hardened_count=hardened_count)
 
 
 def apply_pointer(doc: dict, pointer: str, value) -> None:
@@ -857,6 +881,10 @@ def apply_pointer(doc: dict, pointer: str, value) -> None:
 
 # --- synthetic fixture -------------------------------------------------------
 def synth_txt_lines(root: pathlib.Path | None = None) -> list[str]:
+    # the archived bundle's hardened-runtime observation must agree with the tree the report is
+    # bound to: rule 8 forbids PRESENT-while-the-pbxproj-declares-nothing, so a fixture that
+    # claimed ABSENT against a repaid tree would be describing a different build than this one
+    hardened = "PRESENT" if hardened_count_in_tree(root or pathlib.Path(".")) else "ABSENT"
     body = [
         "# Exolon macOS probe",
         "os_version=26.0.1",
@@ -886,8 +914,8 @@ def synth_txt_lines(root: pathlib.Path | None = None) -> list[str]:
         "bundle_resources_tmx=125 (EXPECTED 125)",
         "bundle_has_gif=0",
         "bundle_has_generated_terrain=1",
-        "hardened_runtime=ABSENT",
-        "codesign_flags=flags=0x2000002(adhoc,runtime)",
+        "hardened_runtime=" + hardened,
+        "codesign_flags=flags=0x2000002(adhoc)",
         "## B3. Archived bundle truth",
         "showdestinations_rc=0",
         "archive_rc=0",
@@ -902,7 +930,7 @@ def synth_txt_lines(root: pathlib.Path | None = None) -> list[str]:
         "archived_codesign_verify_rc=0",
         "archived_codesign_flags=flags=0x10000(runtime)",
         "archived_codesign_timestamp=ABSENT",
-        "archived_hardened_runtime=ABSENT",
+        "archived_hardened_runtime=" + hardened,
         "archived_entitlements_count=0",
         "archived_entitlements_get_task_allow=no",
         "archived_signature=Signature=adhoc",
@@ -1010,7 +1038,8 @@ def free_text_verdict_lines(text: str) -> list[str]:
 
 
 # --- merged checker ----------------------------------------------------------
-def merged_checker_via_subprocess(root: pathlib.Path) -> tuple[int, set, bool]:
+def merged_checker_via_subprocess(root: pathlib.Path) -> tuple[int, set, set]:
+    """(rc, red AC keys, controls that stopped flipping) of the unmodified merged checker."""
     script = root / MERGED_CHECKER_REL
     if not script.is_file():
         raise CheckFailure(f"merged checker not found: {MERGED_CHECKER_REL}")
@@ -1019,8 +1048,8 @@ def merged_checker_via_subprocess(root: pathlib.Path) -> tuple[int, set, bool]:
         payload = json.loads(proc.stdout)
     except json.JSONDecodeError:
         raise CheckFailure(f"merged checker --json produced unparsable output (rc={proc.returncode})")
-    return proc.returncode, set(payload.get("mismatches", {})), all(
-        payload.get("controls", {}).values())
+    broken = {k for k, v in payload.get("controls", {}).items() if not v}
+    return proc.returncode, set(payload.get("mismatches", {})), broken
 
 
 def import_merged(root: pathlib.Path):
@@ -1050,8 +1079,9 @@ def merged_package_is_immutable(root: pathlib.Path) -> list[str]:
 
 
 # --- evidence hygiene (integration §5.2.5, and the local PR secret-scan) ------
-HYGIENE_SCOPE = (PROBE_REL, SCHEMA_REL, HANDOUT_README_REL,
+HYGIENE_SCOPE = (PROBE_REL, SCHEMA_REL, HANDOUT_README_REL, ENTITLEMENTS_REL,
                  f"{CHANGE_DIR}/evidence/macos_handout_check.py",
+                 f"{CHANGE_DIR}/evidence/cutover.md",
                  f"{CHANGE_DIR}/evidence/stage_boundary_check.py")
 HYGIENE_BANS = (
     ("private key header", re.compile(r"BEGIN [A-Z ]*PRIVATE KEY")),
@@ -1101,9 +1131,16 @@ def probe_contract_green(root: pathlib.Path) -> None:
     immut = merged_package_is_immutable(root)
     if immut:
         raise CheckFailure("; ".join(immut))
-    rc, red, controls_ok = merged_checker_via_subprocess(root)
-    if not controls_ok:
-        raise CheckFailure("the unmodified merged checker lost a flipping control on this tree")
+    rc, red, broken_controls = merged_checker_via_subprocess(root)
+    if PHASE == "D1":
+        undeclared = broken_controls - DECLARED_CUTOVER_CONTROLS
+        if undeclared:
+            raise CheckFailure(f"post-D-1 merged-checker controls that stopped flipping must be "
+                               f"exactly the declared cutover instrument, extra: "
+                               f"{sorted(undeclared)}")
+    elif broken_controls:
+        raise CheckFailure(f"the unmodified merged checker lost a flipping control on the D-2 "
+                           f"tree: {sorted(broken_controls)}")
     if PHASE == "D2":
         if rc != 0 or red:
             raise CheckFailure(f"the unmodified merged checker changed its verdict on the D-2 "
@@ -1241,7 +1278,8 @@ def handout_controls_flip(root: pathlib.Path) -> None:
         if rule == "R6":
             apply_pointer(broken, "verdicts.notary_submit", "ACCEPTED")
             apply_pointer(broken, "track", "B")
-        hits = audit_report(root, broken, txt=broken_txt)
+        hits = audit_report(root, broken, txt=broken_txt,
+                            hardened_count=0 if rule == "R8" else None)
         if not any(h.startswith(rule + " ") for h in hits):
             raise CheckFailure(f"control {rule} did not flip: {pointer}={value!r} produced "
                                f"{hits[:3]}")
@@ -1449,9 +1487,13 @@ def cutover_set_exact(root: pathlib.Path) -> None:
     immut = merged_package_is_immutable(root)
     if immut:
         raise CheckFailure("; ".join(immut))
-    rc, red, controls_ok = merged_checker_via_subprocess(root)
-    if not controls_ok:
-        raise CheckFailure(f"merged checker controls regressed (rc={rc})")
+    rc, red, broken_controls = merged_checker_via_subprocess(root)
+    if PHASE == "D2" and broken_controls:
+        raise CheckFailure(f"merged checker controls regressed on the D-2 tree: "
+                           f"{sorted(broken_controls)}")
+    if broken_controls - DECLARED_CUTOVER_CONTROLS:
+        raise CheckFailure(f"undeclared merged-checker control loss (FORBID-002 class): "
+                           f"{sorted(broken_controls - DECLARED_CUTOVER_CONTROLS)}")
     if PHASE == "D2" and red:
         raise CheckFailure(f"the D-2 tree must not have triggered the cutover yet: red={sorted(red)}")
     if PHASE == "D1" and not red:
@@ -1468,24 +1510,49 @@ def cutover_set_exact(root: pathlib.Path) -> None:
     anchors = list(re.finditer(r"\t\t\t\tCODE_SIGN_STYLE = Manual;\n", ctx["pbx"]))
     if len(anchors) != 2:
         raise CheckFailure(f"expected exactly 2 target-config anchors, found {len(anchors)}")
-    sym = ctx["pbx"]
-    for m in reversed(anchors):
-        sym = sym[:m.end()] + insert + sym[m.end():]
-    red_sym = red_keys(mod, mod.measure(dict(ctx, pbx=sym))[0])
+    # The two declared members and the shape of the post-D-1 diff, measured rather than quoted.
+    # `already` distinguishes the phases: on a pre-repayment tree the D-1 shape is simulated in
+    # memory (so the declaration is tested before anything depends on it); on the repaid tree it
+    # is the tree itself, because re-inserting an identical setting proves nothing - the parsed
+    # buildSettings dicts stay equal, which is also why the merged checker's own control 8 stops
+    # flipping and is declared in DECLARED_CUTOVER_CONTROLS / evidence/cutover.md.
+    already = ctx["pbx"].count("ENABLE_HARDENED_RUNTIME")
+    if already:
+        red_sym = red_keys(mod, mod.measure(ctx)[0])
+        if "hardened_runtime_key_count" not in red_sym:
+            raise CheckFailure(f"the repaid tree reddens {sorted(red_sym)} but not "
+                               "hardened_runtime_key_count: the repayment never reached the "
+                               "merged checker")
+    else:
+        sym = ctx["pbx"]
+        for m in reversed(anchors):
+            sym = sym[:m.end()] + insert + sym[m.end():]
+        red_sym = red_keys(mod, mod.measure(dict(ctx, pbx=sym))[0])
+        if "hardened_runtime_key_count" not in red_sym:
+            raise CheckFailure("the D-1 pbxproj edit reddens nothing: the declaration is prose")
     undeclared = red_sym - DECLARED_CUTOVER_SET
     if undeclared:
-        raise CheckFailure(f"the declared cutover set is wrong: the canonical D-1 edit reddens "
+        raise CheckFailure(f"the declared cutover set is wrong: the D-1 shape reddens "
                            f"{sorted(undeclared)}, which FORBID-002 does not declare")
-    if "hardened_runtime_key_count" not in red_sym:
-        raise CheckFailure("the D-1 pbxproj edit reddens nothing: the declaration is prose")
     red_rec = red_keys(mod, mod.measure(mod.undo_records(ctx))[0])
     if "hardened_deferral_recorded" not in red_rec:
         raise CheckFailure("the declared cutover member hardened_deferral_recorded is not a live "
                            "key: the merged checker cannot turn it red")
-    one_side = ctx["pbx"].replace(anchors[0].group(0), anchors[0].group(0) + insert, 1)
+    # Measured truth about that second member: the pbxproj repayment alone does NOT redden it,
+    # because it reads PR #3's immutable plan text. The cutover registry says so explicitly.
+    if already and "hardened_deferral_recorded" in red_sym:
+        raise CheckFailure("hardened_deferral_recorded reddened on the real tree; the registry "
+                           "in evidence/cutover.md is now wrong")
+    # A one-sided key - installing it in one config on a pre-edit tree, or dropping it from one
+    # config on a repaid tree - is a regression class, never a declared cutover.
+    if already:
+        one_side = re.sub(r"^\t{4}ENABLE_HARDENED_RUNTIME = YES;\n", "", ctx["pbx"], count=1,
+                          flags=re.M)
+    else:
+        one_side = ctx["pbx"].replace(anchors[0].group(0), anchors[0].group(0) + insert, 1)
     red_one = red_keys(mod, mod.measure(dict(ctx, pbx=one_side))[0])
     if not (red_one - DECLARED_CUTOVER_SET):
-        raise CheckFailure("control did not flip: a one-sided hardened insert produced no "
+        raise CheckFailure("control did not flip: a one-sided hardened key produced no "
                            "undeclared red, so 'any other cutover red is a regression' is "
                            "unmeasurable")
     if not (red_one & {"hardened_symmetric", "target_cfg_symmetric"}):
@@ -1554,7 +1621,67 @@ def verdicts_machine_readable(root: pathlib.Path) -> None:
                                "text, so the 5-valued vocabulary is decorative")
 
 
+def entitlements_and_hardening_shape(root: pathlib.Path) -> None:
+    """Task 10's product shape, measured: hardened in both target blocks, a real minimal
+    entitlements file named by both, nothing secret in either.
+
+    This is the half of P1-11's signing clause that Linux can actually decide. The observed
+    flags on a built bundle stay out of reach (cutover.md section 6), and saying so is part of
+    the check: a tree that claims more than settings and a plist is the failure mode PR #3 AC-010
+    was written against.
+    """
+    import plistlib
+    pbx = rd(root, PBXPROJ_REL)
+    v: list[str] = []
+    if hardened_count_in_tree(root) != 2:
+        v.append(f"ENABLE_HARDENED_RUNTIME must appear exactly twice (both target configs), "
+                 f"found {hardened_count_in_tree(root)}")
+    for guid in ("800000000000000000000003", "800000000000000000000004"):
+        m = re.search(re.escape(guid) + r" /\* \w+ \*/ = \{\n.*?\n\t\t\};\n", pbx, re.S)
+        if not m:
+            v.append(f"target configuration block {guid} is gone from the project")
+            continue
+        body = m.group(0)
+        if "ENABLE_HARDENED_RUNTIME = YES;" not in body:
+            v.append(f"{guid} lacks ENABLE_HARDENED_RUNTIME = YES")
+        if f"CODE_SIGN_ENTITLEMENTS = {ENTITLEMENTS_REL};" not in body:
+            v.append(f"{guid} lacks CODE_SIGN_ENTITLEMENTS pointing at {ENTITLEMENTS_REL}")
+    if re.search(r"^\t{4}ENABLE_HARDENED_RUNTIME", pbx, re.M) and hardened_count_in_tree(root) > 2:
+        v.append("the hardened key appears outside the two target blocks")
+    if CODE_SIGN_SENTINEL not in pbx:
+        v.append("CODE_SIGN_IDENTITY stopped being the ad-hoc sentinel: a signing identity would "
+                 "now be in the tree, which this change must not introduce")
+    if 'DEVELOPMENT_TEAM = "";' not in pbx:
+        v.append("DEVELOPMENT_TEAM is no longer empty: a team id entered the tree")
+    ent = root / ENTITLEMENTS_REL
+    if not ent.is_file():
+        v.append(f"{ENTITLEMENTS_REL} does not exist")
+    else:
+        try:
+            keys = plistlib.loads(ent.read_bytes())
+        except Exception as exc:  # noqa: BLE001 - a plist that will not parse is the finding
+            raise CheckFailure(f"{ENTITLEMENTS_REL} is not a property list: {exc}")
+        if sorted(keys) != []:
+            v.append(f"{ENTITLEMENTS_REL} must be the empty entitlement set, it grants "
+                     f"{sorted(keys)}")
+        blob = ent.read_bytes()
+        if b"get-task-allow" in blob:
+            v.append("the debugger entitlement is in the shipped entitlements file")
+        if b"-----BEGIN" in blob or b"entitlements.com.apple.security.app-sandbox" in blob:
+            v.append("unexpected material in the entitlements file")
+    if v:
+        raise CheckFailure(" | ".join(v)[:900])
+    # Control: strip the key from one config in memory; the shape test must notice.
+    one_sided = re.sub(r"^\t{4}ENABLE_HARDENED_RUNTIME = YES;\n", "", pbx, count=1, flags=re.M)
+    if one_sided.count("ENABLE_HARDENED_RUNTIME") != 1:
+        raise CheckFailure("control impossible: cannot produce a one-sided hardened tree")
+    if hardened_count_in_tree(root) == 2 and len(re.findall(
+            "ENABLE_HARDENED_RUNTIME = YES;", one_sided)) != 1:
+        raise CheckFailure("control did not flip: the one-sided mutation was not a mutation")
+
+
 CHECKS: dict[str, object] = {
+    "entitlements_and_hardening_shape": entitlements_and_hardening_shape,
     "probe_contract_green": probe_contract_green,
     "flush_barrier": flush_barrier,
     "build_roots_out_of_tree": build_roots_out_of_tree,
@@ -1572,17 +1699,20 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--root")
     ap.add_argument("--only", action="append", default=[],
                     help="run one named check (repeatable)")
-    ap.add_argument("--phase", choices=("D2", "D1"), default="D2")
+    ap.add_argument("--phase", choices=("auto", "D2", "D1"), default="auto",
+                    help="auto (default) reads the tree: D-1 once wave A's ledger and the "
+                         "hardened-runtime repayment are both in it")
     ap.add_argument("--report", action="store_true",
                     help="print the machine-readable MACOS_EVIDENCE line (rc 1 when not OK)")
     ap.add_argument("--derive", metavar="TXT", help="derive the report JSON from a transcript")
     ap.add_argument("--out-json", metavar="PATH")
     ap.add_argument("--attested-by", default="unattested")
     ap.add_argument("--human-present", action="store_true")
-    args = ap.parse_args(argv)
     global PHASE
-    PHASE = args.phase
+    args = ap.parse_args(argv)
     root = repo_root(args.root)
+    PHASE = args.phase if args.phase != "auto" else detect_phase(root)
+    print(f"PHASE={PHASE} " + ("(from --phase)" if args.phase != "auto" else "(detected from the tree)"))
 
     if args.derive:
         data = pathlib.Path(args.derive).read_bytes()
@@ -1631,7 +1761,7 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as exc:  # noqa: BLE001 - a crash must never read as a pass
             failures += 1
             print(f"RESULT {name}=ERROR {type(exc).__name__}: {exc}")
-    print(f"SUMMARY checks={len(names)} failed={failures} phase={args.phase}")
+    print(f"SUMMARY checks={len(names)} failed={failures} phase={PHASE}")
     print("SCOPE=class-1-only: no macOS fact is certified by this tool (integration §3.5)")
     return 1 if failures else 0
 

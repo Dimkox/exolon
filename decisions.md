@@ -45,3 +45,20 @@ probe must pass operator-shaped patterns to `grep -e` (a pattern starting with `
 option), a checker that asserts on the environment must compare against its own baseline (the agent
 host exports `*_TOKEN` names), and a control that "mutates" a shipped file must mutate a string in
 memory, never the file.
+
+## 2026-09-25: When a merged verifier's premise ends, declare the consequence instead of editing it
+
+Wave D repaid PR #3's deferred `ENABLE_HARDENED_RUNTIME`, which reddened exactly one AC
+(`hardened_runtime_key_count`) — and silently made one of PR #3's 29 controls
+(`hardened_key_mutation_detected`) unsatisfiable: it installs the key with
+`replace(anchor, anchor + KEY, 1)` and demands asymmetry, but on a repaid tree that insert is a
+duplicate of an equal setting, so the parsed buildSettings dicts stay equal forever. The two
+temptations were both wrong: editing PR #3's immutable package to tidy the number, and reporting
+the red as "expected" while leaving the dead control unmentioned. Wave D instead measured the
+whole diff (re-measuring with the two lines stripped in memory proves nothing else moved), declared
+the dead control in wave D's own registry (`evidence/cutover.md` +
+`DECLARED_CUTOVER_CONTROLS`), and made the checker require that no *other* control may stop
+flipping in either phase. Related: a declared-expected set can overstate reality — FORBID-002's
+second member `hardened_deferral_recorded` cannot redden without rewriting the dated package it
+reads, so the enforceable claim became "no red outside the set + each member live via the merged
+checker's own revert path", recorded as a deviation rather than a silent narrowing.

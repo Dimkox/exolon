@@ -977,7 +977,7 @@ struct GameplayLabelDomain {
         GameplayLabelDomain(name: "damage_cause", codeCount: 8, label: GameplayWire.damageCauseLabel),
         GameplayLabelDomain(name: "contextual_kind", codeCount: 2, label: GameplayWire.contextualLabel),
         GameplayLabelDomain(name: "support", codeCount: 2, label: GameplayWire.supportLabel),
-        GameplayLabelDomain(name: "exoskeleton_cause", codeCount: 3, label: GameplayWire.exoskeletonCauseLabel),
+        GameplayLabelDomain(name: "exoskeleton_cause", codeCount: 4, label: GameplayWire.exoskeletonCauseLabel),
         GameplayLabelDomain(name: "shoot_denied_reason", codeCount: 1, label: GameplayWire.shootDeniedReasonLabel),
         GameplayLabelDomain(name: "pickup_kind", codeCount: 2, label: GameplayWire.pickupKindLabel),
         GameplayLabelDomain(name: "score_reason", codeCount: 8, label: GameplayWire.scoreReasonLabel),
@@ -985,7 +985,7 @@ struct GameplayLabelDomain {
         GameplayLabelDomain(name: "zone_load_cause", codeCount: 4, label: GameplayWire.zoneLoadCauseLabel),
         GameplayLabelDomain(name: "checkpoint_cleared_reason", codeCount: 3, label: GameplayWire.checkpointClearedReasonLabel),
         GameplayLabelDomain(name: "accumulator_reset_reason", codeCount: 4, label: GameplayWire.accumulatorResetReasonLabel),
-        GameplayLabelDomain(name: "stage_component_id", codeCount: 1, label: GameplayWire.stageComponentLabel),
+        GameplayLabelDomain(name: "stage_component_id", codeCount: 3, label: GameplayWire.stageComponentLabel),
         GameplayLabelDomain(name: "stage_boundary_suppression_reason", codeCount: 2, label: GameplayWire.stageSuppressionReasonLabel),
         GameplayLabelDomain(name: "launcher_kind", codeCount: 1, label: GameplayWire.launcherKindLabel),
         GameplayLabelDomain(name: "log_end_reason", codeCount: 3, label: GameplayWire.logEndReasonLabel)
@@ -1039,13 +1039,14 @@ enum GameplaySupport: UInt16, CaseIterable {
 }
 
 enum GameplayExoskeletonCause: UInt16, CaseIterable {
-    case changingRoom, cheat, reset
+    case changingRoom, cheat, reset, stageBoundary
     var wireCode: UInt16 { rawValue }
     var label: String {
         switch self {
         case .changingRoom: return "changing_room"
         case .cheat: return "cheat"
         case .reset: return "reset"
+        case .stageBoundary: return "stage_boundary"
         }
     }
 }
@@ -1150,10 +1151,16 @@ enum GameplayAccumulatorResetReason: UInt16, CaseIterable {
 /// plumbing (controller amendment, 2026-09-24). Append-only codes.
 enum GameplayStageComponent: UInt16, CaseIterable {
     case livesTimes1000
+    /// Wave D (`ORIGINAL_MECHANICS.md:142`): the stage was completed without taking the suit.
+    case braveryNoExoskeleton
+    /// Wave D (`:143` as an owner-approved deterministic tick ladder): the phase the stage ended in.
+    case timedPhaseLadder
     var wireCode: UInt16 { rawValue }
     var label: String {
         switch self {
         case .livesTimes1000: return "lives_x1000"
+        case .braveryNoExoskeleton: return "bravery_no_exoskeleton"
+        case .timedPhaseLadder: return "timed_phase_ladder"
         }
     }
 }
