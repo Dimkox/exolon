@@ -1,0 +1,56 @@
+# F2/F3 response — debug-rendering coverage and the Swift type-check ceiling
+# Executed 2026-09-24 in /tmp/f1-demo (isolated copy; .git pointer intact so `git show` resolves).
+# Meta-control first: the unmutated copy runs ALL_WAVE_C_PROBES_PASS, so each red below is the
+# mutation, not the harness.
+
+## F2 — GameScene had ZERO meter coverage (reviewer case R2)
+Before: deleting the whole safe-model overlay loop left every probe green, so FORBID-002's
+clause "identifiable **in debug rendering**" was untested while being reported as satisfied.
+Fix: `overlay_binding_problems(text)` (pure over GameScene source) asserts that
+  - `currentLevel.safeModelMarkers` is consumed,
+  - the loop draws `marker.rect` through `addDebugRect(`,,
+  - the loop passes `marker.label` through a `label:` argument,,
+  - `addDebugRect` still accepts `label` and `debugOverlay` still exists.
+Three new controls, all discrimination pairs (honest file passes; the regression fails):
+  honest_overlay_binding_accepted / overlay_deletion_detected / overlay_label_strip_detected
+
+  R2  delete the overlay loop
+      before fix: ALL_WAVE_C_PROBES_PASS rc=0     after fix: WAVE_C_PROBES_FAIL, 1 probe
+      -> safe_models_are_labeled
+
+## F2 also: `swiftc -frontend -parse` was prose-only, never wired to anything runnable
+It appeared in test-plan/tasks/analysis text and in no gate. It is now executed inside
+safe_models_are_labeled over all three changed Swift files (CHANGED_SWIFT), and a missing
+toolchain is reported as a problem rather than passing silently.
+
+  R3  inject a syntax error into TMXLevelRuntime.swift
+      -> WAVE_C_PROBES_FAIL | probes=9 failed=1 safe_models_are_labeled
+  control: parse_gate_detects_a_broken_file compiles a deliberately unclosed struct and
+      requires a non-ok verdict while a well-formed struct stays ok — the gate is proven
+      able to fail, not merely observed to pass.
+
+## F3 — the type-check ceiling, measured rather than asserted
+Attempted the reviewer's suggested extension (join the compile contour with imports only):
+  $ swiftc -typecheck Exolon/GameCore/Levels/TMXLevelRuntime.swift
+    error: no such module 'SpriteKit'   (TMXLevelRuntime.swift:1:8)
+There is no SpriteKit on this host, and the only Linux contour available is the
+CoreGraphics-renaming shim, which cannot substitute it. Writing a fake SpriteKit module was
+rejected deliberately: type-checking the runtime against an API surface I invented would
+prove agreement with my stub, not with Apple's SpriteKit — false assurance dressed as a gate.
+
+  R4  inject a TYPE error (not syntax): forceFields.append(field) ->
+      forceFields.append(field.thisIsNotAMember)
+      -> ALL_WAVE_C_PROBES_PASS  (NOT caught, and cannot be caught on this host)
+
+  Disclosure, stated plainly: **nothing on this host type-checks 2 of the 3 changed Swift
+  files** (TMXLevelRuntime.swift, GameScene.swift). Both are syntax-gated by the meter now,
+  and the third (TMXMapLoader.swift, which owns the classifier) is genuinely compiled AND
+  executed. The residual is closed only by the macOS build (xcodebuild) in the PR's E2E step.
+  AC-005/FORBID-002 must not be read as covering a Swift type error in those two files.
+
+## A measurement error worth keeping in this record
+The first R4 run appeared to be caught. It was not: a helper function `cd`'d into the
+evidence directory, which broke the restore path of the previous case, so the syntax damage
+from R3 was still in the file and the parse gate caught *that*. Re-running R4 in isolation
+gave the true answer above. Reported because a green-looking result that is an artifact of
+the harness is precisely the failure mode this whole change is about.

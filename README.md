@@ -47,3 +47,10 @@ the four wave-A state-machine findings are fixed with stream-only regression pre
   held UP cannot jump after a teleport/changing-room consume (P1-4); the stage bonus awards once per
   completed zone per playthrough with a visible suppression record (P1-8); the double-launcher bonus
   pays once and the launcher keeps firing (P1-6).
+
+## Level content contract
+
+- `Exolon/Resources` ships 125 level files describing 101 distinct levels: 23 `L02Sxx≡L05Sxx` pairs plus `L03S09≡L04S11` are duplicate content. Change `f2d90a` **rules** these pairs intentional and pins them in [`engineering/contracts/level-content-v1.json`](engineering/contracts/level-content-v1.json) — no content was authored to dissolve them. The ruling's premise is source-backed for the 23 stage-2→stage-5 pairs (`ORIGINAL_MECHANICS.md:166`, `engineering/reports/exolon-full-audit-20260920-v3.md:37`, `evidence/perfile/level-graph.md:36`, and the imported ASM table in `LEVEL_COMPILER_AUDIT.md`, whose per-screen records are identical for 23 of the 24 pairs); `L03S09≡L04S11` is a stage-3→stage-4 pair that the premise does not reach, and that tension is disclosed in the manifest's `pair_notes`.
+- The level factory resolves all 127 `source_marker` objects (11 of 11 distinct `sourceBlock` values, was 76 of 127). "Resolved" is not "implemented": 51 formerly-dropped markers became labeled safe models, 26 more are documented no-op/write-only arms, and only 50 reach gameplay. Content the factory cannot express as a gameplay object is recorded instead of silently dropped.
+- Model, canonicalization version, the 0-based `zoneNumber` formula and the regeneration commands: [`engineering/reports/level-content-uniqueness-v1.md`](engineering/reports/level-content-uniqueness-v1.md).
+- Status: audit findings P1-7 (issue #11) and P1-12 (issue #16) are resolved **by ruling, pending PR merge**. Both issues remain OPEN upstream and #16 carries `blocked-on-owner` — the owner's acceptance is what closes them, not this branch.

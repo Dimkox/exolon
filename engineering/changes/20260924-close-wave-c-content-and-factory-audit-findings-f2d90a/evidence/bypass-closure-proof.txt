@@ -1,0 +1,32 @@
+# Bypass closure proof — response to analysis-architect.md §1 (BLOCKING-ish finding)
+
+The auditor demonstrated: flipping the committed blk_waggon row from safe-model to typed with an
+EMPTY label left every probe green, making FORBID-002 false while passing.
+
+## Repro on the fixed meter (tamper applied to a copy of the table, then restored)
+  for m in markers: if sourceBlock=="blk_waggon": m["disposition"]="typed"; m["label"]=""
+  python3 wave_c_check.py
+
+ignored_types_disposition    PASS
+marker_coverage_all_maps     FAIL
+safe_models_are_labeled      FAIL
+RESULT: WAVE_C_PROBES_FAIL | probes=9 failed=2 marker_coverage_all_maps,safe_models_are_labeled
+
+  METER_RC=1  (was: all-True before the fix)
+
+## Red lines produced
+    ! blk_waggon: table disposition 'typed' contradicts the product isSafeModel=True for 'inertScenery'
+    ! blk_waggon: table disposition 'typed' contradicts the product isSafeModel=True for 'inertScenery'
+
+## After restoring the table
+RESULT: ALL_WAVE_C_PROBES_PASS | probes=9 failed=0
+
+## Also closed in the same pass (analysis-architect.md §4)
+- branch_fingerprint now captures CGRect(...) with balanced parens, so height 272->999, width 48->120
+  and an added statement all move the fingerprint (controls
+  branch_rect_height_edit_detected / branch_rect_width_edit_detected /
+  branch_statement_added_detected), while a comment-only edit still does not
+  (branch_comment_edit_ignored). The old decorative branch_edit_detected is gone.
+- AC-005's pre-change side is now read from `git show 295690b:TMXLevelRuntime.swift` instead of
+  only from a golden this tool wrote, so editing the golden cannot make the probe agree with itself.
+  The golden cross-checks itself against the blob (base_branch_fingerprints).

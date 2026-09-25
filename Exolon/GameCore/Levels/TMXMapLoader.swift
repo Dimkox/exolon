@@ -593,3 +593,98 @@ private final class TMXParserDelegate: NSObject, XMLParserDelegate {
         return CGFloat(number)
     }
 }
+
+// MARK: - Source-marker classification
+
+/// Every `source_marker.sourceBlock` family the level runtime knows how to resolve.
+///
+/// This enum, not a chain of string tests, is the level content factory's marker table.
+/// `TMXLevelRuntime` switches over it exhaustively with no `default:` arm, so adding a family
+/// here without teaching the runtime about it is a compile error rather than a silently dropped
+/// marker. `classify(sourceBlock:)` returns `nil` when nothing matches and the runtime records
+/// that as an observable unmatched marker: "silently ignored" is not a representable outcome
+/// anywhere on this path.
+enum TMXSourceMarkerKind: String, CaseIterable {
+    case forceField
+    case highVoltage
+    case blinker
+    case stageEnd
+    case changingRoom
+    case beaconBase
+    case controlBeacon
+    /// Imported static artwork: already solid in the Collision layer and already drawn by the
+    /// baked `Original Static Scenery` image layer. The source table records no action here, so
+    /// the runtime records it and deliberately adds no behaviour.
+    case inertScenery
+    /// A second, distinct action cell that travels with an already-implemented entity. The
+    /// mechanic itself IS documented in this repository (`ORIGINAL_MECHANICS.md:36-41`, and
+    /// `:170` requires gun machines); what is absent in-tree is only the numeric
+    /// type-11 -> entity binding that would say what this extra cell is. Recorded and labeled,
+    /// never armed and never guessed.
+    case unconfirmedAction
+
+    /// A safe model is a recorded, labeled substitution for content the factory cannot express
+    /// as a gameplay object without inventing behaviour. It is never a silent visual drop.
+    var isSafeModel: Bool {
+        switch self {
+        case .inertScenery, .unconfirmedAction:
+            return true
+        case .forceField, .highVoltage, .blinker, .stageEnd, .changingRoom, .beaconBase, .controlBeacon:
+            return false
+        }
+    }
+
+    /// The label every safe model must carry in the coverage meter and in debug rendering; an
+    /// unlabeled placeholder is prohibited.
+    var safeModelLabel: String {
+        switch self {
+        case .inertScenery:
+            return "SAFE-MODEL inert-scenery: imported static artwork, no action in the source table"
+        case .unconfirmedAction:
+            return "SAFE-MODEL unconfirmed-action: the mechanic IS documented in-tree (ORIGINAL_MECHANICS.md:36-41, required by :170); only the numeric type-11 -> entity binding for this second cell is absent, so it is recorded and behaviour deliberately NOT implemented"
+        case .forceField, .highVoltage, .blinker, .stageEnd, .changingRoom, .beaconBase, .controlBeacon:
+            return ""
+        }
+    }
+
+    /// The matcher. The seven original tests keep their historical order: no shipped value
+    /// currently matches two of them, but that is a property of today's data and this is not the
+    /// place to silently change the assumption.
+    static func classify(sourceBlock: String) -> TMXSourceMarkerKind? {
+        if sourceBlock.isEmpty { return nil }
+        if sourceBlock.contains("beam_") { return .forceField }
+        if sourceBlock.contains("topdown_electro") { return .highVoltage }
+        if sourceBlock.contains("blinker") { return .blinker }
+        if sourceBlock.contains("stage_end") { return .stageEnd }
+        if sourceBlock.contains("changing_room") { return .changingRoom }
+        if sourceBlock.contains("beacon_base") { return .beaconBase }
+        if sourceBlock.contains("control_beacon") { return .controlBeacon }
+        if sourceBlock.contains("mushroom") { return .inertScenery }
+        if sourceBlock.contains("waggon") { return .inertScenery }
+        if sourceBlock.contains("gunMachine_BOTTOM") { return .unconfirmedAction }
+        return nil
+    }
+
+    /// Footprint in source cells, measured from the shipped Collision layer rather than assumed:
+    /// `blk_mushroom` is a uniform 4x3 (9/9); the `blk_waggon` unit block is 5x3 (21/24, the
+    /// 10- and 15-wide readings are adjacent waggons merged into one solid run); `blk_gunMachine_BOTTOM`
+    /// is 4 wide on 18/18 with a height that bleeds into the terrain it stands on, so 3 cells is a
+    /// bounded placeholder, not a claim about the original artwork.
+    static func safeModelFootprintCells(sourceBlock: String) -> (width: Int, height: Int) {
+        if sourceBlock.contains("waggon") { return (5, 3) }
+        if sourceBlock.contains("mushroom") { return (4, 3) }
+        if sourceBlock.contains("gunMachine_BOTTOM") { return (4, 3) }
+        return (4, 3)
+    }
+}
+
+/// A source marker the factory resolved to a safe model: an observable, labeled record carrying
+/// its bounded footprint. `TMXLevelRuntime.safeModelMarkers` and the debug nodes derived from it
+/// do not participate in physics, damage, scoring or spawning.
+struct TMXSafeModelMarker {
+    let kind: TMXSourceMarkerKind
+    let sourceBlock: String
+    let label: String
+    let rect: CGRect
+    let mapResource: String
+}

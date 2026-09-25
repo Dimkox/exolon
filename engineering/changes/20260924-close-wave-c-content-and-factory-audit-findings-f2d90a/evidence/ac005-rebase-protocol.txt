@@ -1,0 +1,46 @@
+# AC-005 re-baseline protocol for the A -> B -> C integration order
+
+Wave C's exhaustive switch rewrites the same `beam_`/force-field arm that wave B semantically
+rewrites. After this branch rebases onto a main containing wave B, the `beam_` arm legitimately
+stops matching route base 295690b. AC-005 is fail-closed by default (`arm_deviations: []`), so
+that drift must be written down, not waved away.
+
+## Mechanism (in wave_c_check.py)
+- `unchanged_marker_output` compares the working tree against
+  `git show <golden.base_commit>:Exolon/GameCore/Levels/TMXLevelRuntime.swift`.
+- `arm_deviations: [{arm, from, to, authorized_by, reason}]` + `deviation_ruling` exempt exactly
+  one recorded digest transition. A deviation is honored only when `from` and `to` both match
+  the real digests AND both `authorized_by` and `reason` are non-empty; a deviation for an arm
+  that did not actually change is reported stale; an arm outside the seven legacy arms is an error.
+- `--record-baseline --base <ref>` re-baselines to a new commit as a command, not a hand edit.
+
+## Executed verification of the protocol (2026-09-24, this tree)
+The simulation edited only the local working copy of the arm and restored it byte-exactly
+(sha256 202cd23c97e1f2c9... before == after).
+
+1. beam_ arm edited `height: 272 -> 273` with no deviation recorded:
+   -> `unchanged_marker_output FAIL`, `deviations_honored: []`, and the problem line prints the
+      exact transition (rects '... height: 272' -> '... height: 273'), i.e. AC-005 really does
+      catch a wave-B-style arm rewrite rather than trusting the golden.
+2. Deviation recorded for beam_ with the true from/to + authorized_by 'wave B (beam grouping)'
+   -> `deviations_honored: ["beam_"]`, and the only remaining failure is the vacuous-control
+      guard, which correctly refuses to let the rect mutation controls silently stop testing
+      anything once the literals they edit are gone.
+3. A second, blanket deviation added for `stage_end` (from 'x' to 'y')
+   -> `arm_deviations['stage_end'] is stale: it excuses a transition that is not what the tree
+      now shows` — the escape hatch cannot be widened into a wildcard.
+4. Both files restored -> `RESULT: ALL_WAVE_C_PROBES_PASS | probes=9 failed=0`.
+
+## Controls inside the probe that keep this honest on every run
+deviation_wrong_target_rejected, deviation_uncited_rejected, deviation_exact_and_cited_honored,
+deviation_cannot_wildcard — all four must be true for AC-005 to pass.
+
+## What the person doing the rebase must do
+1. Resolve the single `TMXLevelRuntime.swift` conflict toward wave B's pool API **inside** the
+   exhaustive switch (keep `case .forceField:`, keep `case nil:`, keep no `default:`).
+2. Run `--record-baseline --base <new route base>` only if every non-beam arm is still identical
+   — if any other arm moved, that is a regression, not a re-baseline.
+3. Append the beam_ transition to `arm_deviations` and cite wave B in `deviation_ruling`.
+4. Point the rect mutation controls at the literals the merged arm now uses (the probe fails and
+   says so until they test something again).
+5. Re-run: 9/9 green, and re-check `git diff --name-only -- Exolon.xcodeproj/` is still empty.

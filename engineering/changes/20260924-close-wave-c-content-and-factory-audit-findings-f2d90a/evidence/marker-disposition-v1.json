@@ -1,0 +1,394 @@
+{
+  "authority": [
+    "engineering/changes/20260921-close-audit-finding-p1-11-release-layer-for-the-2e7698/evidence/analysis-p1-7-markers.md",
+    "engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/analysis-repo_explorer.md"
+  ],
+  "change_id": "20260924-close-wave-c-content-and-factory-audit-findings-f2d90a",
+  "citation_policy": {
+    "as_of": "re-bound by `--rebind-citations` against the current working tree; each run of ignored_types_disposition re-reads these spans, so a shift reddens the meter instead of leaving a stale citation. Re-run after every rebase or edit that moves these files.",
+    "checked_by": "wave_c_check.py::ignored_types_disposition",
+    "classifier_anchor_file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
+    "route_base": "295690b",
+    "route_base_note": "route_base strings below cite 295690b deliberately: that is the tree the audit and the merged P1-7 measurement describe, and it is immutable.",
+    "runtime_anchor_file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
+    "why": "line numbers move when this change edits the very file it cites, so every citation is machine-checked against the current tree instead of trusted; the route-base anchor is kept separately because that is what the audit measured."
+  },
+  "classifier_source": "Exolon/GameCore/Levels/TMXMapLoader.swift",
+  "contract": "marker-disposition-v1",
+  "forbidden": [
+    "no new Exolon/Resources/*.tmx or *.png content may be authored to dissolve the 24 duplicate GROUPS (24 pairs, 48 maps; uniqueness is 101 of 125) - FORBID-001",
+    "no new SKTexture(imageNamed:) literal may be introduced (v3_measurements.py texture gate + double-draw over baked scenery)",
+    "these markers may not be routed into sourceHazards (GameScene.swift:575 kills the player; 0 appends today)",
+    "no damage, score, spawn, physics or collision behaviour may change as a result of this change"
+  ],
+  "legend": {
+    "no-op": "resolves to a case that deliberately does nothing (original behaviour is an attribute action)",
+    "safe-model": "resolves to a named, labeled, behaviour-free recorded entity; no artwork invented, no behaviour invented",
+    "typed": "resolves to a factory type with existing documented gameplay behaviour",
+    "write-only": "recorded by the runtime but not consumed by gameplay today (pre-existing, unchanged by this change)"
+  },
+  "markers": [
+    {
+      "basis": "TMXLevelRuntime.swift:356-360 forceFields; P1-5 double-field defect is separate work",
+      "citations": {
+        "classifier_test": {
+          "expect": "sourceBlock.contains(\"beam_\")",
+          "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
+          "lines": "655-655"
+        },
+        "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:356-360 at route base 295690b",
+        "runtime_arm": {
+          "expect": "case .forceField:",
+          "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
+          "lines": "416-418"
+        }
+      },
+      "count": 10,
+      "disposition": "typed",
+      "footprint_cells": [
+        3,
+        17
+      ],
+      "kind": "forceField",
+      "label": "",
+      "maps": 10,
+      "sourceBlock": "blk_beam_up",
+      "substring": "beam_"
+    },
+    {
+      "basis": "same branch as blk_beam_up; P1-5",
+      "citations": {
+        "classifier_test": {
+          "expect": "sourceBlock.contains(\"beam_\")",
+          "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
+          "lines": "655-655"
+        },
+        "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:356-360 at route base 295690b",
+        "runtime_arm": {
+          "expect": "case .forceField:",
+          "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
+          "lines": "416-418"
+        }
+      },
+      "count": 10,
+      "disposition": "typed",
+      "footprint_cells": [
+        3,
+        17
+      ],
+      "kind": "forceField",
+      "label": "",
+      "maps": 10,
+      "sourceBlock": "blk_beam_down",
+      "substring": "beam_"
+    },
+    {
+      "basis": "TMXLevelRuntime.swift:380-393; 4x3 documented at :381-383 and independently calibrated 13/13",
+      "citations": {
+        "classifier_test": {
+          "expect": "sourceBlock.contains(\"beacon_base\")",
+          "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
+          "lines": "660-660"
+        },
+        "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:380-393 at route base 295690b",
+        "runtime_arm": {
+          "expect": "case .beaconBase:",
+          "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
+          "lines": "438-451"
+        }
+      },
+      "count": 13,
+      "disposition": "typed",
+      "footprint_cells": [
+        4,
+        3
+      ],
+      "kind": "beaconBase",
+      "label": "",
+      "maps": 13,
+      "sourceBlock": "blk_beacon_base",
+      "substring": "beacon_base"
+    },
+    {
+      "basis": "TMXLevelRuntime.swift:394-406, DestroyableBlockSizeTable block 31",
+      "citations": {
+        "classifier_test": {
+          "expect": "sourceBlock.contains(\"control_beacon\")",
+          "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
+          "lines": "661-661"
+        },
+        "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:394-406 at route base 295690b",
+        "runtime_arm": {
+          "expect": "case .controlBeacon:",
+          "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
+          "lines": "452-464"
+        }
+      },
+      "count": 13,
+      "disposition": "typed",
+      "footprint_cells": [
+        6,
+        6
+      ],
+      "kind": "controlBeacon",
+      "label": "",
+      "maps": 13,
+      "sourceBlock": "blk_control_beacon",
+      "substring": "control_beacon"
+    },
+    {
+      "basis": "TMXLevelRuntime.swift:371-379 changingRooms + collision exclusions",
+      "citations": {
+        "classifier_test": {
+          "expect": "sourceBlock.contains(\"changing_room\")",
+          "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
+          "lines": "659-659"
+        },
+        "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:371-379 at route base 295690b",
+        "runtime_arm": {
+          "expect": "case .changingRoom:",
+          "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
+          "lines": "429-437"
+        }
+      },
+      "count": 4,
+      "disposition": "typed",
+      "footprint_cells": [
+        5,
+        6
+      ],
+      "kind": "changingRoom",
+      "label": "",
+      "maps": 4,
+      "sourceBlock": "blk_changing_room",
+      "substring": "changing_room"
+    },
+    {
+      "basis": "appended at :370, read nowhere (pre-existing P1-adjacent gap; out of scope, unchanged)",
+      "citations": {
+        "classifier_test": {
+          "expect": "sourceBlock.contains(\"stage_end\")",
+          "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
+          "lines": "658-658"
+        },
+        "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:369-370 at route base 295690b",
+        "runtime_arm": {
+          "expect": "case .stageEnd:",
+          "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
+          "lines": "427-428"
+        }
+      },
+      "count": 5,
+      "disposition": "write-only",
+      "footprint_cells": [
+        6,
+        8
+      ],
+      "kind": "stageEnd",
+      "label": "",
+      "maps": 5,
+      "sourceBlock": "blk_stage_end",
+      "substring": "stage_end"
+    },
+    {
+      "basis": "attribute-flash action, comment at :366-368; deliberately not a damage zone",
+      "citations": {
+        "classifier_test": {
+          "expect": "sourceBlock.contains(\"blinker\")",
+          "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
+          "lines": "657-657"
+        },
+        "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:366-368 at route base 295690b",
+        "runtime_arm": {
+          "expect": "case .blinker:",
+          "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
+          "lines": "424-426"
+        }
+      },
+      "count": 19,
+      "disposition": "no-op",
+      "footprint_cells": [
+        0,
+        0
+      ],
+      "kind": "blinker",
+      "label": "",
+      "maps": 11,
+      "sourceBlock": "blk_blinker",
+      "substring": "blinker"
+    },
+    {
+      "basis": "animated from the action table, comment at :361-365; deliberately not lethal",
+      "citations": {
+        "classifier_test": {
+          "expect": "sourceBlock.contains(\"topdown_electro\")",
+          "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
+          "lines": "656-656"
+        },
+        "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:361-365 at route base 295690b",
+        "runtime_arm": {
+          "expect": "case .highVoltage:",
+          "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
+          "lines": "419-423"
+        }
+      },
+      "count": 2,
+      "disposition": "no-op",
+      "footprint_cells": [
+        0,
+        0
+      ],
+      "kind": "highVoltage",
+      "label": "",
+      "maps": 2,
+      "sourceBlock": "blk_topdown_electro",
+      "substring": "topdown_electro"
+    },
+    {
+      "basis": "0 actions at own cell and 0 in a 6x4 window; footprint uniform 4x3 for 9/9; already solid in Collision and already drawn by the baked Original Static Scenery layer; no asset matches 'mushroom' in Exolon/Resources",
+      "citations": {
+        "classifier_test": {
+          "expect": "sourceBlock.contains(\"mushroom\")",
+          "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
+          "lines": "662-662"
+        },
+        "route_base": "not covered by the matcher at route base 295690b: blk_mushroom was one of the 51 markers the chain dropped without a signal",
+        "runtime_arm": {
+          "expect": "case .inertScenery:",
+          "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
+          "lines": "465-473"
+        }
+      },
+      "count": 9,
+      "disposition": "safe-model",
+      "footprint_cells": [
+        4,
+        3
+      ],
+      "kind": "inertScenery",
+      "label": "SAFE-MODEL inert-scenery: imported static artwork, no action in the source table",
+      "maps": 6,
+      "maps_list": [
+        "L02S01",
+        "L02S19",
+        "L03S04",
+        "L03S20",
+        "L04S16",
+        "L05S19"
+      ],
+      "sourceBlock": "blk_mushroom",
+      "substring": "mushroom",
+      "zones": [
+        25,
+        43,
+        53,
+        69,
+        90,
+        118
+      ]
+    },
+    {
+      "basis": "0 actions at own cell and 0 in a 6x4 window; unit block 5x3 for 21/24, the (10,3) and (15,3) readings are adjacent waggons merged into one solid run (L01S23 has markers at x=8 and x=14) and must not be modelled as one wide object; no asset matches 'waggon|wagon' in Exolon/Resources",
+      "citations": {
+        "classifier_test": {
+          "expect": "sourceBlock.contains(\"waggon\")",
+          "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
+          "lines": "663-663"
+        },
+        "route_base": "not covered by the matcher at route base 295690b: blk_waggon was one of the 51 markers the chain dropped without a signal",
+        "runtime_arm": {
+          "expect": "case .inertScenery:",
+          "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
+          "lines": "465-473"
+        }
+      },
+      "count": 24,
+      "disposition": "safe-model",
+      "footprint_cells": [
+        5,
+        3
+      ],
+      "kind": "inertScenery",
+      "label": "SAFE-MODEL inert-scenery: imported static artwork, no action in the source table",
+      "maps": 14,
+      "maps_list": [
+        "L01S23",
+        "L01S24",
+        "L02S02",
+        "L02S13",
+        "L02S24",
+        "L03S05",
+        "L03S16",
+        "L04S01",
+        "L04S04",
+        "L04S17",
+        "L04S20",
+        "L05S02",
+        "L05S13",
+        "L05S24"
+      ],
+      "sourceBlock": "blk_waggon",
+      "substring": "waggon"
+    },
+    {
+      "basis": "mechanic documented IN-TREE: ORIGINAL_MECHANICS.md:36-41 (bullet origin turret.left+2 / turret.bottom+56, bullets travel left and are blaster-immune, turret grenade-destroyable worth 150 points) and :170 requires gun machines; the upper entity is already shipped as `turret`. Absent in-tree is only the numeric type-11 -> entity binding for this separate lower cell: 56 type-11 actions exist in the original table, only 18 are exported alongside a BOTTOM marker, the other 38 sit in maps with no BOTTOM marker at all. Recorded, never armed, never guessed. No gunMachine* asset exists in Exolon/Resources.",
+      "citations": {
+        "classifier_test": {
+          "expect": "sourceBlock.contains(\"gunMachine_BOTTOM\")",
+          "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
+          "lines": "664-664"
+        },
+        "route_base": "not covered by the matcher at route base 295690b: blk_gunMachine_BOTTOM was one of the 51 markers the chain dropped without a signal",
+        "runtime_arm": {
+          "expect": "case .unconfirmedAction:",
+          "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
+          "lines": "474-487"
+        }
+      },
+      "count": 18,
+      "disposition": "safe-model",
+      "footprint_cells": [
+        4,
+        3
+      ],
+      "kind": "unconfirmedAction",
+      "label": "SAFE-MODEL unconfirmed-action: the mechanic IS documented in-tree (ORIGINAL_MECHANICS.md:36-41, required by :170); only the numeric type-11 -> entity binding for this second cell is absent, so it is recorded and behaviour deliberately NOT implemented",
+      "maps": 15,
+      "maps_list": [
+        "L01S24",
+        "L02S08",
+        "L02S21",
+        "L02S22",
+        "L03S04",
+        "L03S08",
+        "L03S12",
+        "L03S22",
+        "L03S24",
+        "L04S04",
+        "L04S07",
+        "L04S23",
+        "L05S08",
+        "L05S21",
+        "L05S22"
+      ],
+      "sourceBlock": "blk_gunMachine_BOTTOM",
+      "substring": "gunMachine_BOTTOM"
+    }
+  ],
+  "totals": {
+    "distinct_source_blocks": 11,
+    "markers_total": 127,
+    "post_change_covered": 127,
+    "post_change_lost": 0,
+    "pre_change_covered": 76,
+    "pre_change_lost": 51,
+    "pre_change_lost_maps": 32,
+    "safe_model_kinds": 3,
+    "safe_model_markers": 51,
+    "units": {
+      "distinct_source_blocks": "distinct sourceBlock VALUES (11)",
+      "markers_total": "source_marker object INSTANCES (127)",
+      "safe_model_kinds": "families formerly dropped (3); they map onto 2 factory kinds: inertScenery, unconfirmedAction"
+    }
+  }
+}

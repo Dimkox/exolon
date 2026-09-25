@@ -1471,9 +1471,18 @@ final class GameScene: SKScene {
         for bullet in enemyBullets where bullet.isAlive { addDebugRect(bullet.hitbox, color: .yellow) }
         for bullet in bullets where bullet.isAlive { addDebugRect(bullet.hitbox, color: .magenta) }
         for grenade in grenades where grenade.isAlive { addDebugRect(grenade.hitbox, color: .white) }
+
+        // Content-factory safe models: imported scenery or unconfirmed actions that the factory
+        // records instead of dropping. They are outlined here and nowhere else — no sprite and no
+        // texture is created for them, because their artwork is already baked into the map's
+        // static scenery layer. The node name carries the reason label.
+        for marker in currentLevel.safeModelMarkers {
+            addDebugRect(marker.rect, color: .yellow, alpha: 0.5,
+                         label: "\(marker.label) [\(marker.sourceBlock) @ \(marker.mapResource)]")
+        }
     }
 
-    private func addDebugRect(_ rect: CGRect, color: SKColor, alpha: CGFloat = 0.9) {
+    private func addDebugRect(_ rect: CGRect, color: SKColor, alpha: CGFloat = 0.9, label: String = "") {
         guard rect.width > 0, rect.height > 0 else { return }
         let path = CGPath(rect: rect, transform: nil)
         let node = SKShapeNode(path: path)
@@ -1481,6 +1490,9 @@ final class GameScene: SKScene {
         node.lineWidth = 1
         node.alpha = alpha
         node.fillColor = .clear
+        if !label.isEmpty {
+            node.name = label
+        }
         debugOverlay.addChild(node)
     }
 }

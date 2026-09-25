@@ -1,0 +1,101 @@
+{
+  "acceptance_criteria": [
+    {
+      "id": "AC-001",
+      "statement": "Factory marker resolution covers all 127 source_marker INSTANCES (11 distinct values) across all 125 maps: each is resolved by the product classifier into an explicitly dispositioned arm (typed behavior, labeled safe model, or documented no-op/write-only), and the silent-ignore code path no longer exists (an unmatched marker fails the meter). The disposition column (typed/safe-model/no-op/write-only) is normative evidence: 127/127 means resolved, not behavior-implemented.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/wave_c_check.py::marker_coverage_all_maps"},
+        {"test": "engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/wave_c_check.py::marker_baseline_reproduced"},
+        {"receipt": "verification"}
+      ]
+    },
+    {
+      "id": "AC-002",
+      "statement": "blk_waggon, blk_gunMachine_BOTTOM and blk_mushroom produce real factory-typed objects (or documented safe models) on the 32 maps where they were previously dropped, with a per-marker disposition table committed.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/wave_c_check.py::ignored_types_disposition"}
+      ]
+    },
+    {
+      "id": "AC-003",
+      "statement": "engineering/contracts/level-content-v1.json pins canonical hashes of all 125 maps with exactly 101 unique, the 23 L02/L05 pairs plus L03S09/L04S11 declared identical (with background-equality flags), using the audited canonicalization so the merged P1-12 numbers reproduce.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/wave_c_check.py::level_pair_manifest_pinned"}
+      ]
+    },
+    {
+      "id": "AC-004",
+      "statement": "Negative control: a synthetic map fixture that diverges from a declared-identical pair makes the pin test FAIL, and a tampered manifest declaration fails the manifest self-check; absence of any flip is itself a failure.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/wave_c_check.py::manifest_selfcheck"}
+      ]
+    },
+    {
+      "id": "AC-005",
+      "statement": "The 76 previously covered markers generate byte-identical factory output before and after the change (digest equality), so only the 51 lost markers behave differently.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/wave_c_check.py::unchanged_marker_output"}
+      ]
+    }
+  ],
+  "approvals": {
+    "required_scopes": []
+  },
+  "change_id": "20260924-close-wave-c-content-and-factory-audit-findings-f2d90a",
+  "contracts": {
+    "events": [],
+    "json_schema": [
+      "engineering/contracts/level-content-v1.json"
+    ],
+    "openapi": []
+  },
+  "forbidden_outcomes": [
+    {
+      "id": "FORBID-001",
+      "statement": "Fabricating new tile/object content to eliminate the 24 duplicate groups. The duplication is RULED intentional by this change (premise source-backed by ORIGINAL_MECHANICS.md:166, audit v3:37, level-graph:36; ASM source lists agree solid+action for 23 of 24 pairs, while the 24th pair L03S09/L04S11 has divergent source solid= values recorded with its caveat) — it is not an asserted historical fact, and content may change only by explicit owner re-authorization.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/wave_c_check.py::no_invented_content"}
+      ]
+    },
+    {
+      "id": "FORBID-002",
+      "statement": "An unlabeled placeholder: any safe-model substitution must be identifiable in the meter output and in debug rendering, never a silent visual drop.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/wave_c_check.py::safe_models_are_labeled"}
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "id": "INV-001",
+      "statement": "Zone identity follows the 0-based formula zone_index == (stage-1)*25 + (scene-1): it is derived and validated for all 125 maps, while the raw TMX zoneNumber property exists on 117 of 125 (the eight L01S01-L01S08 maps honestly record null) and every present property must equal the derived index; the manifest's canonicalization version is declared once at document level and bound transitively to every hash through the recomputable self_check.body_sha256.",
+      "evidence": [
+        {"test": "engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/wave_c_check.py::zone_index_formula"}
+      ]
+    }
+  ],
+  "objective": {
+    "id": "OBJ-001",
+    "statement": "No factory-dropped content remains (127/127 markers resolved) and the level-uniqueness question is closed by a pinned digest manifest encoding the intentional 101-unique model.",
+    "success_metric": "wave_c_check.py: coverage 127/127, manifest pinned, controls flip",
+    "target": "0 silently ignored markers; manifest test green"
+  },
+  "observability": [
+    {
+      "id": "SIG-001",
+      "metric": "coverage and disposition tables regenerated by one command in <=120 s, stdlib-only",
+      "proves": ["OBJ-001"]
+    }
+  ],
+  "risk": {
+    "domains": [
+      "generic"
+    ],
+    "tier": "green"
+  },
+  "rollback": {
+    "maximum_steps": 1,
+    "strategy": "forward_fix"
+  },
+  "schema_version": 2
+}
