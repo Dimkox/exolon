@@ -17,7 +17,7 @@
     },
     {
       "id": "AC-003",
-      "statement": "Handout contract exolon.macos-probe-report/1: schema file committed; each of the 10 consistency rules has a contradictory synthetic fixture that reddens the checker; binding fields (repo_head, tree_fingerprint, probe git-blob sha1, artifact sha256/CDHash, notary uuid) make stale evidence report STALE and never green; absence of a run yields MACOS_EVIDENCE=ABSENT (unverified) rc=1 distinct from FAIL.",
+      "statement": "Handout contract exolon.macos-probe-report/1: schema file committed; each of the 10 consistency rules has a contradictory synthetic fixture that reddens the checker; binding fields (repo_head, tree_fingerprint, probe git-blob sha1, artifact sha256/CDHash, notary uuid) make stale evidence report STALE and never green; absence of a run yields MACOS_EVIDENCE=ABSENT (unverified) rc=1 distinct from FAIL; a tree binding that cannot be re-derived yields a fourth fail-closed verdict MACOS_EVIDENCE=UNVERIFIED rc=1, proven by control handout_binding_is_fail_closed (planted all-zeros report without .grok-stack never reads OK; a positive mismatch still reads STALE).",
       "evidence": [
         {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/macos_handout_check.py::handout_controls_flip"},
         {"test": "engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/macos_handout_check.py::absent_is_unverified"}

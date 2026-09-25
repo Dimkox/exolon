@@ -50,7 +50,7 @@ Steady-state expectations; every one is an assertion in a committed checker, not
   FORBID-002 as the typed spec words them.
 * Probe back-compat: merged emit-keys **46 → 127, zero lost** (`probe_contract_green`);
   `runbook_stale_gap_claims=0`, `runbook_archive_step_present=1`, Linux still `exit 75`.
-* Verification suite: `stage_boundary_check.py` 10/10 and `macos_handout_check.py` 10/10 with every
+* Verification suite: `stage_boundary_check.py` 10/10 and `macos_handout_check.py` 11/11 with every
   control flipping, wave A `gameplay_log_check.py` 28/28, wave C `wave_c_check.py` 9/9; wave B's
   semantic probes pass and its added-lines size floor reports its documented by-design mismatch
   (deviation 14).
@@ -83,7 +83,7 @@ Go requires all four, on the exact head SHA to be merged:
 
    ```bash
    python3 scripts/grok_verify.py --mode pr                # PASS, then record the receipt
-   python3 …/8341b7/evidence/macos_handout_check.py   --root . --phase D1   # 10/10
+   python3 …/8341b7/evidence/macos_handout_check.py   --root . --phase D1   # 11/11
    python3 …/8341b7/evidence/stage_boundary_check.py  --root . --phase D1   # 10/10
    bash    …/8341b7/evidence/ledger-xcheck/run.sh                          # table identical
    python3 …/32f59c/evidence/gameplay_log_check.py --artifacts <contour run>  # 28/28

@@ -266,3 +266,152 @@ and no Developer ID, so Track A and Track B are structurally unrunnable, not pen
 signing/notarization clause stays open for that reason alone, and this verdict says nothing about
 archived bundles, `codesign`, `spctl`, `notarytool`, `stapler`, or a play-through of E1…E16.
 Nothing in this report constitutes merge authority.
+
+---
+
+# Re-check at `bea3efe`
+
+- Reviewed head: `bea3efe970468fb9326a564608b9a37bc821bc5d` (= PR #17 `headRefOid`, verified live;
+  `baseRefName: main`, `merge-base HEAD origin/main` still `817bf52`). Fix batch on top of the
+  first-pass head `84b7813`: `377e7ae` (docs: release/rollback + rebind), `30ea679`
+  (security F-1 fail-closed), `bea3efe` (security review index) — 14 files, all documentation,
+  wave-D-local verifiers, the schema's `path` annotation and one `decisions.md` line; **no product
+  Swift and no pbxproj line moved** (`git diff --name-only 84b7813..bea3efe -- Exolon/GameCore` =
+  empty).
+- Environment: a **new** `git clone --no-hardlinks` at
+  `/home/pall/projects/.review-wave-d/clone2` (checked out at `bea3efe`, `refs/remotes/origin/main`
+  bound to `817bf52` per the clone-hygiene note this review contributed). Every number below is
+  from my own runs, including a **constructed rollback tree** (§R.2) in `/tmp/rb`.
+- My first-pass report is committed byte-identical (268 lines, `git diff 84b7813..bea3efe` on it
+  shows only the file addition), so nothing was edited to flatter the fix batch.
+
+## R.1 First-pass blockers — closed
+
+| # | First-pass finding | State at `bea3efe` | How I checked it |
+| --- | --- | --- | --- |
+| 1 | `release.md` empty | **CLOSED** — 92 lines: merge position, "ships no artifact" deployment statement, a 4-row flag table with defaults and who may flip each (`EXOLON_DEBUG_WARP` absent from Release by construction; `EXOLON_EVENT_LOG` orthogonal because the award reads `FixedTickDriver.stepCount`; the Track-B triple gate; `EXOLON_PROBE_SCRATCH` with `exit 78`), Metrics as *assertions* (`ABSENT` rc 1 permanently, `red_ac=1 bad_controls=1`, emit-keys 46→127, per-meter counts, plus the `wave_b_check` `origin/main` fallback hazard), and a 4-criterion Go/no-go with the exact command set and an explicit "No-go made explicit" paragraph | read in full; each quantitative expectation re-measured below (all match except the two `10/10` counts in §R.4) |
+| 2 | `rollback.md` empty | **CLOSED and, unlike the others, *executable* — I ran it** (§R.2) | measured on a constructed rolled-back tree |
+| 3 | PR body stale + range overclaim | **CLOSED** — the "requires one more rebase" paragraph is gone (`grep -i rebase` on the live body: no match); the body now reads "ORIGINAL_MECHANICS:138-148 … (140-146 DONE at `StageBoundaryLedger.swift:48-64/248-252` + `GameScene.swift:842-855`; **:147 stage-start coordinates deliberately deferred, :148 pre-existing**)", i.e. the section range is kept but the delivered clauses and both exclusions are named in the same sentence; "#15 … stays OPEN, externally-blocked-forever … Do not close #15 from this PR" | live `gh pr view 17 --json body` |
+| 4 | FORBID-002 misquoted in `cutover.md` §2 / Deviation 9 | **CLOSED, three-way agreement measured**: typed spec = `{hardened_runtime_key_count}` (verbatim-quoted in `cutover.md` §2); checker constant = `frozenset({"hardened_runtime_key_count"})` at `macos_handout_check.py:163`, **was** `frozenset({"hardened_runtime_key_count", "hardened_deferral_recorded"})` at `84b7813:…:156` — so the writer's statement that the constant was looser than the spec is true, and the gap is closed; the non-red member is now declared separately as `DECLARED_NON_RED_KEYS` (`:167`) and still proven live | `git show` of both revisions + grep of the constants |
+| 5 | `requirements.md:77` orphan; `decisions.md` "126" | **CLOSED** — the dangling `29/29 controls, on the extended tree).` line is gone (the drift note now ends cleanly at :79); `decisions.md` now says "46 before, **127** after, zero lost (re-measured on head `84b7813`: the D-2 draft said 126)" — and my own re-measurement at `bea3efe` gives 46 → 127, lost 0 | read + `emit_keys` re-run |
+| 6 | +1 life gated by the refill flag, unwatched | **CLOSED as recorded+bound** — Deviation 15 states the coupling and its reason, and `lives_and_refill_semantics` now asserts `refillsAmmoAndGrenades: true` is a hard-coded literal *with its own meta-control* (`control impossible…` / `control did not flip…`), so a future conditional flag reddens instead of quietly dropping the life | diff of `stage_boundary_check.py` (+14 lines) + `stage_boundary_check` 10/10 |
+| 7 | Phase auto-detect makes `cutover_set_exact` vacuous on a de-repaid tree | **CLOSED as a stated limit + neutralised procedurally** — Deviation 16 records it as an accepted nit with the defences that still hold, `cutover.md` §2 "Limits" says it plainly, and release.md Go/no-go item 4 now requires **`--phase D1` named explicitly**. I measured that this actually bites: on a rolled-back tree run *with* `--phase D1`, `cutover_set_exact` FAILED ("a D-1 tree with a fully green merged checker means the hardened-runtime edit is missing") instead of passing vacuously | §R.2 run |
+
+## R.2 I executed the rollback plan instead of accepting it
+
+Rolled back the **product** half only (`Exolon.xcodeproj/project.pbxproj`,
+`Exolon/Exolon.entitlements` removed, and `GameScene`/`GameConstants`/`StageBoundaryLedger`/
+`GameplayEventSink`/`FixedTickDriver` restored to `817bf52`) in a scratch copy, leaving the
+verifiers and contracts in place — the case `rollback.md` "Verification after rollback" describes.
+Measured:
+
+| Expectation in `rollback.md` | Measured |
+| --- | --- |
+| `l0_characterization_pinned` **stays green, by design** (read from base `295690b` via `git show`, frozen table `l0-before-d1.txt`) | **TRUE — `RESULT l0_characterization_pinned=PASS` on the rolled-back tree.** Mechanism confirmed in code: `stage_boundary_check.py:209`, `:265`, `:288` call `git_show(root, BASE_COMMIT, …)`, never the working tree, so L0 cannot be "un-fixed" by reverting its subject; and the doc's correction (the "L0 must be red after rollback" expectation belongs to the L1 table) is right |
+| `single_funnel` stays green | `RESULT single_funnel=PASS` ✓ |
+| Wave-D ledger rules go red | `stage_boundary_check --phase D1` → rc 1, **8 of 10 FAIL**. The doc lists 6; `component_stream_identity` and `executed_ledger_matches_model` also fail (and `ledger-xcheck/run.sh` stops *compiling*, rc 1 — the harness references `.timedPhaseLadder`). Understated, never overstated |
+| `macos_handout_check` goes red | rc 1, **4 of 11 FAIL**: `entitlements_and_hardening_shape`, `cutover_set_exact`'s D-1 posture (both named), plus `probe_contract_green` ("post-D-1 merged-checker reds must be a non-empty subset of ['hardened_runtime_key_count'], got []") and `agent_boundary` (hygiene: entitlements file missing). Also understated, never overstated |
+| Merged verifier returns to PR #3's posture: `rc=0`, `RELEASE_LAYER_READY`, 29/29 controls green | **TRUE exactly**: `rc=0`, `RESULT: RELEASE_LAYER_READY`, 29 `OK` control lines, 0 `BAD`, 0 `RED` keys. This is also the cleanest possible proof that the cutover was caused by this change and nothing else |
+| Siblings unaffected: wave A still 28/28 | **TRUE**: `RESULT: PASS (28/28 checks passed)` on the rolled-back tree |
+
+Verdict on this item: the rollback plan is not prose — every load-bearing expectation in it
+reproduced, and the two undercounts are cosmetic.
+
+## R.3 Security F-1, measured independently
+
+- `macos_handout_check.py --phase D1` at `bea3efe` → **`SUMMARY checks=11 failed=0`, rc 0**,
+  `RESULT handout_binding_is_fail_closed=PASS`.
+- **The control is load-bearing, not decorative** (my own mutation test): replacing
+  `elif not live_fp:` with a skip (i.e. restoring pre-fix behaviour) in a scratch copy flips it to
+  `RESULT handout_binding_is_fail_closed=FAIL … got STALE`, rc 1. The control also asserts its own
+  premise (`if tree_fingerprint(fake): raise CheckFailure("the fixture is not unmeasurable…")`) and
+  runs the environment flip rather than an evidence flip.
+- **Not a blanket refusal** (my own measurement on a tree where the binding *is* computable):
+  planted all-zeros fingerprint → `R3 tree_fingerprint differs from the current tree - STALE, never
+  green`; the honest synthetic report → `OK`. Precedence in `classify_status` (substantive mismatch
+  beats unavailability) matches what I observed.
+- **The ancestor residual is disclosed honestly**, in the exact terms a later reader needs:
+  `cutover.md:141-145` — `repo_head` must be a commit *in this history* (an unrelated-but-real
+  commit, e.g. a pre-rebase tip, now reads STALE), "**An ancestor still passes**: nothing in the
+  report can prove it was sealed at HEAD rather than at an ancestor, and that is precisely the job
+  of `tree_fingerprint`, which is why the two bindings are checked together"; the same statement is
+  in `macos-handout/README.md:143`. F-2's self-reference limit (an in-tree report can never
+  self-bind, no fixed point, no `--allow-head-only` mode added) is stated as a limit of the
+  mechanism, and §6 still says no Linux check can reach the machine. **No new exposure introduced by
+  the fix**, and `MACOS_EVIDENCE=ABSENT (unverified)` (rc 1) remains the repository's steady state
+  at this head (`--report` re-run).
+- Two wording/traceability nits, non-blocking, listed in §R.5.
+
+## R.4 Machine gates re-measured at `bea3efe` (all by me, in the fresh clone)
+
+| Command | Result |
+| --- | --- |
+| `macos_handout_check.py --phase D1` | **11/11**, rc 0 |
+| `macos_handout_check.py --report` | `MACOS_EVIDENCE=ABSENT (unverified)`, rc 1 |
+| `stage_boundary_check.py --phase D1` | **10/10**, rc 0 |
+| `ledger-xcheck/run.sh` vs committed `ledger-xcheck-executed.txt` | **byte-identical** (rc 0) — the doc-only batch did not move the executed numbers |
+| merged `release_layer_check.py --root .` | rc 1 `NOT_READY (red_ac=1 bad_controls=1)`; the red AC is **exactly** `hardened_runtime_key_count` (=2), the only `BAD` control **exactly** `hardened_key_mutation_detected`, `mismatches: 1`, 28 other controls OK → pair-exact against `cutover.md` and release.md's Metrics |
+| probe back-compat | emit-keys 46 → 127, **0 lost**; `bash -n` clean (re-verified at `84b7813`, probe unchanged since) |
+| wave A `gameplay_log_check.py` | **28/28**, rc 0 |
+| wave C `wave_c_check.py` | **9/9** `ALL_WAVE_C_PROBES_PASS` (+ its own two stale-tool WARNINGs, self-declared as not this change's failure) |
+| wave B `wave_b_check.py` | 8 behavioural `PASS`, `RESULT: MISMATCH` solely from the calibration floor `файлов=5 строк=124` — identical to Deviation 14 at the first-pass head |
+| pbxproj/entitlements shape | unchanged from `84b7813`: 5 added lines total, `CODE_SIGN_ENTITLEMENTS` ×2, `SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG` ×1, entitlements `plistlib` → `[]`, no `get-task-allow` |
+| Local machine receipt | **stale right now**: the only receipt (`verification.json`, `pass`, 03:38:58Z) is bound to tree `d92174eb…` while the current tree at `bea3efe` is `b0b41a12…`; my append changes it again, so `grok_verify --mode pr` must be the last write in this tree |
+| External merge gate | **absent as expected**: on `bea3efe` the only check run is GitGuardian; no App-owned `adaptive-trust-ci/verified@<policy-sha12>` yet |
+
+**One stale count set survives the batch:** `release.md:53`, `release.md:86` and PR-body line 36 say
+`macos_handout_check` **10/10**; this head reports **11/11** (`stage_boundary_check` 10/10 is
+correct). Cause is ordering, not sloppiness — the docs commit `377e7ae` predates the F-1 commit
+`30ea679` that added the control. Direction is conservative (it under-claims a defence), but a gate
+list a human executes should match the tree it ships.
+
+## R.5 Remaining items (all non-blocking)
+
+1. `release.md:53`/`:86` + PR body: `macos_handout_check` 10/10 → **11/11**.
+2. `rollback.md` "Verification after rollback": name the two extra red wave-D controls
+   (`component_stream_identity`, `executed_ledger_matches_model`), the two extra red handout
+   controls (`probe_contract_green`, `agent_boundary`) and that `ledger-xcheck/run.sh` stops
+   compiling post-revert; expectations are otherwise exact.
+3. Deviation 17 (and the new control's docstring) call a tree without `.grok-stack/` "a legitimate
+   state of a fresh clone per AGENTS.md". Measured: `.grok-stack/adaptive_grok/**` **is tracked**
+   (66 files; `util.py` present in my clone, `tree_fingerprint` importable), and AGENTS.md scopes
+   the "may legitimately be absent in a fresh clone" statement to `.grok-stack/runtime`. The F-1
+   fixture is therefore a *stripped/partial export*, not an ordinary clone — the fix is right,
+   the reachability claim is overstated. Narrow the wording.
+4. `handout_binding_is_fail_closed` and the fourth verdict `UNVERIFIED` are cited in
+   `requirements.md` AC-003 but appear **nowhere in the typed `change-spec.yaml`** (16 evidence
+   symbols, none of them this control; 0 occurrences of "UNVERIFIED"), so the strongest new security
+   defence binds to no typed acceptance criterion and a spec-mapping gate run would not require it.
+   Either add it to AC-003's typed evidence or label it explicitly as a reviewer-driven extra.
+5. Contract surface still has no runtime consumer on Linux (carried from the first pass; wave D
+   *adds* an in-tree producer, and `FixedTickDriver.stepCount` is now the award's clock source, so
+   the wave-E reconciliation issue should mention that field).
+6. Still open externally, unchanged and honestly labelled: no Apple hardware ⇒ Track A/B runs
+   permanently unrunnable; issue #15's signing/notarization clause stays open; the App-owned
+   policy-epoch check does not exist for any wave-D head yet.
+
+On the security-report transcription question the controller raised: `review-security-2.md:179-181`
+abridges the PEM header to `-----BEGIN … PRIVATE KEY …` with the reason stated in place ("writing it
+out in full makes this report itself fail the repository's own secret scan") and wave A's precedent
+cited by file:line, and `review-security.md` restates it as a transcription disclosure. The abridged
+text is an element of a *forbidden-pattern list*, not evidence whose bytes are load-bearing, and the
+finding it documents is unchanged. **I do not treat it as a review-integrity issue and I am not
+adding a disclosure line for it** — the disclosure already exists twice, in the right places.
+
+## R.6 Final release-readiness verdict — change `20260924-…-8341b7` @ `bea3efe`
+
+**PASS.** The first-pass FAIL is cleared: both plan documents are filled and one of them I executed
+successfully, the PR body and the cutover narrative now agree with the typed spec and with the tree,
+the orphan defects are gone, and every gate re-measured at this head reproduces the claimed state —
+including the pair-exact merged-checker red set, the byte-identical executed ledger table, and
+F-1's fail-closed binding with a control that demonstrably flips. No product, contract or
+verification defect was found at either head, and nothing I measured contradicts anything in the
+package. The four items in §R.5.1-4 and §R.5.3 are one-line documentation repairs; none of them can
+change a verdict, a red set or a shipped byte.
+
+This verdict is for **the change** — source, contracts and verifiers — on the assumption it is
+merged as `bea3efe` (if the SHA moves, §R.4 and §R.5.6 must be re-run against the new head). It is
+not a certification of any publishable artifact, of any signing or notarization posture, or of
+anything a Mac would have to observe. Merge authority remains only the App-owned
+`adaptive-trust-ci/verified@<policy-sha12>` check on the exact head SHA plus the required human
+approvals; the local receipt must be re-recorded last, after this file lands.

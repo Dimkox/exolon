@@ -163,8 +163,9 @@
     that flag conditional the check reddens instead of the boundary quietly stopping to grant
     lives. The product shape is unchanged (no new award field, no widened wave-A contract).
 17. **Security part-2 findings F-1/F-2 closed or stated (final micro-fix).** F-1 was a real
-    bypass in my own artifact: with `.grok-stack/` absent (legitimate in a fresh clone per
-    AGENTS.md) `tree_fingerprint()` returns `""`, and rule 3's `elif live_fp and …` skipped the only
+    bypass in my own artifact: with `.grok-stack/` absent (NOT a legitimate fresh-clone state: .grok-stack/adaptive_grok/** is
+    tracked - 66 files - and tree_fingerprint imports fine in a real clone; only
+    .grok-stack/runtime is local per AGENTS.md) `tree_fingerprint()` returns `""`, and rule 3's `elif live_fp and …` skipped the only
     tree binding, so a hand-sealed all-zeros report read `MACOS_EVIDENCE=OK`, rc 0. It now reads the
     new **UNVERIFIED** verdict (rc 1, distinct from OK/FAIL/STALE/ABSENT) and
     `handout_binding_is_fail_closed` reproduces the reviewer's planting in a stack-free clone while

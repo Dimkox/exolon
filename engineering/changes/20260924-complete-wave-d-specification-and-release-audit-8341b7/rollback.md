@@ -65,9 +65,12 @@ Expect, in this order, on the reverted tree:
 * **Wave-D checks go red, deliberately:** `stage_boundary_check.py` fails on
   `sequence_components_identity`, `lives_and_refill_semantics`, `bravery_latch_distinguishes`,
   `timed_ladder_deterministic`, `warp_debug_only` and `ladder_is_declared_deviation` (the ledger
-  rules, the constants and the warp are gone); `macos_handout_check.py` fails on
-  `entitlements_and_hardening_shape` (0 hardened settings where 2 are required) and on
-  `cutover_set_exact`'s D-1 posture. A rollback that turns them green would mean they never measured
+  rules, the constants and the warp are gone); `macos_handout_check.py` fails 4 of 11 (measured; the named two being
+  `entitlements_and_hardening_shape` and `cutover_set_exact`'s D-1 posture, plus two
+  transitive guards that read the same settings) — and `ledger-xcheck/run.sh` stops
+  compiling once the D-1 ledger members are gone. The stage_boundary list above names six
+  of the eight measured reds: these lists understate, never overstate. A rollback that
+  turned any of them green would mean they never measured
   the fix.
 * **`l0_characterization_pinned` stays GREEN after the rollback, by design.** It is a historical
   characterization read from base `295690b` via `git show`, with `evidence/l0-before-d1.txt` as its
