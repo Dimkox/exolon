@@ -12,7 +12,8 @@ WHAT THIS TOOL DECIDES ON LINUX (Class 1 of integration §3.5)
     present, the Track A archive steps exist, the M-8/M-9 fixes are real, verdicts are
     machine-readable;
   * the handout's internal consistency: schema, ten rules, binding fields;
-  * that an absent run stays ABSENT (unverified) instead of laundering into a pass.
+  * that an absent run stays ABSENT (unverified) instead of laundering into a pass, and that a
+    binding which cannot be re-derived here reads UNVERIFIED rather than being skipped.
 
 WHAT IT NEVER DECIDES (Class 3): that a Mac existed, that a bundle was signed, that
 Gatekeeper accepted anything. A green verdict here means "the report is internally
@@ -20,7 +21,9 @@ consistent and bound to real git objects", never "release-ready" (PR #3 AC-010).
 
 rc contract
   0  every requested check behaved as expected
-  1  at least one check went red, or --report found the evidence ABSENT/FAIL/STALE
+  1  at least one check went red, or --report found the evidence ABSENT, STALE, FAIL or
+     UNVERIFIED - the fourth state meaning "a binding could not be re-derived on this host":
+     never a pass, and never folded into FAIL (finding F-1, evidence/cutover.md §5b)
   2  usage error or an unreadable tree
 
 Subcommands
@@ -193,6 +196,10 @@ RULES = {
     "R10": "producer self-test must be all-PASS or the report is untrusted",
 }
 STALE_RULES = ("R3",)
+# Tag used for a check that cannot be evaluated locally. It is deliberately not an "R3 " prefix,
+# so it never counts as STALE and never disappears into a generic FAIL.
+UNVERIFIED_HIT = "R3-UNVERIFIED"
+UNVERIFIED_LINE = "MACOS_EVIDENCE=UNVERIFIED (tree binding not re-derivable here)"
 
 
 class CheckFailure(Exception):
@@ -777,6 +784,11 @@ def rule_checks(root: pathlib.Path, doc: dict, txt: bytes | None = None,
     elif not git_ok(root, "cat-file", "-e", f"{head}^{{commit}}"):
         v.append(f"R3 provenance.repo_head {head} does not resolve as a commit in this "
                  "repository (STALE: the run measured a tree that does not exist here)")
+    elif not git_ok(root, "merge-base", "--is-ancestor", head, "HEAD"):
+        # Existence alone let an unrelated-but-real commit pass; the report has to bind to
+        # *this* history. An ancestor still passes - see the limits note in cutover.md §2.
+        v.append(f"R3 provenance.repo_head {head} is not an ancestor of this HEAD, so the "
+                 "report binds to an unrelated history (STALE)")
     live_blob = blob_sha1((root / PROBE_REL).read_bytes()) if (root / PROBE_REL).is_file() else ""
     if not op.get("probe_script_blob_sha1"):
         v.append("R3 operational.probe_script_blob_sha1 is empty")
@@ -787,7 +799,17 @@ def rule_checks(root: pathlib.Path, doc: dict, txt: bytes | None = None,
     live_fp = tree_fingerprint(root)
     if not re.fullmatch(r"[0-9a-f]{64}", fp or ""):
         v.append(f"R3 provenance.tree_fingerprint {fp!r} is not a sha256 hex digest")
-    elif live_fp and fp != live_fp:
+    elif not live_fp:
+        # F-1 (security part 2). The fingerprint is the only binding between a report and a
+        # tree, and `.grok-stack/` is legitimate in a fresh clone. Silently skipping the
+        # comparison when it cannot be computed turned a planted all-zeros fingerprint into
+        # `MACOS_EVIDENCE=OK`, i.e. a green verdict from unverifiable evidence - the exact
+        # failure AC-003 exists to prevent. Fail closed, and name the state: UNVERIFIED is
+        # neither OK, nor FAIL, nor STALE, and it never returns rc 0.
+        v.append(UNVERIFIED_HIT + " tree_fingerprint cannot be re-derived here "
+                 "(.grok-stack/adaptive_grok/util.py is absent or unimportable): the only "
+                 "tree binding is unavailable, so the report cannot be accepted")
+    elif fp != live_fp:
         v.append("R3 tree_fingerprint differs from the current tree - STALE, never green (M-9)")
 
     if track == "A":
@@ -999,6 +1021,20 @@ def synth_handout(root: pathlib.Path | None = None, **over) -> tuple[dict, bytes
     return doc, txt
 
 
+def classify_status(violations: list[str], *, stale: bool, unparsable: bool = False) -> str:
+    """OK / STALE / FAIL / UNVERIFIED, in that precedence.
+
+    A positive mismatch outranks an unavailable check: a report whose fingerprint
+    disagrees with the tree is STALE whether or not the tree could be measured, and
+    any rule violation is FAIL. Only a report whose *sole* problem is that the binding
+    could not be computed is UNVERIFIED - still never a pass (rc 1 in --report).
+    """
+    substantive = [h for h in violations if not h.split(": ", 1)[-1].startswith(UNVERIFIED_HIT)]
+    if substantive or unparsable:
+        return "STALE" if stale else "FAIL"
+    return "UNVERIFIED" if violations else "OK"
+
+
 def evaluate_handout(root: pathlib.Path) -> dict:
     """Class-1 verdict over the committed handout. It never invents a pass."""
     hdir = root / HANDOUT_REL
@@ -1009,23 +1045,25 @@ def evaluate_handout(root: pathlib.Path) -> dict:
                 "line": "MACOS_EVIDENCE=ABSENT (unverified)"}
     violations: list[str] = []
     stale = False
+    unparsable = False
     for rp in reports:
         tag = rp.name
         try:
             doc = json.loads(rp.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
             violations.append(f"{tag}: R1 not parsable JSON ({exc})")
-            stale = True
+            unparsable = True
             continue
         hits = audit_report(root, doc, report_path=rp)
         violations += [f"{tag}: {hit}" for hit in hits]
         if any(hit.startswith(rule + " ") for hit in hits for rule in STALE_RULES):
             stale = True
-    status = "STALE" if stale else ("FAIL" if violations else "OK")
+    status = classify_status(violations, stale=stale, unparsable=bool(unparsable))
+    line = UNVERIFIED_LINE if status == "UNVERIFIED" else f"MACOS_EVIDENCE={status}"
     return {"status": status,
             "reports": [str(p.relative_to(root)) for p in reports],
             "violations": violations,
-            "line": f"MACOS_EVIDENCE={status}"}
+            "line": line}
 
 
 def free_text_verdict_lines(text: str) -> list[str]:
@@ -1691,6 +1729,66 @@ def entitlements_and_hardening_shape(root: pathlib.Path) -> None:
         raise CheckFailure("control did not flip: the one-sided mutation was not a mutation")
 
 
+def handout_binding_is_fail_closed(root: pathlib.Path) -> None:
+    """Extra (security finding F-1): a binding that cannot be computed must never be a pass.
+
+    Reproduces the reviewer's planting exactly - a hand-sealed report claiming a 64-zero
+    `tree_fingerprint` - in a scratch clone that has no `.grok-stack/`, which is a legitimate
+    state of a fresh clone per AGENTS.md, and demands the non-green answer. Then flips the
+    environment, not the evidence: the identical claim against a tree where the fingerprint
+    *is* re-derivable must read STALE. Same payload, two verdicts, both non-green: that is what
+    separates "unverifiable" from "wrong", and neither of them is OK.
+    """
+    with tempfile.TemporaryDirectory(prefix="exolon-binding-") as tmp:
+        fake = pathlib.Path(tmp)
+        for rel in (SCHEMA_REL, PROBE_REL, "Exolon.xcodeproj/project.pbxproj"):
+            dst = fake / rel
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(root / rel, dst)
+        # deliberately no .grok-stack here: this is the state that produced the green default
+        run(["git", "-C", str(fake), "init", "-q"])
+        run(["git", "-C", str(fake), "-c", "user.email=c@e", "-c", "user.name=c", "add", "-A"])
+        run(["git", "-C", str(fake), "-c", "user.email=c@e", "-c", "user.name=c",
+             "commit", "-qm", "scratch clone without the stack"])
+        if tree_fingerprint(fake):
+            raise CheckFailure("the fixture is not unmeasurable: a fingerprint was re-derived in "
+                               "the scratch clone, so the control proves nothing")
+        doc, txt = synth_handout(root)
+        doc["provenance"]["repo_head"] = git(fake, "rev-parse", "HEAD")
+        doc["operational"]["probe_script_blob_sha1"] = blob_sha1((fake / PROBE_REL).read_bytes())
+        doc["operational"]["raw_report_sha256"] = sha256_bytes(txt)
+        doc["provenance"]["tree_fingerprint"] = "0" * 64
+        hdir = fake / HANDOUT_REL
+        hdir.mkdir(parents=True, exist_ok=True)
+        (hdir / "probe-report-planted.json").write_text(json.dumps(doc, indent=2),
+                                                        encoding="utf-8")
+        (hdir / "probe-report-planted.txt").write_bytes(txt)
+        res = evaluate_handout(fake)
+        if res["status"] != "UNVERIFIED":
+            raise CheckFailure(f"a planted report in a clone without .grok-stack must be "
+                               f"UNVERIFIED (never a pass), got {res['status']}: "
+                               f"{res['violations'][:3]}")
+        if res["line"] != UNVERIFIED_LINE:
+            raise CheckFailure(f"the UNVERIFIED line must be machine-exact, got {res['line']!r}")
+        # the same all-zeros claim where the fingerprint IS computable: STALE, not UNVERIFIED,
+        # and the honest claim there stays green - otherwise this branch is just a refusal.
+        stale_doc, stale_txt = synth_handout(root)
+        if not tree_fingerprint(root):
+            raise CheckFailure("the real tree must be measurable for the second half of this "
+                               "control; run the checker inside an installed stack")
+        stale_doc["provenance"]["tree_fingerprint"] = "0" * 64
+        hits = audit_report(root, stale_doc, txt=stale_txt)
+        if not any(h.startswith("R3 tree_fingerprint differs") for h in hits):
+            raise CheckFailure(f"the same planted fingerprint must read STALE where it is "
+                               f"comparable, got {hits[:3]}")
+        if any(h.startswith(UNVERIFIED_HIT) for h in hits):
+            raise CheckFailure("a comparable tree must not report UNVERIFIED: " + str(hits[:2]))
+        clean_doc, clean_txt = synth_handout(root)
+        if audit_report(root, clean_doc, txt=clean_txt):
+            raise CheckFailure("the honest report stopped being green, so this control is a "
+                               "blanket refusal rather than a fail-closed rule")
+
+
 CHECKS: dict[str, object] = {
     "entitlements_and_hardening_shape": entitlements_and_hardening_shape,
     "probe_contract_green": probe_contract_green,
@@ -1702,6 +1800,7 @@ CHECKS: dict[str, object] = {
     "no_track_b_claim": no_track_b_claim,
     "cutover_set_exact": cutover_set_exact,
     "verdicts_machine_readable": verdicts_machine_readable,
+    "handout_binding_is_fail_closed": handout_binding_is_fail_closed,
 }
 
 

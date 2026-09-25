@@ -162,6 +162,21 @@
     `refillsAmmoAndGrenades: true` on every awarded boundary, and if a future component ever makes
     that flag conditional the check reddens instead of the boundary quietly stopping to grant
     lives. The product shape is unchanged (no new award field, no widened wave-A contract).
+17. **Security part-2 findings F-1/F-2 closed or stated (final micro-fix).** F-1 was a real
+    bypass in my own artifact: with `.grok-stack/` absent (legitimate in a fresh clone per
+    AGENTS.md) `tree_fingerprint()` returns `""`, and rule 3's `elif live_fp and …` skipped the only
+    tree binding, so a hand-sealed all-zeros report read `MACOS_EVIDENCE=OK`, rc 0. It now reads the
+    new **UNVERIFIED** verdict (rc 1, distinct from OK/FAIL/STALE/ABSENT) and
+    `handout_binding_is_fail_closed` reproduces the reviewer's planting in a stack-free clone while
+    showing the same claim reads STALE where the fingerprint *is* comparable and the honest claim
+    stays green there - fail-closed, not a blanket refusal. `repo_head` went from "exists" to
+    "exists **and is an ancestor of HEAD**", so an existing-but-unrelated commit (a pre-rebase
+    branch tip) now reddens. F-2 is a limit of the mechanism, not a bug: a report committed inside
+    the clone can never self-bind, so the tree binding's authority is stated as applying to reports
+    sealed outside it, and no `--allow-head-only` degraded mode was added. README §3/§6,
+    `requirements.md` AC-003 and `cutover.md` §5b now say what those fields actually prove, and the
+    `path` annotation in `gameplay-event-v1.schema.json` gained the note that path-shaped values
+    live in exactly two record kinds (`log.begin`'s `path`; `log.rotate`'s `from_path`/`to_path`).
 16. **Accepted nit: `cutover_set_exact`'s D-2 posture is trivially satisfied on a de-repaid tree**
     (phase is auto-detected from the tree). Stated once in `evidence/cutover.md` §2 "Limits", with
     the checks that still hold there (`entitlements_and_hardening_shape`, the merged checker's own

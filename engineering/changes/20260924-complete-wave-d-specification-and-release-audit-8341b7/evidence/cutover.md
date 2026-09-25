@@ -115,6 +115,38 @@ keeps the load-bearing distinction — a setting in `project.pbxproj` is not an 
 now expected to flip from `ABSENT` to `PRESENT` on a real archive. `runbook_stale_gap_claims`
 stays 0 and `runbook_archive_step_present` stays 1 (the merged checker is green on both).
 
+## 5b. What the handout binding can prove, and what it cannot (security findings F-1, F-2)
+
+Both were measured, both are fixed or stated:
+
+* **F-1 is closed.** When `tree_fingerprint()` cannot be computed (`.grok-stack/` absent - a state
+  `AGENTS.md` calls legitimate for a fresh clone), rule 3 no longer *skips* the only tree binding:
+  the report reads `MACOS_EVIDENCE=UNVERIFIED (tree binding not re-derivable here)`, rc 1, a state
+  distinct from OK, FAIL, STALE and ABSENT. The reviewer's exact planting (a hand-sealed report
+  claiming 64 zeros, in a copy of this tree without `.grok-stack`) now returns UNVERIFIED rc=1
+  where it used to return OK rc=0, and the committed control
+  `macos_handout_check.py::handout_binding_is_fail_closed` reproduces it while proving the branch is
+  not a blanket refusal: the identical zero claim against a measurable tree reads STALE, and the
+  honest claim there stays green.
+* **F-2 is a limit of the mechanism, not a defect to fix by weakening it.** `tree_fingerprint` is a
+  function of the tree that contains the report, so a report committed *into* this repository can
+  never self-bind: sealing, committing and re-sealing all measure STALE (there is no fixed point -
+  `--derive` rewrites the JSON and `generated_utc` changes on every pass). The tree-binding
+  authority of rule 3 therefore applies to reports **sealed outside the clone**, which is what the
+  handout protocol does: the Mac produces the transcript, the reviewing host derives the JSON
+  against the tree being committed into, and only that pair is reviewed. An in-tree report is read
+  STALE by construction and this repository never reaches that state anyway, because no report
+  exists (§6). No `--allow-head-only` mode was added: an explicitly degraded verdict is a door a
+  planted report could walk through, and nothing in this change needs it.
+* **What `repo_head` proves, exactly.** It must be a commit *in this history* - existence alone was
+  not enough, and an existing-but-unrelated commit (e.g. a pre-rebase branch tip) now reads STALE.
+  An **ancestor** still passes: nothing in the report can prove it was sealed at HEAD rather than at
+  an ancestor, and that is precisely the job of `tree_fingerprint`, which is why the two bindings
+  are checked together rather than one standing in for the other.
+* **What no Linux check can ever prove here** (unchanged, PR #3 AC-010): that the machine existed,
+  that the bytes it describes are the bytes it built. Digests, the blob id and the fingerprint make
+  a report internally consistent and bound to a real tree; they cannot reach the machine.
+
 ## 6. Track A and Track B: structurally unrunnable, not deferred
 
 The owner has no macOS hardware and no Developer ID ("нет у меня маков", 2026-09-25). Consequences,

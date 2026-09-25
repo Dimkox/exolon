@@ -97,7 +97,8 @@
     "path": {
       "type": "string",
       "minLength": 1,
-      "x-only-in": "log.begin"
+      "x-only-in": "log.begin",
+      "x-note": "the field NAMED path is log.begin\u0027s; path-shaped values overall live in exactly two record kinds \u2014 log.begin (path) and log.rotate (from_path, to_path) \u2014 so this annotation is not a claim that the log never names a file twice"
     },
     "seed": {
       "type": "string",

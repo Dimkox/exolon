@@ -130,10 +130,21 @@ python3 engineering/changes/20260924-complete-wave-d-specification-and-release-a
 * The report is bound to: `repo_head` (must resolve as a real commit, checked with
   `git cat-file`), `tree_fingerprint`, the probe's git blob sha1, and the artifact digests
   (`sha256` plus the `CDHash`, and for Track B the notary submission uuid).
-* If any binding stops matching — the probe text changed, the head moved, the tree
-  fingerprint differs — the verdict is **STALE, never green**. Fix it by re-running, not by
-  re-dating the file. Dated evidence in this repository is append-only: do not edit or
-  delete a superseded report, add the new one and note the supersession.
+* If a binding stops matching — the probe text changed, the head is not in this history, the
+  tree fingerprint differs — the verdict is **STALE, never green**. If a binding cannot be
+  computed at all (the reviewing tree has no `.grok-stack/`, so the fingerprint cannot be
+  re-derived), the verdict is **UNVERIFIED**, which is likewise never a pass and is never
+  conflated with FAIL. Fix either by re-running, never by re-dating the file.
+* Two limits of rule 3, stated so nobody is surprised later: the tree binding is
+  meaningful for a report **sealed outside the clone** — a report committed into this
+  repository can never satisfy it, because the fingerprint it would carry is a function of
+  the very tree that must contain it, so sealing, committing and re-sealing all read STALE
+  (no fixed point exists); and `repo_head` proves membership of this history, not that the
+  run happened at HEAD — an ancestor head passes that clause, which is exactly why the
+  fingerprint is checked alongside it rather than instead of it. See
+  `evidence/cutover.md` §5b.
+* Dated evidence in this repository is append-only: do not edit or delete a superseded
+  report, add the new one and note the supersession.
 * Ten consistency rules are enforced, each with a contradictory fixture that must turn the
   checker red; a rule that cannot be violated is treated as a bug in the checker, not as a
   clean bill. Rule 4 is why a Track-A report can never say notarization Accepted.
@@ -189,8 +200,9 @@ one for home-directory paths — must return nothing over the files added here.
 ## 6. Reading a report without a Mac
 
 `result` semantics, in one paragraph: a green checker run here means the transcript is
-internally consistent, bound to a commit that really exists, and produced by the probe text
-that is in this tree. It does not mean the machine existed, that the bundle is signed by a
+internally consistent, bound to a commit in this history and to a probe text that is in this
+tree, and and bound to that tree — when, and only when, the reviewing host could actually re-derive the tree
+fingerprint. It does not mean the machine existed, that the bundle is signed by a
 real identity, or that Gatekeeper accepted anything — those are attested (Class 2) or
 excluded (Class 3) facts, listed in the report's own `attestation` block. Quote the
 `key=value` lines when you make a claim; a prose sentence about a Mac run is not evidence.

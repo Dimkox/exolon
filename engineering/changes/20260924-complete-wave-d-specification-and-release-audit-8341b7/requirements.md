@@ -14,8 +14,12 @@ promise about a future run).
 - [x] AC-002 M-8 flush barrier and M-9 out-of-tree build roots — `::flush_barrier`,
       `::build_roots_out_of_tree`.
 - [x] AC-003 handout contract `exolon.macos-probe-report/1`: schema committed, ten rules each with
-      a reddening fixture, binding fields, `ABSENT` distinct from `FAIL` —
-      `::handout_controls_flip`, `::absent_is_unverified`.
+      a reddening fixture, and the re-derivable bindings (report digest, line counts, probe
+      blob, commit membership in this history, tree fingerprint) deciding STALE / UNVERIFIED /
+      FAIL / ABSENT against OK — `::handout_controls_flip`, `::absent_is_unverified`,
+      `::handout_binding_is_fail_closed`. Scope stated honestly: these fields make a
+      *re-derivable* mismatch non-green; they cannot prove the machine existed, and a report
+      sealed inside the clone can never self-bind (`evidence/cutover.md` §5b).
 - [x] AC-004 structural agent/human boundary (double gate + tty, abort-not-redact argv/env scan,
       no credential path, identity only as hashes) — `::agent_boundary`.
 - [x] AC-005 ledger sequence as data, per-boundary identity, award before +1, `maxLives`, exo
