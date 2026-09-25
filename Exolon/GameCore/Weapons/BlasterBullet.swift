@@ -20,14 +20,17 @@ final class BlasterBullet {
 
         let texture = SKTexture(imageNamed: "blaster_bullet")
         texture.filteringMode = .nearest
-        node = SKSpriteNode(texture: texture, size: CGSize(width: 16, height: 2))
+        node = SKSpriteNode(texture: texture, size: GameConstants.blasterBulletSize)
         node.zPosition = 20
         node.xScale = direction == .left ? -1 : 1
         node.position = position
     }
 
     var hitbox: CGRect {
-        return CGRect(x: position.x - 8, y: position.y - 1, width: 16, height: 2)
+        return CGRect(x: position.x - GameConstants.blasterBulletSize.width * 0.5,
+                      y: position.y - GameConstants.blasterBulletSize.height * 0.5,
+                      width: GameConstants.blasterBulletSize.width,
+                      height: GameConstants.blasterBulletSize.height)
     }
 
     func update(dt: TimeInterval) {
@@ -39,7 +42,15 @@ final class BlasterBullet {
         travelledDistance += abs(dx)
         node.position = position
 
-        if travelledDistance >= maximumRange || position.x < -16 || position.x > GameConstants.logicalSize.width + 16 {
+        // P1-3: the cull bounds derive from the player clamp plus one bullet
+        // width, so a shot never disappears while it is still entirely inside
+        // the reachable field (the old logicalSize.width + 16 bound culled at
+        // x>528 while the player can stand to x=544 and 61 maps carry
+        // Collision right of x=512). The screen-transition trigger (x>510 in
+        // GameScene.checkScreenExit) is unchanged.
+        if travelledDistance >= maximumRange
+            || position.x < GameConstants.blasterCullMinimumX
+            || position.x > GameConstants.blasterCullMaximumX {
             isAlive = false
         }
     }

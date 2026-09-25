@@ -8,9 +8,14 @@ final class TMXTileMapRenderer {
     private let map: TMXMapData
     private var sheetTextures: [String: SKTexture] = [:]
 
-    init(map: TMXMapData) {
+    init(map: TMXMapData, surfaceQuery: TMXSurfaceQuery) {
         self.map = map
-        self.collisionRects = TMXTileMapRenderer.buildCollisionRects(map: map)
+        // P1-2/P1-1 (wave B): the renderer no longer owns a private Collision
+        // interpretation. The shared SpriteKit-free surface query (built once
+        // per load by the level runtime) produces the exact same merged
+        // horizontal runs — one tile tall, rows top to bottom, runs left to
+        // right — that spawn and piston anchoring read their ground from.
+        self.collisionRects = surfaceQuery.collisionRects
         node.name = "tmx-map"
         node.zPosition = 0
         renderImageLayers()
@@ -110,41 +115,5 @@ final class TMXTileMapRenderer {
         let texture = SKTexture(rect: rect, in: sheet)
         texture.filteringMode = .nearest
         return texture
-    }
-
-    private static func buildCollisionRects(map: TMXMapData) -> [CGRect] {
-        guard let collision = map.layers.first(where: { $0.name.lowercased() == "collision" }),
-              collision.gids.count == collision.width * collision.height else { return [] }
-
-        // Merge horizontal runs. It keeps collision cheap while still preserving
-        // arbitrary platforms and ledges from TMX maps.
-        var rects: [CGRect] = []
-        for row in 0..<collision.height {
-            var column = 0
-            while column < collision.width {
-                let gid = collision.gids[row * collision.width + column] & 0x1FFF_FFFF
-                if gid == 0 {
-                    column += 1
-                    continue
-                }
-
-                let start = column
-                column += 1
-                while column < collision.width {
-                    let next = collision.gids[row * collision.width + column] & 0x1FFF_FFFF
-                    if next == 0 { break }
-                    column += 1
-                }
-
-                let y = map.pixelHeight - CGFloat((row + 1) * map.tileHeight)
-                rects.append(CGRect(
-                    x: CGFloat(start * map.tileWidth),
-                    y: y,
-                    width: CGFloat((column - start) * map.tileWidth),
-                    height: CGFloat(map.tileHeight)
-                ))
-            }
-        }
-        return rects
     }
 }

@@ -148,8 +148,9 @@ final class Player {
         // Original screen transition happens around x=510.
         // Clamp by the visible 48 px sprite, not by the narrower collider.
         // Otherwise the x=0 TMX spawn can walk a few pixels off the left edge.
-        let visualHalfWidth = GameConstants.playerSpriteSize.width * 0.5
-        position.x = min(max(position.x, visualHalfWidth), GameConstants.logicalSize.width + 32)
+        // The named clamp bounds are what the P1-3 bullet culling bound
+        // derives from, so the two can never drift apart.
+        position.x = min(max(position.x, GameConstants.playerMinimumCenterX), GameConstants.playerMaximumCenterX)
 
         landOnFallbackFloorIfNeeded()
         updateMotionState(isCrouching: input.crouch && isGrounded)
@@ -211,7 +212,7 @@ final class Player {
 
         let box = movementHitbox
         let footY = box.minY
-        let horizontalInset: CGFloat = 3
+        let horizontalInset = GameConstants.footSupportHorizontalInset
         let left = box.minX + horizontalInset
         let right = box.maxX - horizontalInset
 
@@ -295,16 +296,21 @@ final class Player {
         // Reference VitorcEntity: BLASTER_BULLET_OFFSET_X=2,
         // BLASTER_BULLET_OFFSET_Y=30, DUCK_OFFSET=10. Converted from the
         // original top-left entity coordinates to our centre-based SpriteKit
-        // coordinates, including the 16x2 bullet size.
-        let xOffset: CGFloat = facing == .right ? 34 : -34
+        // coordinates, including the 16x2 bullet size. The named muzzle offset
+        // is the same constant the P1-3 cull bounds are derived from, so a
+        // shot can never be born outside its own cull bound (AC-004).
+        let xOffset: CGFloat = facing == .right
+            ? GameConstants.blasterMuzzleOffsetX : -GameConstants.blasterMuzzleOffsetX
         let yOffset: CGFloat = motionState == .crouching ? -9 : 1
         return CGPoint(x: position.x + xOffset, y: position.y + yOffset)
     }
 
     func grenadeOrigin() -> CGPoint {
         // Reference offsets: GRENADE_OFFSET_X=20, GRENADE_OFFSET_Y=12,
-        // DUCK_OFFSET=10. The grenade sheet is 16x16.
-        let xOffset: CGFloat = facing == .right ? 4 : -4
+        // DUCK_OFFSET=10. The grenade sheet is 16x16. The named throw offset
+        // feeds the shared cull-bound derivation like the blaster muzzle.
+        let xOffset: CGFloat = facing == .right
+            ? GameConstants.grenadeThrowOffsetX : -GameConstants.grenadeThrowOffsetX
         let yOffset: CGFloat = motionState == .crouching ? 2 : 12
         return CGPoint(x: position.x + xOffset, y: position.y + yOffset)
     }

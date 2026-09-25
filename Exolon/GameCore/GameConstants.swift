@@ -25,6 +25,49 @@ enum GameConstants {
     static let playerCrouchingMovementSize = CGSize(width: 46, height: 52)
     static let playerStandingDamageSize = CGSize(width: 46, height: 63)
 
+    // Player horizontal clamp bounds (centre of the 48x64 sprite). Player.update
+    // clamps to this range and the bullet culling bound is derived from it, so
+    // no shot can disappear while it is still entirely inside the reachable
+    // field (P1-3). The screen-transition trigger (x > 510) is separate and
+    // unchanged.
+    static let playerMinimumCenterX: CGFloat = playerSpriteSize.width * 0.5
+    static let playerMaximumCenterX: CGFloat = logicalSize.width + 32
+
+    // Horizontal inset Player.refreshGroundSupport applies to the movement box
+    // when it looks for ground support under the feet. The spawn surface query
+    // (TMXSurfaceQuery) uses the same inset, so it is named here once.
+    static let footSupportHorizontalInset: CGFloat = 3
+
+    static let blasterBulletSize = CGSize(width: 16, height: 2)
+    // P1-3/AC-004 (amended): a shot must never be born outside its own cull
+    // bound at any reachable player position, and it must survive past the
+    // whole reachable field. The reachable firing reach is the player clamp
+    // plus the muzzle offset plus one full bullet width; the lower bound
+    // mirrors the muzzle reach plus bullet width around the visible field's
+    // left edge (x = 0). Both cull bounds are therefore DERIVED; nothing here
+    // re-pins the old 528.
+    static let blasterMuzzleOffsetX: CGFloat = 34
+    static let blasterCullMaximumX: CGFloat =
+        playerMaximumCenterX + blasterMuzzleOffsetX + blasterBulletSize.width
+    static let blasterCullMinimumX: CGFloat =
+        -(blasterMuzzleOffsetX + blasterBulletSize.width)
+
+    static let grenadeSize = CGSize(width: 16, height: 16)
+    static let grenadeThrowOffsetX: CGFloat = 4
+    // Same x-bound policy as the blaster (no inline literals survive in
+    // Grenade.swift): firing reach up to the clamp, mirrored reach on the left.
+    static let grenadeCullMaximumX: CGFloat =
+        playerMaximumCenterX + grenadeThrowOffsetX + grenadeSize.width
+    static let grenadeCullMinimumX: CGFloat =
+        -(grenadeThrowOffsetX + grenadeSize.width)
+
+    static let pistonNodeSize = CGSize(width: 48, height: 64)
+    // The piston rises from hiddenY = groundY - travel up to exposedY = groundY,
+    // so the travel equals the node height. The hitbox is the visible core.
+    static let pistonTravel: CGFloat = pistonNodeSize.height
+    static let pistonHitXInset: CGFloat = 3
+    static let pistonHitWidth: CGFloat = 42
+
     // Damage is intentionally lower than the 46x52 movement collider while
     // ducking. The turret bullet travels with its lower edge at ground+50; a
     // 52 px damage box overlaps that trajectory by two pixels and makes ducking

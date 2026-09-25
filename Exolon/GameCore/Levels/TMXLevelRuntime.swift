@@ -10,6 +10,9 @@ final class TMXLevelRuntime {
     let rootNode = SKNode()
     let map: TMXMapData
     let mapRenderer: TMXTileMapRenderer
+    // The single Collision surface query shared by every ground derivation of
+    // this level (spawn, pistons, renderer rects).
+    let surfaceQuery: TMXSurfaceQuery
     let spawnCenter: CGPoint
     let groundY: CGFloat
 
@@ -27,6 +30,13 @@ final class TMXLevelRuntime {
     private(set) var mines: [MineHazard] = []
     private(set) var sourceHazards: [CGRect] = []
     private(set) var forceFields: [ForceFieldBarrier] = []
+    // P1-5: one shared hit-point pool per beam field; `forceFields` holds the
+    // visual sides and delegates hits/lethality to these entities. Gameplay
+    // reads the fields only through their sides — this array is retained as
+    // the owner-visible registry of whole fields (per-level fresh instance,
+    // 25 HP each) for review and future field-level consumers (audit §Q6.7
+    // disposition: intentional, documented).
+    private(set) var beamFields: [BeamFieldModel] = []
     private(set) var stageExitMarkers: [CGRect] = []
     private(set) var changingRooms: [CGRect] = []
     // Changing rooms are pass-through scenery. The original action trigger lives
@@ -59,14 +69,19 @@ final class TMXLevelRuntime {
             fatalError("Unable to load TMX map \(name): \(error)")
         }
 
-        let renderer = TMXTileMapRenderer(map: loadedMap)
+        // Build the shared surface query exactly once per load and hand it to
+        // every consumer (renderer rects, spawn resolver, piston anchors) —
+        // the Collision layer is parsed a single time.
+        let query = loadedMap.surfaceQuery
+        let renderer = TMXTileMapRenderer(map: loadedMap, surfaceQuery: query)
 
-        let playerBottom: CGPoint
-        if let playerObject = loadedMap.object(named: "vitorc") {
-            playerBottom = loadedMap.worldBottomLeft(for: playerObject)
-        } else {
-            playerBottom = CGPoint(x: 0, y: GameConstants.defaultGroundY)
-        }
+        // P1-2 (bounded as amended after the 2026-09-24 audit): the vitorc
+        // marker line sits 0/+16/−16 px off the Collision surface across the
+        // corpus (37/59/29). The feet re-anchor to the nearest surface inside
+        // that one-tile window only; markers with no surface in the window
+        // stay UNMOVED and are enumerated in the change evidence, so no spawn
+        // ever moves more than one tile.
+        let playerBottom = loadedMap.resolvedPlayerBottom(using: query)
 
         let resolvedSpawnCenter = CGPoint(
             x: playerBottom.x + GameConstants.playerSpriteSize.width * 0.5,
@@ -75,17 +90,14 @@ final class TMXLevelRuntime {
 
         // The grenade fallback floor must be the lowest traversable surface,
         // not the player's spawn platform. Elevated spawns appear from L01S04.
-        var resolvedGroundY = GameConstants.defaultGroundY
-        if let firstRect = renderer.collisionRects.first {
-            resolvedGroundY = firstRect.maxY
-            for rect in renderer.collisionRects.dropFirst() {
-                resolvedGroundY = min(resolvedGroundY, rect.maxY)
-            }
-        }
+        // Same value the renderer rects used to produce (min rect maxY), now
+        // read from the shared query instead of a second ad-hoc computation.
+        let resolvedGroundY = query.fallbackPlaneY
 
         self.name = name
         self.map = loadedMap
         self.mapRenderer = renderer
+        self.surfaceQuery = query
         self.spawnCenter = resolvedSpawnCenter
         self.groundY = resolvedGroundY
 
@@ -257,6 +269,9 @@ final class TMXLevelRuntime {
 
     private func buildObjectsFromTMX() {
         let objects = map.objectGroups.flatMap { $0.objects }
+        // P1-5: beam sides are collected first so each x-overlapping group of
+        // segments can become one field entity with a single shared 25-hit pool.
+        var beamBoxes: [CGRect] = []
 
         for object in objects {
             let bottom = map.worldBottomLeft(for: object)
@@ -309,7 +324,16 @@ final class TMXLevelRuntime {
                 rootNode.addChild(portal.node)
 
             case "piston":
-                let piston = PistonHazard(leftX: bottom.x, groundY: bottom.y)
+                // P1-1: the piston emerges from the Collision surface directly
+                // under its fully raised tread (query.pistonGroundY), not from
+                // the marker's own tile row — the marker row leaves the world
+                // bottom 64 px below that surface on 40 of 46 pistons and
+                // 48 px below on 3 shaft pistons (only 3 are anchored on the
+                // surface already).
+                let piston = PistonHazard(
+                    leftX: bottom.x,
+                    groundY: surfaceQuery.pistonGroundY(markerX: bottom.x, markerBottomY: bottom.y)
+                )
                 pistons.append(piston)
                 rootNode.addChild(piston.node)
 
@@ -380,9 +404,7 @@ final class TMXLevelRuntime {
                 let bottomY = map.pixelHeight - syTop - 32
                 if source.contains("beam_") {
                     let box = CGRect(x: sx, y: max(0, bottomY - 240), width: 48, height: 272)
-                    let field = ForceFieldBarrier(hitbox: box)
-                    forceFields.append(field)
-                    rootNode.addChild(field.node)
+                    beamBoxes.append(box)
                 } else if source.contains("topdown_electro") {
                     // High-voltage is animated from the action table. The
                     // original update routine does not call KillPlayer; do not
@@ -437,6 +459,35 @@ final class TMXLevelRuntime {
                 // later screens.
                 break
             }
+        }
+
+        // P1-5 (issue #9): the imported `blk_beam_up`/`blk_beam_down` markers
+        // are the two halves of one beam. Boxes with overlapping x intervals
+        // form a single field entity with one shared 25-hit-point pool; both
+        // visual sides stay and the field is destroyed as a unit. The old code
+        // gave every side its own 25-point field, doubling the shots to clear.
+        // Provenance: ORIGINAL_MECHANICS.md:26/:121-127 words ONE field per
+        // source marker (25 hits, 1000 points on destruction). The pair
+        // reading here is ruled by issue #9 ("ожидаемое суммарное поведение —
+        // 25") plus the corpus data (10/10 maps carry exactly one up+down pair
+        // in adjacent columns whose 48-px boxes overlap by 32 px — one beam
+        // slit); it also restores the documented single 1000-point award per
+        // destroyed beam, where the old per-side model paid up to 2000.
+        for group in TMXBeamGrouping.groups(for: beamBoxes) {
+            let field = BeamFieldModel()
+            var sides: [ForceFieldBarrier] = []
+            for index in group {
+                let side = ForceFieldBarrier(hitbox: beamBoxes[index], field: field)
+                // Weak capture: the field owns the handler list; a strong
+                // handler reference would close a field ↔ side retain cycle.
+                field.onDestroyed { [weak side] in side?.coverDestroyed() }
+                sides.append(side)
+            }
+            for side in sides {
+                forceFields.append(side)
+                rootNode.addChild(side.node)
+            }
+            beamFields.append(field)
         }
 
         // L01S01's reference artwork contains the gate directly under the ship.

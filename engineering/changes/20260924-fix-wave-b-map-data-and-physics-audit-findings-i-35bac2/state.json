@@ -1,0 +1,29 @@
+{
+  "change_id": "20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2",
+  "created_at": "2026-09-24T19:41:55+00:00",
+  "history": [
+    {
+      "at": "2026-09-24T19:41:55+00:00",
+      "from": null,
+      "reason": "created",
+      "to": "draft"
+    },
+    {
+      "at": "2026-09-24T19:45:45+00:00",
+      "from": "draft",
+      "reason": "rulings 1-5 and typed AC/INV/FORBID recorded",
+      "to": "scoped"
+    },
+    {
+      "at": "2026-09-24T19:45:45+00:00",
+      "from": "scoped",
+      "reason": "route human_gates empty; medium-free green bugfix",
+      "to": "approved"
+    }
+  ],
+  "route_id": "35bac25f12ae",
+  "schema_version": 1,
+  "status": "approved",
+  "title": "Fix wave-B map-data and physics audit findings in the Exolon game: P1-2 (player spawn does not match the Collision surface: 59 of 125 maps spawn 16px above and 29 below the ground), P1-3 (bullets are culled at x>528 while the player can move to x=544 and 61 maps have Collision right of x=512), P1-5 (beam_up/beam_down pairs create two 25-hit-point fields instead of one shared 25-hit model), P1-1 (46 pistons on 27 maps use the wrong height anchor and frequently cannot damage the player). Ground every fix in the TMX Collision data; self-checking verifiers per finding with contradictory controls.",
+  "updated_at": "2026-09-24T19:45:45+00:00"
+}

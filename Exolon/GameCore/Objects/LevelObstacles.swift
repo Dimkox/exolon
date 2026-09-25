@@ -326,23 +326,24 @@ final class PistonHazard {
 
     init(leftX: CGFloat, groundY: CGFloat) {
         self.groundY = groundY
-        hiddenY = groundY - 64
+        hiddenY = groundY - GameConstants.pistonTravel
         exposedY = groundY
         waitDuration = TimeInterval(Int.random(in: 60...300)) / 60.0
 
         let texture = SKTexture(imageNamed: "piston")
         texture.filteringMode = .nearest
-        node = SKSpriteNode(texture: texture, size: CGSize(width: 48, height: 64))
+        node = SKSpriteNode(texture: texture, size: GameConstants.pistonNodeSize)
         node.anchorPoint = CGPoint(x: 0, y: 0)
         node.position = CGPoint(x: leftX, y: hiddenY)
         node.zPosition = 10
     }
 
     var hitbox: CGRect {
-        let top = node.position.y + 64
+        let top = node.position.y + GameConstants.pistonNodeSize.height
         let visibleHeight = max(0, top - groundY)
         guard visibleHeight > 0 else { return .zero }
-        return CGRect(x: node.position.x + 3, y: groundY, width: 42, height: visibleHeight)
+        return CGRect(x: node.position.x + GameConstants.pistonHitXInset, y: groundY,
+                      width: GameConstants.pistonHitWidth, height: visibleHeight)
     }
 
     func fixedUpdate(dt: TimeInterval) {
@@ -775,33 +776,36 @@ final class MineHazard {
 
 // MARK: - Original electric force field
 
+/// One visual side of a beam field. P1-5 (issue #9): the up/down pair shares
+/// a single 25-hit-point pool owned by `BeamFieldModel` — a side no longer
+/// counts hits on its own, so clearing the whole beam takes 25 shots total
+/// and the field is destroyed as a unit (`coverDestroyed` runs for every
+/// side through the field's `onDestroy` callback).
 final class ForceFieldBarrier {
     let hitbox: CGRect
     let node: SKShapeNode
-    private(set) var isActive = true
-    private var hitPoints = 25
+    let field: BeamFieldModel
 
-    init(hitbox: CGRect) {
+    init(hitbox: CGRect, field: BeamFieldModel) {
         self.hitbox = hitbox
+        self.field = field
         node = SKShapeNode(rect: hitbox)
         node.fillColor = .clear
         node.strokeColor = .clear
         node.zPosition = 6
     }
 
+    var isActive: Bool { field.isActive }
+
+    /// Returns true exactly once, on the hit that empties the shared pool.
     @discardableResult
-    func hitByBlaster() -> Bool {
-        guard isActive else { return false }
-        hitPoints -= 1
-        if hitPoints <= 0 {
-            isActive = false
-            // The imported beam is part of the tile layer. Cover its former
-            // area when destroyed so the visual state follows gameplay.
-            node.fillColor = .black
-            node.strokeColor = .black
-            return true
-        }
-        return false
+    func hitByBlaster() -> Bool { field.registerHit() }
+
+    func coverDestroyed() {
+        // The imported beam is part of the tile layer. Cover its former
+        // area when destroyed so the visual state follows gameplay.
+        node.fillColor = .black
+        node.strokeColor = .black
     }
 }
 

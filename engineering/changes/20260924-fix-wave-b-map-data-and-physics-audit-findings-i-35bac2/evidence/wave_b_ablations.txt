@@ -1,0 +1,573 @@
+## Wave B контрольные прогоны (RED→GREEN батарея; генератор — человек+meter, 2026-09-24)
+## 14 мутационных прогонов: A1–A8, B1–B4, M12, M13 (+ baseline/FINAL green прогоны)
+### baseline GREEN
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+PASS spawn_ground_all_maps
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+PASS beam_shared_hp_all_maps
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+PASS bullet_cull_bounds
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+PASS controls_flip
+  added-lines: 237 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+PASS no_magic_offsets
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96, rects идентичны на 125/125, worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: True)
+elapsed=2.8s (бюджет 60s: ok)
+RESULT: ALL_WAVE_B_CHECKS_MATCH_SPEC
+RESULT: ALL_WAVE_B_CHECKS_MATCH_SPEC
+### A1 cull->old formula
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+PASS spawn_ground_all_maps
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+PASS beam_shared_hp_all_maps
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+FAIL bullet_cull_bounds
+       - 528-стиль CULL найден в BlasterBullet.swift: || position.x > GameConstants.logicalSize.width + 16 {
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+PASS controls_flip
+  added-lines: 237 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+FAIL no_magic_offsets
+       - FORBID-001 bullet.update: литерал 16 в коде: ['16']
+       - FORBID-001 added Exolon/GameCore/Weapons/BlasterBullet.swift: ±16 смещение: || position.x > GameConstants.logicalSize.width + 16 {
+       - BlasterBullet всё ещё режет x>528 по формуле
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96, rects идентичны на 125/125, worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: True)
+elapsed=2.8s (бюджет 60s: ok)
+RESULT: MISMATCH
+### A2 piston anchor->marker row
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+PASS spawn_ground_all_maps
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+PASS beam_shared_hp_all_maps
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+PASS bullet_cull_bounds
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+PASS controls_flip
+  added-lines: 237 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+PASS no_magic_offsets
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+FAIL single_surface_query
+       - поршни не через общий запрос
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96, rects идентичны на 125/125, worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: True)
+elapsed=2.9s (бюджет 60s: ok)
+RESULT: MISMATCH
+### A3 side-local HP returns
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+PASS spawn_ground_all_maps
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+FAIL beam_shared_hp_all_maps
+       - у ForceFieldBarrier остался собственный hitPoints
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+PASS bullet_cull_bounds
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+PASS controls_flip
+  added-lines: 238 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+PASS no_magic_offsets
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96, rects идентичны на 125/125, worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: True)
+elapsed=2.8s (бюджет 60s: ok)
+RESULT: MISMATCH
+### A4 resolver->REJECTED unbounded
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+FAIL spawn_ground_all_maps
+       - harness разошёлся с зеркалом на картах ['L01S17.tmx', 'L02S24.tmx', 'L03S06.tmx', 'L04S09.tmx', 'L04S19.tmx']
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+PASS beam_shared_hp_all_maps
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+PASS bullet_cull_bounds
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+FAIL controls_flip
+       - вывод живого harness не совпал с закоммиченным артефактом
+  added-lines: 237 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+PASS no_magic_offsets
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96, rects идентичны на 125/125, worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: False)
+elapsed=2.8s (бюджет 60s: ok)
+RESULT: MISMATCH
+### B1 preference deleted
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+PASS spawn_ground_all_maps
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+PASS beam_shared_hp_all_maps
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+PASS bullet_cull_bounds
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+FAIL controls_flip
+       - Swift boundedSurfaceY потерял preference-ветку (clear shadows buried)
+  added-lines: 237 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+PASS no_magic_offsets
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96, rects идентичны на 125/125, worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: True)
+elapsed=2.8s (бюджет 60s: ok)
+RESULT: MISMATCH
+### B2 preference as hard filter
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+FAIL spawn_ground_all_maps
+       - harness разошёлся с зеркалом на картах ['L01S11.tmx', 'L01S12.tmx', 'L01S13.tmx', 'L01S20.tmx', 'L01S21.tmx']
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+PASS beam_shared_hp_all_maps
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+PASS bullet_cull_bounds
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+FAIL controls_flip
+       - Swift boundedSurfaceY потерял preference-ветку (clear shadows buried)
+       - вывод живого harness не совпал с закоммиченным артефактом
+  added-lines: 237 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+PASS no_magic_offsets
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96, rects идентичны на 125/125, worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: False)
+elapsed=2.7s (бюджет 60s: ok)
+RESULT: MISMATCH
+### B3 grenade inline 536
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+PASS spawn_ground_all_maps
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+PASS beam_shared_hp_all_maps
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+FAIL bullet_cull_bounds
+       - Grenade.swift не режет по именованным выведенным границам
+       - в Grenade.swift остались inline-литералы по x при cull
+       - 528-стиль CULL найден в Grenade.swift: || position.x > GameConstants.logicalSize.width + 24
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+PASS controls_flip
+  added-lines: 237 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+PASS no_magic_offsets
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96, rects идентичны на 125/125, worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: True)
+elapsed=2.8s (бюджет 60s: ok)
+RESULT: MISMATCH
+### B4 muzzle term removed
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+PASS spawn_ground_all_maps
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+PASS beam_shared_hp_all_maps
+  AC-004: blaster cull -50.0..560.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+FAIL bullet_cull_bounds
+       - выстрел рождается за границей: 560.0 < 578.0
+       - cull 560.0 != 594
+       - blaster cull не выведен из clamp+muzzle+width
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+FAIL controls_flip
+       - вывод живого harness не совпал с закоммиченным артефактом
+  added-lines: 237 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+PASS no_magic_offsets
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96, rects идентичны на 125/125, worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: False)
+elapsed=2.7s (бюджет 60s: ok)
+RESULT: MISMATCH
+### A5 beam tie-break removed
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+PASS spawn_ground_all_maps
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+FAIL beam_shared_hp_all_maps
+       - Swift-сортировка потеряла index tie-break
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+PASS bullet_cull_bounds
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+PASS controls_flip
+  added-lines: 236 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+PASS no_magic_offsets
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96, rects идентичны на 125/125, worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: True)
+elapsed=2.8s (бюджет 60s: ok)
+RESULT: MISMATCH
+### A6 retain cycle returns
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+PASS spawn_ground_all_maps
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+FAIL beam_shared_hp_all_maps
+       - уничтожение поля не покрывает все стороны слабыми захватами (retain cycle = утечка на уровень)
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+PASS bullet_cull_bounds
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+PASS controls_flip
+  added-lines: 237 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+PASS no_magic_offsets
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96, rects идентичны на 125/125, worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: True)
+elapsed=2.7s (бюджет 60s: ok)
+RESULT: MISMATCH
+### A7 TMX byte touched
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+PASS spawn_ground_all_maps
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+PASS beam_shared_hp_all_maps
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+PASS bullet_cull_bounds
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+PASS controls_flip
+  added-lines: 237 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (124/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+FAIL no_magic_offsets
+       - TMX изменён/отсутствует vs base commit: L01S01.tmx
+       - не все TMX совпали base-коммиту
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96, rects идентичны на 125/125, worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: True)
+elapsed=2.9s (бюджет 60s: ok)
+RESULT: MISMATCH
+### A8 per-map added line
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+PASS spawn_ground_all_maps
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+PASS beam_shared_hp_all_maps
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+PASS bullet_cull_bounds
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+PASS controls_flip
+  added-lines: 238 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+FAIL no_magic_offsets
+       - FORBID-001 added Exolon/GameCore/Levels/TMXLevelRuntime.swift: per-map имя: let _probeL02S03 = !beamBoxes.isEmpty
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96, rects идентичны на 125/125, worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: True)
+elapsed=2.8s (бюджет 60s: ok)
+RESULT: MISMATCH
+### FINAL restore GREEN
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+PASS spawn_ground_all_maps
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+PASS beam_shared_hp_all_maps
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+PASS bullet_cull_bounds
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+PASS controls_flip
+  added-lines: 237 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+PASS no_magic_offsets
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96, rects идентичны на 125/125, worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: True)
+elapsed=2.8s (бюджет 60s: ok)
+RESULT: ALL_WAVE_B_CHECKS_MATCH_SPEC
+
+### R1-1 battery (post-review): three-way rect check mutation controls — runs below
+### M12 product collisionRects y := run.top + 7.5 (reviewer's case)
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+PASS spawn_ground_all_maps
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+PASS beam_shared_hp_all_maps
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+PASS bullet_cull_bounds
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+FAIL controls_flip
+       - victim L01S03.tmx: чистое сравнение уже разошлось — контроль бессмысленнен
+       - вывод живого harness не совпал с закоммиченным артефактом
+  added-lines: 237 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+PASS no_magic_offsets
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96; rects base-порт==new-порт==исполненный на 0/125 (всего 0 rect'ов), worldBottomLeft-ветки на месте
+FAIL pinned_geometry_unchanged
+       - L01S01.tmx: rect-геометрия рассинхронизирована (base=1 new=1 exec=1/1)
+       - L01S02.tmx: rect-геометрия рассинхронизирована (base=1 new=1 exec=1/1)
+       - L01S03.tmx: rect-геометрия рассинхронизирована (base=8 new=8 exec=8/8)
+       - L01S04.tmx: rect-геометрия рассинхронизирована (base=3 new=3 exec=3/3)
+       - L01S05.tmx: rect-геометрия рассинхронизирована (base=1 new=1 exec=1/1)
+       - L01S06.tmx: rect-геометрия рассинхронизирована (base=4 new=4 exec=4/4)
+       - L01S07.tmx: rect-геометрия рассинхронизирована (base=5 new=5 exec=5/5)
+       - L01S08.tmx: rect-геометрия рассинхронизирована (base=7 new=7 exec=7/7)
+       - L01S09.tmx: rect-геометрия рассинхронизирована (base=6 new=6 exec=6/6)
+       - L01S10.tmx: rect-геометрия рассинхронизирована (base=9 new=9 exec=9/9)
+       - L01S11.tmx: rect-геометрия рассинхронизирована (base=11 new=11 exec=11/11)
+       - L01S12.tmx: rect-геометрия рассинхронизирована (base=15 new=15 exec=15/15)
+       - L01S13.tmx: rect-геометрия рассинхронизирована (base=10 new=10 exec=10/10)
+       - L01S14.tmx: rect-геометрия рассинхронизирована (base=8 new=8 exec=8/8)
+       - L01S15.tmx: rect-геометрия рассинхронизирована (base=14 new=14 exec=14/14)
+       - L01S16.tmx: rect-геометрия рассинхронизирована (base=11 new=11 exec=11/11)
+       - L01S17.tmx: rect-геометрия рассинхронизирована (base=1 new=1 exec=1/1)
+       - L01S18.tmx: rect-геометрия рассинхронизирована (base=4 new=4 exec=4/4)
+       - L01S19.tmx: rect-геометрия рассинхронизирована (base=14 new=14 exec=14/14)
+       - L01S20.tmx: rect-геометрия рассинхронизирована (base=20 new=20 exec=20/20)
+       - L01S21.tmx: rect-геометрия рассинхронизирована (base=18 new=18 exec=18/18)
+       - L01S22.tmx: rect-геометрия рассинхронизирована (base=12 new=12 exec=12/12)
+       - L01S23.tmx: rect-геометрия рассинхронизирована (base=11 new=11 exec=11/11)
+       - L01S24.tmx: rect-геометрия рассинхронизирована (base=12 new=12 exec=12/12)
+       - L01S25.tmx: rect-геометрия рассинхронизирована (base=1 new=1 exec=1/1)
+       - L02S01.tmx: rect-геометрия рассинхронизирована (base=35 new=35 exec=35/35)
+       - L02S02.tmx: rect-геометрия рассинхронизирована (base=19 new=19 exec=19/19)
+       - L02S03.tmx: rect-геометрия рассинхронизирована (base=6 new=6 exec=6/6)
+       - L02S04.tmx: rect-геометрия рассинхронизирована (base=3 new=3 exec=3/3)
+       - L02S05.tmx: rect-геометрия рассинхронизирована (base=22 new=22 exec=22/22)
+       - L02S06.tmx: rect-геометрия рассинхронизирована (base=9 new=9 exec=9/9)
+       - L02S07.tmx: rect-геометрия рассинхронизирована (base=2 new=2 exec=2/2)
+       - L02S08.tmx: rect-геометрия рассинхронизирована (base=15 new=15 exec=15/15)
+       - L02S09.tmx: rect-геометрия рассинхронизирована (base=19 new=19 exec=19/19)
+       - L02S10.tmx: rect-геометрия рассинхронизирована (base=26 new=26 exec=26/26)
+       - L02S11.tmx: rect-геометрия рассинхронизирована (base=9 new=9 exec=9/9)
+       - L02S12.tmx: rect-геометрия рассинхронизирована (base=4 new=4 exec=4/4)
+       - L02S13.tmx: rect-геометрия рассинхронизирована (base=14 new=14 exec=14/14)
+       - L02S14.tmx: rect-геометрия рассинхронизирована (base=8 new=8 exec=8/8)
+       - L02S15.tmx: rect-геометрия рассинхронизирована (base=10 new=10 exec=10/10)
+       - L02S16.tmx: rect-геометрия рассинхронизирована (base=1 new=1 exec=1/1)
+       - L02S17.tmx: rect-геометрия рассинхронизирована (base=8 new=8 exec=8/8)
+       - L02S18.tmx: rect-геометрия рассинхронизирована (base=9 new=9 exec=9/9)
+       - L02S19.tmx: rect-геометрия рассинхронизирована (base=9 new=9 exec=9/9)
+       - L02S20.tmx: rect-геометрия рассинхронизирована (base=1 new=1 exec=1/1)
+       - L02S21.tmx: rect-геометрия рассинхронизирована (base=25 new=25 exec=25/25)
+       - L02S22.tmx: rect-геометрия рассинхронизирована (base=28 new=28 exec=28/28)
+       - L02S23.tmx: rect-геометрия рассинхронизирована (base=13 new=13 exec=13/13)
+       - L02S24.tmx: rect-геометрия рассинхронизирована (base=16 new=16 exec=16/16)
+       - L02S25.tmx: rect-геометрия рассинхронизирована (base=13 new=13 exec=13/13)
+       - L03S01.tmx: rect-геометрия рассинхронизирована (base=6 new=6 exec=6/6)
+       - L03S02.tmx: rect-геометрия рассинхронизирована (base=4 new=4 exec=4/4)
+       - L03S03.tmx: rect-геометрия рассинхронизирована (base=13 new=13 exec=13/13)
+       - L03S04.tmx: rect-геометрия рассинхронизирована (base=33 new=33 exec=33/33)
+       - L03S05.tmx: rect-геометрия рассинхронизирована (base=16 new=16 exec=16/16)
+       - L03S06.tmx: rect-геометрия рассинхронизирована (base=4 new=4 exec=4/4)
+       - L03S07.tmx: rect-геометрия рассинхронизирована (base=12 new=12 exec=12/12)
+       - L03S08.tmx: rect-геометрия рассинхронизирована (base=22 new=22 exec=22/22)
+       - L03S09.tmx: rect-геометрия рассинхронизирована (base=2 new=2 exec=2/2)
+       - L03S10.tmx: rect-геометрия рассинхронизирована (base=17 new=17 exec=17/17)
+       - L03S11.tmx: rect-геометрия рассинхронизирована (base=9 new=9 exec=9/9)
+       - L03S12.tmx: rect-геометрия рассинхронизирована (base=16 new=16 exec=16/16)
+       - L03S13.tmx: rect-геометрия рассинхронизирована (base=13 new=13 exec=13/13)
+       - L03S14.tmx: rect-геометрия рассинхронизирована (base=11 new=11 exec=11/11)
+       - L03S15.tmx: rect-геометрия рассинхронизирована (base=12 new=12 exec=12/12)
+       - L03S16.tmx: rect-геометрия рассинхронизирована (base=13 new=13 exec=13/13)
+       - L03S17.tmx: rect-геометрия рассинхронизирована (base=29 new=29 exec=29/29)
+       - L03S18.tmx: rect-геометрия рассинхронизирована (base=35 new=35 exec=35/35)
+       - L03S19.tmx: rect-геометрия рассинхронизирована (base=21 new=21 exec=21/21)
+       - L03S20.tmx: rect-геометрия рассинхронизирована (base=22 new=22 exec=22/22)
+       - L03S21.tmx: rect-геометрия рассинхронизирована (base=27 new=27 exec=27/27)
+       - L03S22.tmx: rect-геометрия рассинхронизирована (base=16 new=16 exec=16/16)
+       - L03S23.tmx: rect-геометрия рассинхронизирована (base=8 new=8 exec=8/8)
+       - L03S24.tmx: rect-геометрия рассинхронизирована (base=9 new=9 exec=9/9)
+       - L03S25.tmx: rect-геометрия рассинхронизирована (base=1 new=1 exec=1/1)
+       - L04S01.tmx: rect-геометрия рассинхронизирована (base=10 new=10 exec=10/10)
+       - L04S02.tmx: rect-геометрия рассинхронизирована (base=20 new=20 exec=20/20)
+       - L04S03.tmx: rect-геометрия рассинхронизирована (base=5 new=5 exec=5/5)
+       - L04S04.tmx: rect-геометрия рассинхронизирована (base=28 new=28 exec=28/28)
+       - L04S05.tmx: rect-геометрия рассинхронизирована (base=11 new=11 exec=11/11)
+       - L04S06.tmx: rect-геометрия рассинхронизирована (base=9 new=9 exec=9/9)
+       - L04S07.tmx: rect-геометрия рассинхронизирована (base=11 new=11 exec=11/11)
+       - L04S08.tmx: rect-геометрия рассинхронизирована (base=12 new=12 exec=12/12)
+       - L04S09.tmx: rect-геометрия рассинхронизирована (base=1 new=1 exec=1/1)
+       - L04S10.tmx: rect-геометрия рассинхронизирована (base=4 new=4 exec=4/4)
+       - L04S11.tmx: rect-геометрия рассинхронизирована (base=2 new=2 exec=2/2)
+       - L04S12.tmx: rect-геометрия рассинхронизирована (base=16 new=16 exec=16/16)
+       - L04S13.tmx: rect-геометрия рассинхронизирована (base=16 new=16 exec=16/16)
+       - L04S14.tmx: rect-геометрия рассинхронизирована (base=14 new=14 exec=14/14)
+       - L04S15.tmx: rect-геометрия рассинхронизирована (base=4 new=4 exec=4/4)
+       - L04S16.tmx: rect-геометрия рассинхронизирована (base=27 new=27 exec=27/27)
+       - L04S17.tmx: rect-геометрия рассинхронизирована (base=14 new=14 exec=14/14)
+       - L04S18.tmx: rect-геометрия рассинхронизирована (base=13 new=13 exec=13/13)
+       - L04S19.tmx: rect-геометрия рассинхронизирована (base=4 new=4 exec=4/4)
+       - L04S20.tmx: rect-геометрия рассинхронизирована (base=5 new=5 exec=5/5)
+       - L04S21.tmx: rect-геометрия рассинхронизирована (base=5 new=5 exec=5/5)
+       - L04S22.tmx: rect-геометрия рассинхронизирована (base=5 new=5 exec=5/5)
+       - L04S23.tmx: rect-геометрия рассинхронизирована (base=13 new=13 exec=13/13)
+       - L04S24.tmx: rect-геометрия рассинхронизирована (base=4 new=4 exec=4/4)
+       - L04S25.tmx: rect-геометрия рассинхронизирована (base=1 new=1 exec=1/1)
+       - L05S01.tmx: rect-геометрия рассинхронизирована (base=4 new=4 exec=4/4)
+       - L05S02.tmx: rect-геометрия рассинхронизирована (base=7 new=7 exec=7/7)
+       - L05S03.tmx: rect-геометрия рассинхронизирована (base=6 new=6 exec=6/6)
+       - L05S04.tmx: rect-геометрия рассинхронизирована (base=3 new=3 exec=3/3)
+       - L05S05.tmx: rect-геометрия рассинхронизирована (base=22 new=22 exec=22/22)
+       - L05S06.tmx: rect-геометрия рассинхронизирована (base=9 new=9 exec=9/9)
+       - L05S07.tmx: rect-геометрия рассинхронизирована (base=2 new=2 exec=2/2)
+       - L05S08.tmx: rect-геометрия рассинхронизирована (base=15 new=15 exec=15/15)
+       - L05S09.tmx: rect-геометрия рассинхронизирована (base=19 new=19 exec=19/19)
+       - L05S10.tmx: rect-геометрия рассинхронизирована (base=26 new=26 exec=26/26)
+       - L05S11.tmx: rect-геометрия рассинхронизирована (base=9 new=9 exec=9/9)
+       - L05S12.tmx: rect-геометрия рассинхронизирована (base=4 new=4 exec=4/4)
+       - L05S13.tmx: rect-геометрия рассинхронизирована (base=14 new=14 exec=14/14)
+       - L05S14.tmx: rect-геометрия рассинхронизирована (base=8 new=8 exec=8/8)
+       - L05S15.tmx: rect-геометрия рассинхронизирована (base=10 new=10 exec=10/10)
+       - L05S16.tmx: rect-геометрия рассинхронизирована (base=1 new=1 exec=1/1)
+       - L05S17.tmx: rect-геометрия рассинхронизирована (base=8 new=8 exec=8/8)
+       - L05S18.tmx: rect-геометрия рассинхронизирована (base=9 new=9 exec=9/9)
+       - L05S19.tmx: rect-геометрия рассинхронизирована (base=9 new=9 exec=9/9)
+       - L05S20.tmx: rect-геометрия рассинхронизирована (base=1 new=1 exec=1/1)
+       - L05S21.tmx: rect-геометрия рассинхронизирована (base=25 new=25 exec=25/25)
+       - L05S22.tmx: rect-геометрия рассинхронизирована (base=28 new=28 exec=28/28)
+       - L05S23.tmx: rect-геометрия рассинхронизирована (base=13 new=13 exec=13/13)
+       - L05S24.tmx: rect-геометрия рассинхронизирована (base=16 new=16 exec=16/16)
+       - L05S25.tmx: rect-геометрия рассинхронизирована (base=13 new=13 exec=13/13)
+       - rects совпали не на всех картах: 0
+       - суммарный rect-объём 0 != 1437
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: False)
+elapsed=2.9s (бюджет 60s: ok)
+RESULT: MISMATCH
+   rc=1
+### (M12 restored)
+### M13 spawn halfWindow doubled (2 tiles)
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+FAIL spawn_ground_all_maps
+       - harness разошёлся с зеркалом на картах ['L01S12.tmx', 'L01S13.tmx', 'L01S20.tmx', 'L01S22.tmx', 'L01S23.tmx']
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+PASS beam_shared_hp_all_maps
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+PASS bullet_cull_bounds
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+FAIL controls_flip
+       - вывод живого harness не совпал с закоммиченным артефактом
+  added-lines: 237 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+PASS no_magic_offsets
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96; rects base-порт==new-порт==исполненный на 125/125 (всего 1437 rect'ов), worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: False)
+elapsed=2.8s (бюджет 60s: ok)
+RESULT: MISMATCH
+   rc=1
+### (M13 restored)
+### FINAL GREEN baseline
+  zones: 125 файлов = 000..124, zoneNumber у 117/125, все формуле равны; мутация +1 ловится на 117
+PASS zone_index_formula
+  AC-001 disclosure: runtime потребляет resolved spawn Y только на stage-start входах/смертях (carried-Y, GameScene.swift:638-646) — ~5-6 zone entries за проход; обычные переходы несут y предыдущей зоны.
+  AC-001 (bounded+preference): matched 119/125 delta 0 (clear 71 / dirty-nearest 48), kept 6 (L01S17, L02S24, L03S06, L04S09, L04S19, L05S24 — нет поверхности в окне ±16px); buried: base 61 -> after 48; hist vs marker: {'-16': 1, '0': 41, '16': 83}; старый контроль: {'0': 37, '16': 59, '-16': 29}
+PASS spawn_ground_all_maps
+  AC-002: летальных новым 46/46, старым (контроль) 6/46, сдвинуто якорей 43, plane-fallback 3
+PASS piston_anchor_all_pistons
+  AC-003: полей 10 (пары), HP/поле 25, сумма 250; старая по-сторонняя модель (контроль): 500
+PASS beam_shared_hp_all_maps
+  AC-004: blaster cull -50.0..594.0 (clamp 544.0 + muzzle 34 + width 16.0); grenade -20.0..564.0; рождение в границах ≤578.0/≤548.0; контроли: old 528<594, old grenade 536<548; правый край данных 560
+PASS bullet_cull_bounds
+  AC-005: controls flip: spawn(old nonzero 88, unbounded-rejected 91/50, preference-fixture 80!=64), pistons(old lethal 6/46), beam(old 500 != 250), cull(old 528<594, grenade 536<548), broken-TMX падает, harness-контроли на месте
+PASS controls_flip
+  added-lines: 237 стронок кода в 8 изменённых продуктовых файлах
+  FORBID-001: TMX байт-в-байт base-коммита (125/125), в 10 новых швах нет ±16/528/544/560 и per-map имён
+PASS no_magic_offsets
+  FORBID-002: единственное определение поверхности — TMXSurfaceQuery; потребители: spawn, piston, renderer-прямоугольники, fallback-пол
+PASS single_surface_query
+  INV-002: 512x384, x>510 (1 место), clamp 24..544, defaultGroundY 96; rects base-порт==new-порт==исполненный на 125/125 (всего 1437 rect'ов), worldBottomLeft-ветки на месте
+PASS pinned_geometry_unchanged
+delta-таблицы: engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_deltas.md | артефакт Swift: живой (совпал: True)
+elapsed=2.8s (бюджет 60s: ok)
+RESULT: ALL_WAVE_B_CHECKS_MATCH_SPEC
+   rc=0
