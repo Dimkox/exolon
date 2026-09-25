@@ -52,6 +52,28 @@ WAVE_SCAN = TOOLS / 'wave_scan.py'
 SWIFTC = os.environ.get('SWIFTC', '/opt/swift/usr/bin/swiftc')
 # The change root of the A-D chain: every accumulated delta is policed from here down.
 ROOT_BASE = '295690b'
+# The route base of THIS change (route.json base_commit). Every control that needs the PRE-edit
+# bytes of a merged tool reads them from here, never from HEAD: once the wave is committed,
+# `git checkout -- <path>` restores the edited file and the control compares the tree with itself
+# (review-code R3 / review-test M2, and decisions.md 2026-09-24 said this already).
+CHANGE_BASE_FALLBACK = '0b0dea97997aa675dd6216284bda2d3476e10bbc'
+
+
+def _route_base() -> str:
+    try:
+        doc = json.loads((PKG / 'route.json').read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return CHANGE_BASE_FALLBACK
+    value = str(doc.get('base_commit') or '').strip()
+    return value if re.fullmatch(r'[0-9a-f]{7,40}', value) else CHANGE_BASE_FALLBACK
+
+
+CHANGE_BASE = _route_base()
+CHANGE_BASE_SHORT = CHANGE_BASE[:7]
+# The freeze artifacts that certify a specific head (evidence/freeze.sh writes all three in one
+# pass, so a run whose head differs from them is a stale certification - M3).
+FREEZE_ARTIFACTS = ('wave-scan-end-to-end.txt', 'wave-e1-check-green.txt', 'wave-e1-check.json',
+                    'ruff-new-tools.txt', 'grok-verify-pr.txt')
 DIAG_LOG = ROOT / 'Exolon' / 'GameCore' / 'Diagnostics' / 'GameplayEventLog.swift'
 
 CHANGES = ROOT / 'engineering' / 'changes'
@@ -154,8 +176,15 @@ def ensure_work() -> Path:
     return WORK
 
 
-def clone_tree(name: str, pin_origin: bool = True) -> Path:
-    """Fresh ``git clone --no-hardlinks`` tree carrying the real HEAD plus this change's edits.
+def clone_tree(name: str, topology: str = 'real') -> Path:
+    """``topology``: ``real`` mirrors this repository's refs (origin/main = the route base, i.e.
+    the OPEN-PR state every review and merge gate observes); ``post-merge`` pins origin/main to HEAD
+    (the state after the PR lands); ``no-origin`` deletes the remote-tracking ref (the bare-clone
+    hazard AC-006 exists for).
+
+    The first implementation pinned ``origin/main := HEAD`` in every clone, so each clone control ran
+    in a post-merge topology the real run never sees (review-test M1).
+    A fresh ``git clone --no-hardlinks`` tree carrying the real HEAD plus this change's edits.
 
     A clone (never ``cp -a`` of this linked worktree) because ``cp -a`` copies the ``.git``
     *pointer* file, so every ref-writing command in the copy would hit the shared repository.
@@ -172,9 +201,20 @@ def clone_tree(name: str, pin_origin: bool = True) -> Path:
     if git('rev-parse', 'HEAD', cwd=dst).strip() != head_sha():
         raise CheckFailure(f'clone {name} HEAD is not the real HEAD')
     copy_working_changes(dst)
-    if pin_origin:
+    if topology == 'real':
+        pin_origin_main(dst, real_origin_main())
+    elif topology == 'post-merge':
         pin_origin_main(dst, head_sha())
+    elif topology == 'no-origin':
+        drop_origin(dst)
+    else:
+        raise CheckFailure(f'unknown clone topology {topology!r}')
     return dst
+
+
+def real_origin_main() -> str:
+    """The real repository's origin/main, so a clone control sees the same merge-base."""
+    return git('rev-parse', 'refs/remotes/origin/main').strip()
 
 
 def copy_working_changes(dst: Path) -> None:
@@ -205,6 +245,11 @@ def pin_origin_main(clone: Path, sha: str) -> None:
     git('update-ref', 'refs/remotes/origin/main', sha, cwd=clone)
 
 
+def git_show_base(path: Path) -> str:
+    """Bytes of ``path`` at the route base commit - the pre-edit side of every control."""
+    return git('show', f'{CHANGE_BASE}:{rel(path)}')
+
+
 def drop_origin(clone: Path) -> None:
     git('update-ref', '-d', 'refs/remotes/origin/main', cwd=clone, check=False)
     proc = run(['git', 'show-ref', '--verify', 'refs/remotes/origin/main'], cwd=clone, timeout=60)
@@ -230,13 +275,15 @@ def require(condition, message) -> None:
         raise CheckFailure(message)
 
 
-def wave_scan(root: Path, only: str = 'parse,attribution,meters', timeout=900, meters=None):
-    """Run the tool under review and require parsable JSON out of it - never a text grep."""
+def wave_scan(root: Path, only: str = 'parse,attribution,meters', timeout=900, meters=None,
+              base: str | None = None) -> dict:
     if not WAVE_SCAN.is_file():
         raise CheckFailure(f'{rel(WAVE_SCAN)} is missing')
     if not Path(SWIFTC).is_file():
         raise CheckFailure(f'swiftc is absent at {SWIFTC}; the parse contour cannot be proven')
     argv = [sys.executable, str(WAVE_SCAN), '--root', root, '--only', only, '--json']
+    if base:
+        argv += ['--base', base]
     for meter in (meters or []):
         argv += ['--meter', meter]
     proc = run(argv, timeout=timeout)
@@ -285,9 +332,11 @@ def count_verdicts(tag: str, stdout: str) -> tuple:
     if tag == 'B':
         passed = sum(1 for line in lines if re.match(r'^(PASS|OK) ', line))
         failed = sum(1 for line in lines if re.match(r'^(FAIL|MISMATCH) ', line))
-        marker = 'ALL_WAVE_B_CHECKS_MATCH_SPEC' if 'ALL_WAVE_B_CHECKS_MATCH_SPEC' in stdout \
-            else 'MISMATCH'
-        return passed, failed, marker
+        markers = [line for line in lines if line.startswith('RESULT:')]
+        if not markers:
+            raise CheckFailure('wave B meter printed no RESULT marker (a fail-closed exit prints '
+                               'none - it must never be reported as a success line)')
+        return passed, failed, markers[-1]
     if tag == 'C':
         m = [re.search(r'RESULT: (\S+) \| probes=(\d+) failed=(\d+)', line) for line in lines]
         m = [x for x in m if x]
@@ -445,8 +494,7 @@ def attribution_scan_flips() -> str:
                            f'{att["violation_details"][:2]}')
     buckets = att['buckets']
     if len(buckets) < 4:
-        raise CheckFailure(f'{len(buckets)} attribution buckets, expected one '
-                           'per merged wave')
+        raise CheckFailure(f'{len(buckets)} attribution buckets, expected one per merged wave')
     merged = [b for b in buckets if b['merge_subject'].startswith('Merge pull request')]
     zero = [b['name'] for b in merged if int(b['code_lines']) <= 0]
     if zero:
@@ -459,21 +507,49 @@ def attribution_scan_flips() -> str:
     mine = union_added_code_lines(ROOT, doc['base'])
     if mine != int(att['code_lines']):
         raise CheckFailure(f'wave_scan scanned {att["code_lines"]} added code lines, my own '
-                           f'recount of the same diff is {mine}')
+                           f'recount of the same delta (untracked included) is {mine}')
     allow = att.get('constant_allow_list')
     if allow != ['Exolon/GameCore/GameConstants.swift']:
         raise CheckFailure(f'the magic-literal allowance is {allow}, expected exactly the '
                            'single-source constants file')
+    # review-code R11: the allowance must be inert right now, or it is a hole in waiting.
+    strict = int(att.get('strict_violations_without_allow_list', -1))
+    if strict != 0:
+        raise CheckFailure(f'the constants allowance currently hides {strict} violation(s) '
+                           '(strict recount without it) - it stopped being inert')
+    if list(att.get('ignored_swift', [])):
+        raise CheckFailure(f'ignored-but-present Swift under Exolon/ escapes the scan: '
+                           f'{att["ignored_swift"][:3]}')
+    untracked_now = list(att.get('untracked_files', []))
+    # The contour must state what it does not police, and that statement must not be deletable in
+    # silence (review-code R2/R4 ask for exactly this disclosure).
+    disclosed = ' | '.join(att.get('not_policed') or [])
+    for needle in ('string literal', 'Resources', 'syntax-only'):
+        if needle not in disclosed:
+            raise CheckFailure(f'the tool no longer discloses that it does not police {needle!r} '
+                               f'(attribution.not_policed={att.get("not_policed")!r})')
 
-    def plant(name, path, line, expect_pattern, expect_bucket=None, committed=False):
+    UNCOMMITTED = 'uncommitted (working tree + untracked)'
+    BRANCH = next((b['name'] for b in buckets
+                   if b['merge_subject'] == 'branch commits after the last merge'), '')
+    if not BRANCH:
+        raise CheckFailure('no "committed on this branch" bucket to attribute a commit to')
+
+    def plant(name, path, body, expect_pattern, expect_bucket, new_file=False, committed=False):
+        """Every plant must redden AND land in the bucket that introduced it (review-test A4)."""
         clone = clone_tree(name)
         victim = clone / path
-        original = victim.read_text(encoding='utf-8')
-        written(victim, original.rstrip('\n') + '\n' + line + '\n')
+        if new_file:
+            written(victim, body)
+        else:
+            original = victim.read_text(encoding='utf-8')
+            written(victim, original.rstrip('\n') + '\n' + body + '\n')
         if committed:
             git('add', '--', path, cwd=clone)
             git('-c', 'user.name=wave-e1-control', '-c', 'user.email=control@localhost',
                 'commit', '-q', '-m', 'planted violation (AC-002 control)', cwd=clone)
+        elif new_file:
+            written(victim, body)          # stays untracked on purpose (the R2 case)
         out = wave_scan(clone, 'attribution')
         details = out['attribution']['violation_details']
         hit = [d for d in details if expect_pattern in d['pattern'] and path in d['path']]
@@ -481,20 +557,68 @@ def attribution_scan_flips() -> str:
             raise CheckFailure(f'planted {expect_pattern} at {path} did not redden the '
                                f'attribution scan (result={out["result"]}, '
                                f'violations={out["attribution"]["violations"]})')
-        if expect_bucket is not None and hit[0]['bucket'] != expect_bucket:
-            raise CheckFailure(f'planted violation landed in bucket {hit[0]["bucket"]!r}, '
-                               f'expected {expect_bucket!r}')
-        return hit[0]
+        wrong = [d['bucket'] for d in hit if d['bucket'] != expect_bucket]
+        if wrong:
+            raise CheckFailure(f'planted {expect_pattern} at {path} landed in bucket '
+                               f'{wrong[0]!r}, expected {expect_bucket!r} - bucketing must name '
+                               'the wave that added the line')
+        return out['attribution']
 
-    per_map = plant('ac002-per-map', 'Exolon/GameCore/GameScene.swift',
-                    '        if name == "L01S02" { return 48.0 }', 'per-map')
-    delta = plant('ac002-delta16', 'Exolon/GameCore/Objects/LevelObstacles.swift',
-                  '        let probe: CGFloat = marker.x + 16', '±16')
-    boundary = plant('ac002-boundary', 'Exolon/GameCore/Levels/TMXMapLoader.swift',
-                     '        let probe: CGFloat = 544.0', 'граница')
-    committed_hit = plant('ac002-committed', 'Exolon/GameCore/GameScene.swift',
-                          '        if name == "L05S99" { return 1.0 }', 'per-map', committed=True)
+    plant('ac002-per-map', 'Exolon/GameCore/GameScene.swift',
+                    '        if name == "L01S02" { return 48.0 }', 'per-map', UNCOMMITTED)
+    plant('ac002-delta16', 'Exolon/GameCore/Objects/LevelObstacles.swift',
+                  '        let probe: CGFloat = marker.x + 16', '±16', UNCOMMITTED)
+    plant('ac002-boundary', 'Exolon/GameCore/Levels/TMXMapLoader.swift',
+                     '        let probe: CGFloat = 544.0', 'граница', UNCOMMITTED)
+    plant('ac002-committed', 'Exolon/GameCore/GameScene.swift',
+                          '        if name == "L05S99" { return 1.0 }', 'per-map', BRANCH,
+                          committed=True)
 
+    # R2: a brand-new product file that exists only in the working tree - `git diff` cannot see it,
+    # so an attribution contour built from diffs alone was blind here while naming the bucket
+    # "working tree + untracked".
+    untracked_body = '\n'.join([
+        'import Foundation',
+        'enum E1UntrackedProbe {',
+        '    static let bound = 544.0',
+        '    static let step: Int = 100 +  16',
+        '    static let other: Int = 100 + (16)',
+        '    static let map = "L01S02"',
+        '}', ''])
+    untracked_att = plant('ac002-untracked-file', 'Exolon/GameCore/Levels/E1UntrackedProbe.swift',
+                          untracked_body, 'per-map', UNCOMMITTED, new_file=True)
+    seen = {d['pattern'] for d in untracked_att['violation_details']}
+    for want in ('per-map имя', '±16 смещение', 'закреплённая граница вместо вывода из констант'):
+        if want not in seen:
+            raise CheckFailure(f'the untracked new-file plant did not surface {want!r}: {seen}')
+
+    # R5: the syntax variants the merged `[-+] ?\b16\b` predicate missed. One plant each.
+    variants = (('plus-equals', '        acc += 16'),
+                ('double-space', '        let probe: CGFloat = marker.x +  16'),
+                ('parenthesised', '        let probe: CGFloat = marker.x + (16)'))
+    for tag, code in variants:
+        plant('ac002-variant-' + tag, 'Exolon/GameCore/Player/Player.swift', code,
+              '±16', UNCOMMITTED)
+
+    # R4: an ignored-but-present Swift file (`.gitignore` carries a bare `coverage/`, which matches
+    # at any depth, including under the product tree) must be REDDEN the contour, not vanish.
+    clone = clone_tree('ac002-ignored-file')
+    hidden = clone / 'Exolon/GameCore/coverage/E1IgnoredProbe.swift'
+    written(hidden, 'enum E1IgnoredProbe { static let bound = 544.0}\n')
+    listed = run(['git', 'check-ignore', '--', 'Exolon/GameCore/coverage/E1IgnoredProbe.swift'],
+                 cwd=clone, timeout=60)
+    if listed['returncode'] != 0:
+        raise CheckFailure('the ignored-file control lost its anchor: .gitignore no longer hides '
+                           'Exolon/GameCore/coverage/')
+    hidden_att = wave_scan(clone, 'attribution')
+    if is_green(hidden_att) or not any('coverage' in problem and 'escapes' not in problem
+                                       for problem in hidden_att['problems'] +
+                                       hidden_att['attribution']['problems']):
+        raise CheckFailure('an ignored-but-present product Swift file is invisible to the '
+                           'attribution contour (result=%s)' % hidden_att['result'])
+
+    # R11's two-sided allowance: a boundary literal in the constants file is the allowed
+    # definition site; per-map logic there is not.
     clone = clone_tree('ac002-constants-allow-list')
     victim = clone / 'Exolon/GameCore/GameConstants.swift'
     original = victim.read_text(encoding='utf-8')
@@ -507,18 +631,100 @@ def attribution_scan_flips() -> str:
     red = wave_scan(clone, 'attribution')
     if is_green(red) or not red['attribution']['violation_details']:
         raise CheckFailure('the allow-list also hides per-map logic (FORBID-002)')
+
+    # Bucket correctness on a real two-wave merge: a line authored by the first wave and edited by
+    # the second must be attributed to the SECOND (the added side), not hidden in the first.
+    synth_att = synthetic_two_wave_attribution()
     if git('status', '--porcelain', '--', 'Exolon', 'Exolon.xcodeproj').strip():
         raise CheckFailure('the real tree shows product changes after the AC-002 controls')
     names = ', '.join(f"{b['name']}={b['code_lines']}" for b in buckets)
     return (f'0 violations over {att["code_lines"]} added code lines in {att["files"]} product '
-            f'files across {len(buckets)} buckets ({names}); '
-            f'planted per-map/±16/544 all reddened ({per_map["bucket"]}, {delta["bucket"]}, '
-            f'{boundary["bucket"]}), committed plant attributed to {committed_hit["bucket"]}; '
-            'allow-list exempts a constant but not per-map logic')
+            f'files across {len(buckets)} buckets ({names}); strict recount without the '
+            f'allowance also 0; plants reddened AND attributed (per-map/±16/544 -> '
+            f'{UNCOMMITTED}, committed -> {BRANCH}, untracked new file -> {UNCOMMITTED} with '
+            f'{len(seen)} pattern kinds); 3 arithmetic ±16 variants each red; ignored '
+            f'Exolon/GameCore/coverage/*.swift reddens the coverage guard; synthetic two-wave '
+            f'repo attributes an A-authored/B-edited line to {synth_att}; '
+            f'untracked product swift on the real tree now: {len(untracked_now)}')
 
+
+
+def synthetic_two_wave_attribution() -> str:
+    """Build a throwaway two-wave repo and prove an A-authored/B-edited line lands in `wave-b`.
+
+    The real chain cannot express this case (no merged line was both authored by one wave and later
+    edited into a violation by the next), so the probe builds one: root base, a `--no-ff` merge
+    whose subject is shaped like this project's (`Merge pull request #90 from owner/wave-a-...`),
+    then a second such merge that edits the first wave's line into `100 + 16`. Everything lives in
+    ${TMPDIR}; nothing touches this repository.
+    """
+    ensure_work()
+    repo = WORK / 'ac002-synth-two-wave'
+    if repo.exists():
+        shutil.rmtree(repo)
+    repo.mkdir(parents=True)
+    env = dict(os.environ, GIT_AUTHOR_NAME='E1 Control', GIT_AUTHOR_EMAIL='control@localhost',
+               GIT_COMMITTER_NAME='E1 Control', GIT_COMMITTER_EMAIL='control@localhost')
+
+    def g(*args):
+        proc = run(['git', *[str(a) for a in args]], cwd=repo, env=env, timeout=120)
+        if proc['returncode'] != 0:
+            raise CheckFailure(f'synthetic repo `git {args[0]}` failed: {proc["stderr"][:200]}')
+        return proc['stdout'].strip()
+
+    pad = '\n'.join(f'let e1_pad_{index} = {index}' for index in range(30))
+    for index in range(6):
+        written(repo / 'Exolon/GameCore' / f'Base{index}.swift',
+                'import Foundation\n' + pad + '\n')
+    (repo / 'engineering').mkdir(parents=True, exist_ok=True)
+    shutil.copy2(WAVE_SCAN, repo / 'engineering/wave_scan.py')
+    g('init', '-q', '--initial-branch=main')
+    g('add', '--all')
+    g('commit', '-q', '-m', 'root base')
+    root = g('rev-parse', 'HEAD')
+
+    # wave A authors the line that wave B will edit into a violation.
+    first = repo / 'Exolon/GameCore/Base0.swift'
+    written(first, first.read_text(encoding='utf-8') + '\nfunc e1WaveA() {\n    let edited = 7\n}\n')
+    g('checkout', '-q', '-b', 'codex/wave-a-synth-20260925')
+    g('add', '--all')
+    g('commit', '-q', '-m', 'feat: wave A synth')
+    g('checkout', '-q', 'main')
+    g('merge', '-q', '--no-ff', '-m',
+      'Merge pull request #90 from owner/wave-a-synth-20260925',
+      'codex/wave-a-synth-20260925')
+
+    # wave B edits that same line into `100 + 16`.
+    written(first, first.read_text(encoding='utf-8').replace('let edited = 7', 'let edited = 100 + 16'))
+    g('checkout', '-q', '-b', 'codex/wave-b-synth-20260925')
+    g('add', '--all')
+    g('commit', '-q', '-m', 'feat: wave B synth edits the line')
+    g('checkout', '-q', 'main')
+    g('merge', '-q', '--no-ff', '-m',
+      'Merge pull request #91 from owner/wave-b-synth-20260925',
+      'codex/wave-b-synth-20260925')
+
+    doc = wave_scan(repo, 'attribution', base=root)
+    hits = [d for d in doc['attribution']['violation_details'] if 'edited' in d['line']]
+    if not hits:
+        raise CheckFailure('the synthetic repo produced no violation on the edited line: '
+                           f'{doc["attribution"]["violation_details"][:2]}')
+    wrong = sorted({d['bucket'] for d in hits} - {'wave-b'})
+    if wrong:
+        raise CheckFailure(f'the line authored by wave A and edited by wave B was attributed to '
+                           f'{wrong[0]!r}, expected the wave that added the violating text '
+                           "('wave-b')")
+    names = sorted(b['name'] for b in doc['attribution']['buckets'])
+    if 'wave-a' not in names or 'wave-b' not in names:
+        raise CheckFailure(f'the synthetic merge history did not produce wave buckets: {names}')
+    return 'wave-b'
 
 def union_added_code_lines(root: Path, base: str) -> int:
-    """Count non-comment added Swift code lines from ``base`` to the working tree, independently."""
+    """Count non-comment added Swift code lines from ``base`` to the working tree, independently.
+
+    The union is `git diff` output plus every line of every untracked product ``*.swift``: a diff
+    cannot see those, and the parse contour already proved it can enumerate them (review-code R2).
+    """
     proc = run(['git', 'diff', '-U0', base, '--', 'Exolon'], cwd=root, timeout=300)
     if proc['returncode'] != 0:
         detail = proc['stderr'][:200]
@@ -531,6 +737,19 @@ def union_added_code_lines(root: Path, base: str) -> int:
             if not (path or '').endswith('.swift'):
                 continue
             code = re.sub(r'///?.*', '', line[1:])
+            code = re.sub(r'/\*.*?\*/', '', code, flags=re.S)
+            if code.strip():
+                total += 1
+    listed = run(['git', 'ls-files', '--others', '--exclude-standard', '--', 'Exolon', '*.swift'],
+                 cwd=root, timeout=120)
+    for rel in sorted(line for line in listed['stdout'].splitlines() if line.strip()):
+        try:
+            text = (root / rel).read_text(encoding='utf-8', errors='replace')
+        except OSError:
+            total += 1
+            continue
+        for line in text.splitlines():
+            code = re.sub(r'///?.*', '', line)
             code = re.sub(r'/\*.*?\*/', '', code, flags=re.S)
             if code.strip():
                 total += 1
@@ -552,9 +771,11 @@ def full_suite() -> dict:
 
 
 def is_green(doc: dict) -> bool:
-    """`WAVE_SCAN_GREEN` and `WAVE_SCAN_GREEN_PARTIAL` both mean "nothing failed"; only the first
-    is the series contour, and every check here names which one it demands."""
-    return str(doc.get('result', '')).startswith('WAVE_SCAN_GREEN')
+    """True when nothing failed: `WAVE_SCAN_GREEN` (the series contour) or `WAVE_SCAN_PARTIAL`
+    (a restricted run that found nothing wrong). Renamed away from the old
+    `WAVE_SCAN_GREEN_PARTIAL` token so that no consumer greping for `WAVE_SCAN_GREEN` can read a
+    restricted run as the contour (review-code R8); controls below say which one they demand."""
+    return str(doc.get('result', '')) in ('WAVE_SCAN_GREEN', 'WAVE_SCAN_PARTIAL')
 
 
 def meter_entries(doc: dict) -> dict:
@@ -613,11 +834,22 @@ def cross_wave_suite_green() -> str:
     probe2 = wave_scan(clone2, 'meters', meters=['wave-d-stage'])
     if probe2['result'] != 'WAVE_SCAN_RED':
         raise CheckFailure(f'an absent meter script does not read red (result={probe2["result"]})')
+    shrink = clone_tree('ac003-loader-shrink')
+    removed = sorted((shrink / 'Exolon/Resources').glob('L05S*.tmx'))[:25]
+    for path in removed:
+        path.unlink()
+    shrunk = wave_scan(shrink, 'meters', meters=['loader-harness-125maps'])
+    loader = meter_entries(shrunk)['loader-harness-125maps']
+    if loader['green'] or int(shrunk['totals']['meters_green']) != 0:
+        raise CheckFailure(f'a shrunken map corpus still certifies the loader contour '
+                           f'({loader["verdict_line"]}, expected=125 asserted)')
     counts = ', '.join(f'{n}={entries[n]["passed"]}' for n in METER_NAMES)
     return (f'{doc["totals"]["meters_green"]}/{len(METER_NAMES)} meters green ({counts}), parse '
             f'{doc["totals"]["parse_failures"]} failures, attribution '
             f'{doc["totals"]["attribution_violations"]} violations in {doc["seconds"]} s; '
-            f'forced-red meter reddened the suite ({stage["failed"]} failed), absent meter is red')
+            f'forced-red meter reddened the suite ({stage["failed"]} failed), absent meter is red, '
+            f'deleting {len(removed)} maps reddened the loader contour '
+            f'({loader["verdict_line"][:34]})')
 
 
 # ---------------------------------------------------------------------------
@@ -664,7 +896,9 @@ def loader_harness_green() -> str:
 
     clone = clone_tree('ac004-one-line-revert')
     rel_run = rel(LOADER_RUN)
-    git('checkout', '--', rel_run, cwd=clone)     # safe: a clone owns its gitdir
+    # The pre-edit side comes from the route base, not from HEAD: once wave E1 is committed, HEAD
+    # already contains the fix and `git checkout --` could not revert anything (review-code R3).
+    written(clone / rel_run, git_show_base(LOADER_RUN))
     reverted = (clone / rel_run).read_text(encoding='utf-8')
     still = re.search(r'swiftc -I[^\n]*\n(?:[ \t]+\S[^\n]*\n)+', reverted)
     if not still or 'GameConstants.swift' in still.group(0):
@@ -714,9 +948,13 @@ def v3_header_present() -> str:
 
     clone = clone_tree('ac005-frozen-behavior')
     rel_v3 = rel(V3_MIRROR)
-    git('checkout', '--', rel_v3, cwd=clone)
+    written(clone / rel_v3, git_show_base(V3_MIRROR))    # the route-base copy, not HEAD's
     before = run([sys.executable, str(clone / rel_v3)], timeout=300)
     after = run([sys.executable, str(V3_MIRROR)], timeout=300)
+    if before['stdout'] == after['stdout'] and _last_line(before['stderr']) == \
+            _last_line(after['stderr']) and git_show_base(V3_MIRROR) == read(V3_MIRROR):
+        raise CheckFailure('the inertness control compares identical bytes - re-keyed to HEAD by '
+                           'accident? (the pre-edit side must be the route base)')
     if before['stdout'] != after['stdout']:
         raise CheckFailure('v3_measurements.py stdout changed - the header was not inert')
     last_before = _last_line(before['stderr'])
@@ -755,8 +993,7 @@ def b_meter_failclosed() -> str:
     require('wave_base' in src and re.search(r'def wave_base\(\)', src),
             'wave_base() is gone from wave_b_check.py')
 
-    clone = clone_tree('ac006-no-origin', pin_origin=False)
-    drop_origin(clone)
+    clone = clone_tree('ac006-no-origin', topology='no-origin')
     proc = run(meter_argv('B', clone), timeout=600)
     joined = proc['stdout'] + proc['stderr']
     if proc['returncode'] == 0:
@@ -770,10 +1007,32 @@ def b_meter_failclosed() -> str:
     if 'added-lines: ' in joined:
         raise CheckFailure('the remote-less clone still ran a scan (the old wide fallback)')
 
-    pinned = clone_tree('ac006-origin-pinned')
-    ok = run(meter_argv('B', pinned), timeout=600)
+    # M1: the control must mirror the topology the real run sees. An OPEN PR head has
+    # origin/main == the route base (!= HEAD); the post-merge state has origin/main == HEAD. Both
+    # must be green, and both through the measured-empty re-anchor, not through a synthesised ref.
+    real = clone_tree('ac006-real-topology', topology='real')
+    if git('rev-parse', 'refs/remotes/origin/main', cwd=real).strip() == \
+            git('rev-parse', 'HEAD', cwd=real).strip():
+        raise CheckFailure('the "real" clone topology was synthesised to post-merge')
+    ok = run(meter_argv('B', real), timeout=600)
     if ok['returncode'] != 0 or 'ALL_WAVE_B_CHECKS_MATCH_SPEC' not in ok['stdout']:
-        raise CheckFailure(f'B is not green with origin/main pinned: {meter_result(ok["stdout"])}')
+        raise CheckFailure(f'B is not green on the open-PR topology: {meter_result(ok["stdout"])}')
+    merged = clone_tree('ac006-post-merge-topology', topology='post-merge')
+    after = run(meter_argv('B', merged), timeout=600)
+    if after['returncode'] != 0 or 'ALL_WAVE_B_CHECKS_MATCH_SPEC' not in after['stdout']:
+        raise CheckFailure(f'B is not green on the post-merge topology: {meter_result(after["stdout"])}')
+    # R7: the same fail-closed meter, seen THROUGH wave_scan, must not have a success marker
+    # synthesised for it - verdict_line is what every transcript quotes as the meter's verdict.
+    seen = wave_scan(clone, 'meters', meters=['wave-b-mapdata'])
+    entry = meter_entries(seen)['wave-b-mapdata']
+    if 'ALL_WAVE_B_CHECKS_MATCH_SPEC' in str(entry['verdict_line']):
+        raise CheckFailure(f'wave_scan invented a success marker for a fail-closed meter run: '
+                           f'{entry["verdict_line"]}')
+    if entry['green'] or int(entry['rc']) == 0:
+        raise CheckFailure(f'a fail-closed meter is not red in the suite ({entry})')
+    reason = [line for line in ok['stdout'].splitlines() if 'WAVE_BASE=' in line]
+    if not reason or 'own_delta_code_lines=0' not in reason[0]:
+        raise CheckFailure(f'the re-anchor left no machine-readable reason: {reason[:1]}')
     scanned = re.search(r'added-lines: (\d+) стронок кода в (\d+) изменённых продуктовых файлах',
                         ok['stdout'])
     if not scanned or int(scanned.group(1)) < 150 or int(scanned.group(2)) < 7:
@@ -781,13 +1040,18 @@ def b_meter_failclosed() -> str:
     hygiene = run(['git', 'show-ref'], cwd=ROOT, timeout=60)['stdout']
     if re.search(r'refs/heads/origin/', hygiene):
         raise CheckFailure(f'ref pollution in the real repository: {hygiene.splitlines()[-3:]}')
-    if short_head() not in run(['git', 'rev-parse', '--short', 'refs/remotes/origin/main'],
-                              cwd=ROOT, timeout=60)['stdout']:
-        raise CheckFailure("the real refs/remotes/origin/main moved during the AC-006 controls")
-    return (f'remote-less clone: rc={proc["returncode"]} with the explicit fail-closed error; '
-            f'pinned clone: green with {scanned.group(1)} added code lines in '
-            f'{scanned.group(2)} files; real-tree refs clean '
-            f'({len(hygiene.splitlines())} refs, no refs/heads/origin/)')
+    # R3: origin/main is never equal to HEAD on an open PR, so the assert must be "unchanged and
+    # an ancestor of HEAD", not "equal to HEAD" (the old form could only pass in a synthesised repo).
+    before_sha = git('rev-parse', 'refs/remotes/origin/main').strip()
+    if before_sha != real_origin_main():
+        raise CheckFailure('the real refs/remotes/origin/main moved during the AC-006 controls')
+    if not _commit_is_ancestor_or_head(before_sha):
+        raise CheckFailure(f'refs/remotes/origin/main ({before_sha[:7]}) is not an ancestor of HEAD')
+    return (f'remote-less clone: rc={proc["returncode"]} with the explicit fail-closed error and '
+            f'no scan line; open-PR topology: green with {scanned.group(1)} added code lines in '
+            f'{scanned.group(2)} files via {reason[0].strip()[:70]}; post-merge topology: green; '
+            f'real-tree refs clean ({len(hygiene.splitlines())} refs, no refs/heads/origin/, '
+            f'origin/main={before_sha[:7]} ancestor of HEAD)')
 
 
 # ---------------------------------------------------------------------------
@@ -801,8 +1065,13 @@ def _func_body(text: str, name: str) -> str:
     return match.group(0)
 
 
-def _git_show(path: Path) -> str:
-    return git('show', f'HEAD:{rel(path)}')
+def _git_show(path: Path, ref: str | None = None) -> str:
+    """Bytes of a merged tool as the repository recorded it.
+
+    The default is the ROUTE base, never `HEAD`: after the wave is committed, `HEAD` already holds
+    the edit and every "unchanged / byte-identical / inert" claim against it becomes a tautology
+    (review-code R3, review-test M2 - and decisions.md recorded this exact lesson on 2026-09-24)."""
+    return git('show', f'{ref or CHANGE_BASE}:{rel(path)}')
 
 
 def m3_soft_band() -> str:
@@ -1014,6 +1283,11 @@ def _helper_callers(src: str, body: str) -> str:
 
 E1_PREFIXES = ('engineering/tools/', f'{rel(PKG)}/')
 SANCTIONED_MERGED_EDITS = (
+    # M4 / review-code R10: AGENTS.md ("README before push") requires README.md to match the tree,
+    # and the controller authored that section; the wave-E1 fix batch adopted it as an explicit,
+    # recorded touch of this change (tasks.md "Package paperwork"). It is documentation only - the
+    # product half of FORBID-001 is untouched and asserted separately below.
+    'README.md',
     rel(H_PKG / 'evidence/harness/run.sh'),
     rel(H_PKG / 'evidence/harness/last-run.txt'),
     rel(H_PKG / 'evidence/harness/README.md'),
@@ -1026,9 +1300,16 @@ SANCTIONED_MERGED_EDITS = (
 )
 
 
-def _working_paths() -> list:
+def _changed_paths() -> list:
+    """Everything this change touched: committed since the route base PLUS the working tree.
+
+    Review-code R3 / review-test M2: the previous version looked only at the working diff, so on a
+    committed head it reported "0 paths, 0 sanctioned edits" and every scope cap became vacuous -
+    a later wave could rewrite a merged meter wholesale and trip nothing.
+    """
     out = set()
-    for args in (['diff', '--name-only', 'HEAD'], ['diff', '--name-only', '--cached'],
+    for args in (['diff', '--name-only', f'{CHANGE_BASE}..HEAD'],
+                 ['diff', '--name-only', 'HEAD'], ['diff', '--name-only', '--cached'],
                  ['ls-files', '--others', '--exclude-standard']):
         proc = run(['git', *args], cwd=ROOT, timeout=180)
         if proc['returncode'] != 0:
@@ -1042,12 +1323,12 @@ def product_untouched() -> str:
     dirty = git('status', '--porcelain', '--', 'Exolon', 'Exolon.xcodeproj').strip()
     if dirty:
         raise CheckFailure(f'FORBID-001: the product tree is dirty: {dirty.splitlines()[:4]}')
-    base = git('merge-base', 'HEAD', 'refs/remotes/origin/main').strip()
-    committed = git('diff', '--name-only', f'{base}..HEAD', '--', 'Exolon', 'Exolon.xcodeproj').strip()
+    committed = git('diff', '--name-only', f'{CHANGE_BASE}..HEAD', '--',
+                    'Exolon', 'Exolon.xcodeproj').strip()
     if committed:
         raise CheckFailure(f'FORBID-001: commits since the E1 base touch the product: '
                            f'{committed.splitlines()[:4]}')
-    touched = _working_paths()
+    touched = _changed_paths()
     offenders = [path for path in touched
                  if not (path.startswith(E1_PREFIXES) or path in SANCTIONED_MERGED_EDITS)]
     if offenders:
@@ -1057,18 +1338,27 @@ def product_untouched() -> str:
                or '/fixtures/' in path or '__pycache__' in path]
     if scratch:
         raise CheckFailure(f'scratch artifacts left in the repository: {scratch[:5]}')
+    if not [p for p in touched if p in SANCTIONED_MERGED_EDITS]:
+        raise CheckFailure('the change surface names no sanctioned merged edit at all - the scope '
+                           'list is being compared against nothing (review-code R3)')
     sizes = {}
     for path in (p for p in touched if p in SANCTIONED_MERGED_EDITS):
-        numstat = git('diff', '--numstat', 'HEAD', '--', path).strip()
+        numstat = git('diff', '--numstat', CHANGE_BASE, '--', path).strip()
         added, deleted = (numstat.split('\t')[:2] if numstat else ('0', '0'))
         sizes[path] = f'+{added}/-{deleted}'
         capped = not path.endswith(('.txt', '.md'))
+        if not int(added or 0) and not int(deleted or 0):
+            raise CheckFailure(f'the sanctioned touch {path} shows no diff against the route base '
+                               '- either the cap check is vacuous or the file is not part of E1')
         if capped and int(added or 0) + int(deleted or 0) > 90:
             raise CheckFailure(f'the merged-tool touch {path} is {sizes[path]}, far beyond a '
                                'recorded one-line/heading edit')
-    return (f'{len(touched)} working paths, all inside engineering/tools + this package + '
-            f'{len(sizes)} sanctioned merged edits ({", ".join(f"{Path(k).name}:{v}" for k, v in sorted(sizes.items()))}); '
-            'Exolon/ and Exolon.xcodeproj byte-clean against HEAD')
+    short = {path: (path if path == 'README.md' else '…/' + Path(path).parent.name +
+                    '/' + Path(path).name) for path in sizes}
+    return (f'{len(touched)} paths in the change surface ({CHANGE_BASE_SHORT}..HEAD + working), '
+            f'all inside engineering/tools + this package + {len(sizes)} sanctioned merged edits '
+            f'({", ".join(f"{short[k]}:{v}" for k, v in sorted(sizes.items()))}); '
+            'Exolon/ and Exolon.xcodeproj byte-clean against the route base')
 
 
 # ---------------------------------------------------------------------------
@@ -1089,14 +1379,15 @@ def no_silent_relaxation() -> str:
     warp = _func_body(stage_src, 'warp_debug_only')
     if 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' not in warp or '!= 1' not in warp:
         raise CheckFailure('warp_debug_only dropped a clause while gaining the GUID binding')
-    c_diff = git('diff', '-U0', 'HEAD', '--', rel(C_CHECK))
+    c_diff = git('diff', '-U0', CHANGE_BASE, '--', rel(C_CHECK))
     changed = [line[1:].strip() for line in c_diff.splitlines()
                if line.startswith(('+', '-')) and not line.startswith(('+++', '---'))]
     for line in changed:
         if 'stale' in line.lower() or 'divergence' in line:
             raise CheckFailure(f'the wave C stale-mirror edit touched logic, not only text: {line[:90]}')
     if not changed:
-        raise CheckFailure('wave_c_check.py shows no edit at all - the WARNING wording was never updated')
+        raise CheckFailure(f'wave_c_check.py shows no edit against the route base '
+                           f'{CHANGE_BASE_SHORT} - the WARNING wording was never updated')
 
     clone = clone_tree('forbid002-b-planted')
     victim = clone / 'Exolon/GameCore/Levels/TMXMapLoader.swift'
@@ -1118,8 +1409,10 @@ def no_silent_relaxation() -> str:
                            f'(result={doc["result"]} rc={missing["returncode"]})')
     if git('status', '--porcelain', '--', 'Exolon', 'Exolon.xcodeproj').strip():
         raise CheckFailure('the real tree shows product changes after the FORBID-002 controls')
-    return ('B non-vacuity guard + planted ±16 red at the root anchor; A hard checks byte-identical '
-            'to HEAD; C edit is text-only; wave_scan fails closed without swiftc')
+    return (f'B non-vacuity guard present + a planted ±16 still red at the root anchor; A hard '
+            f'checks byte-identical to the route base {CHANGE_BASE_SHORT} (not to HEAD); '
+            f'C edit is text-only against {CHANGE_BASE_SHORT}; the constants-allowance exemption '
+            f'is pinned inert by AC-002; wave_scan fails closed without swiftc')
 
 
 # ---------------------------------------------------------------------------
@@ -1152,6 +1445,38 @@ def suite_standalone_agreement() -> str:
 # ---------------------------------------------------------------------------
 # driver
 # ---------------------------------------------------------------------------
+
+def stale_certification() -> list:
+    """Freeze artifacts whose recorded head is not the head being checked (review-test M3).
+
+    `evidence/freeze.sh` regenerates every artifact in one pass, so a clean pass always ends with
+    all four naming this head. If they name an older one, this certification predates the commit it
+    sits in - which is exactly how the first wave E1 freeze shipped a green bound to `0b0dea9` while
+    the head was `32e61e8`. Reported as a WARNING with the verdict (a probe cannot refuse its own
+    recording pass) and as `stale_certification` in --json, so the freeze script can fail on it.
+    """
+    current = head_sha()
+    recording = os.environ.get('EXOLON_E1_FREEZE') == '1'
+    # Written by this very pass (after it) or by the step that follows it - flagging them as stale
+    # mid-freeze would be noise, and evidence/freeze.sh checks all five at the end anyway.
+    written_later = {'grok-verify-pr.txt', 'wave-e1-check-green.txt', 'wave-e1-check.json'}
+    stale = []
+    for name in FREEZE_ARTIFACTS:
+        if recording and name in written_later:
+            continue
+        path = HERE / name
+        if not path.is_file():
+            stale.append(f'{name}: missing')
+            continue
+        text = path.read_text(encoding='utf-8', errors='replace')
+        found = re.findall(r'[0-9a-f]{40}', text)
+        recorded = next((sha for sha in found if sha != CHANGE_BASE), '')
+        if not recorded:
+            stale.append(f'{name}: records no head')
+        elif not recorded.startswith(current):
+            stale.append(f'{name}: records {recorded[:7]}, head is {current[:7]}')
+    return stale
+
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -1199,16 +1524,26 @@ def main(argv=None) -> int:
               file=sink, flush=True)
 
     failed = sorted(name for name, res in results.items() if not res['pass'])
+    stale = stale_certification()
+    for line in stale:
+        print(f'WARNING stale-certification {line} - re-record with evidence/freeze.sh',
+              file=sys.stderr if args.json else sys.stdout, flush=True)
     elapsed = round(time.time() - started, 1)
     if args.json:
+        # the human verdict line too, on stderr, so one --json run can produce both transcripts
+        print(f'RESULT: {"WAVE_E1_PROBES_FAIL" if failed else "WAVE_E1_PROBES_PASS"} | '
+              f'probes={len(results)} failed={len(failed)} seconds={elapsed} '
+              f'stale_certification={len(stale)}', file=sys.stderr, flush=True)
         print(json.dumps({'tool': 'wave_e1_check', 'root': str(ROOT), 'head': head_sha(),
-                          'base': ROOT_BASE, 'seconds': elapsed, 'checks': len(results),
+                          'change_base': CHANGE_BASE, 'base': ROOT_BASE, 'seconds': elapsed,
+                          'stale_certification': stale, 'checks': len(results),
                           'failed': len(failed), 'results': results,
                           'result': 'WAVE_E1_PROBES_PASS' if not failed else 'WAVE_E1_PROBES_FAIL'},
                          indent=2, sort_keys=True))
     else:
         print(f'RESULT: {"WAVE_E1_PROBES_FAIL" if failed else "WAVE_E1_PROBES_PASS"} | '
-              f'probes={len(results)} failed={len(failed)} seconds={elapsed}')
+              f'probes={len(results)} failed={len(failed)} seconds={elapsed} '
+              f'stale_certification={len(stale)}')
         for name in failed:
             print(f'  ! {name}: {results[name]["reason"][:300]}')
     if not args.keep_work and WORK.exists():

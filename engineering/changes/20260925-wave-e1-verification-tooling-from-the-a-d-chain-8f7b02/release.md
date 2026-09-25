@@ -23,9 +23,10 @@ involved: wave E1 ships `engineering/tools/wave_scan.py`, this package's
 No flags. Two switches exist for offline/partial use and neither relaxes a verdict:
 
 - `wave_scan.py --only parse|attribution|meters` and `--meter NAME` restrict contours; a restricted
-  run prints `RESULT: WAVE_SCAN_GREEN_PARTIAL`, exits **3** (0 = the series contour, 1 = red,
-  2 = usage, 3 = green-but-partial) and reports `"partial": true` plus `skipped=…`, so a partial
-  green can never be read as the series contour or as a gate.
+  run prints `RESULT: WAVE_SCAN_PARTIAL`, exits **3** (0 = the series contour, 1 = red, 2 = usage,
+  3 = clean-but-partial) and reports `"partial": true` plus `skipped=…`/`sections=…` on the same
+  line, so a partial verdict can never be read as the series contour - including by `grep`, because
+  the token is deliberately not a super-set of `WAVE_SCAN_GREEN` (review-code R8).
 - `wave_b_check.py` keeps its own `--artifact-only`; wave E1 added no opt-in path around the
   `origin/main` fail-closed rule.
 - Soft M3 bands are not a flag: they always print a `WARNING` line with the measured value, in both
@@ -40,6 +41,8 @@ No flags. Two switches exist for offline/partial use and neither relaxes a verdi
 | suite wall time | `SUMMARY TOTAL … elapsed=…s budget=600s` | `elapsed` over budget → the run is red by rule (SIG-001) |
 | tree writes caused by a run | `SUMMARY TOTAL … tree_writes=…` | non-`none` on a tooling wave → somebody's evidence-refresh moved the fingerprint |
 | load-sensitive cost | `WARNING emission-cost band …` / `WARNING … (M3) …` | not an alert; it is the disclosed measurement limit (wave A M3 tripped under host load 16-18) |
+| wave B's base decision | `wave_base: WAVE_BASE=<sha> own_delta_files=… own_delta_code_lines=… reason=…` | `reason=no-product-delta-on-this-branch` is legitimate on a tooling wave; a **non-empty** small delta tripping the `≥7/≥150` guard is the real signal (review-code R9) |
+| certification head binding | every freeze artifact header `head=<sha> dirty=<n>`; `wave_e1_check` WARNING `stale-certification …` | any artifact naming another head → re-run `evidence/freeze.sh` before believing a green (review-test M3) |
 | stale mirror | `wave_c_check.py` prints two `WARNING … frozen-historical …` lines | wording points at the header; not a failure of wave C or E1 |
 | probe verdicts | `wave_e1_check.py` `RESULT: WAVE_E1_PROBES_PASS \| probes=11 failed=0` | any failed probe, including a control that refused to flip |
 
@@ -52,8 +55,10 @@ tick ratios and the 55-70 ns sizing band are warnings; the deterministic twins
 Go requires **all** of:
 
 - `engineering/tools/wave_scan.py` exits 0 with `parse_failures=0`, `attribution_violations=0`,
-  `meters=6/6 green` and elapsed under the 600 s budget (this head: 20 files parsed, 2938 added code
-  lines scanned, 81 s) — `evidence/wave-scan-end-to-end.txt`;
+  `meters=6/6 green` and elapsed under the 600 s budget, **on the open-PR ref topology**
+  (`refs/remotes/origin/main` = the route base, not a synthesised `HEAD`); its `--json` carries the
+  exact 40-char `head`, and `evidence/freeze.sh` refuses to finish if any artifact names another —
+  `evidence/wave-scan-end-to-end.txt`;
 - `python3 evidence/wave_e1_check.py` reports `probes=11 failed=0` with every flipping control
   executed — `evidence/wave-e1-check-green.txt`, `evidence/wave-e1-check.json`;
 - `git status --porcelain -- Exolon Exolon.xcodeproj` empty (FORBID-001) and
@@ -64,7 +69,10 @@ Go requires **all** of:
 
 No-Go / hold: any meter red at its recorded count (a red merged meter blocks **E1**, per the brief —
 it does not get excused in place); a control that does not flip; an unattributable violation
-(`bucket=unattributed`); an elapsed time over budget.
+(`bucket=unattributed`); an elapsed time over budget; a non-empty `stale_certification` (evidence
+bound to another head); an `Exolon/**.swift` that no git listing reports (the ignore guard).
+Re-certification is one command: `bash evidence/freeze.sh` — it regenerates all five artifacts at the
+current head, each header carrying `head=<sha> dirty=<n>`, and fails if any of them does not name it.
 
 Permanent residuals that do **not** block and are not hidden: everything class-2/macOS (no Apple
 host, #22 item 6), `vitorc` spawn regeneration for 48 maps (wave E2, needs owner data approval),

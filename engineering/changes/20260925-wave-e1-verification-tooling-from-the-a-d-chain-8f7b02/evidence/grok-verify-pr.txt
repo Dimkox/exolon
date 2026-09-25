@@ -1,5 +1,6 @@
-# python3 scripts/grok_verify.py --mode pr --no-record (2026-09-25T06:12:45Z)  rc=0  wall=181s
-# final run after the last tasks.md edit; nothing else writes during it
+# python3 scripts/grok_verify.py --mode pr --no-record
+# head=32e61e8fd49abb94730371682229e518abd4188a  date=2026-09-25T08:05:54Z  dirty=16  rc=0  wall=184s
+# run last, after every other artifact was written (source-stability is one of its checks)
 PASS git-diff-check: 4/4 checks passed; bases=route:0b0dea97997aa675dd6216284bda2d3476e10bbc,pr-target:0b0dea97997aa675dd6216284bda2d3476e10bbc
      INFO route.base_commit: checked 0b0dea97997aa675dd6216284bda2d3476e10bbc..HEAD
      INFO refs/remotes/origin/main: checked 0b0dea97997aa675dd6216284bda2d3476e10bbc..HEAD
@@ -15,4 +16,4 @@ PASS bandit: exit=0
 PASS factory-unit: exit=0
 PASS factory-postgres-exit: exit=0
 PASS source-stability: repository fingerprint remained stable
-RESULT: PASS | profiles=base,frontend | changed=28
+RESULT: PASS | profiles=base,frontend | changed=32

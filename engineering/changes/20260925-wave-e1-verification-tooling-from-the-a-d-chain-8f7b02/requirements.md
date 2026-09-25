@@ -12,8 +12,10 @@
   syntax error in a committed file reddens the run.
 - **AC-002** Given the accumulated delta since the change root, when the attribution scan runs, then
   it reports zero violations over 2 938 added code lines in 16 product files, bucketed per merged
-  wave (A 2 494, B 237, C 95, D 124), and reddens on a planted per-map table, a planted ±16 and a
-  planted pinned boundary - each attributed to the bucket that introduced it.
+  wave (A 2 494, B 237, C 95, D 124), and reddens on a planted per-map table, a planted ±16 (in each
+  of the forms `+ 16`, `+= 16`, `+  16`, `+ (16)`) and a planted pinned boundary - each attributed to
+  the bucket that introduced it. The union is `git diff` **plus untracked product sources**, and a
+  product `*.swift` hidden by an ignore rule reddens the contour instead of escaping it.
 - **AC-003** Given the five merged meters plus the loader harness, when `wave_scan.py` runs the
   suite, then it records A 28, B 9, C 9, D handout 11, D stage 10, loader 125/125 and exits green
   only if all six are green; one forced-red meter reddens the whole contour.
@@ -50,8 +52,19 @@
   themselves keep their own `TOOL_ABSENT` behaviour (wave B returns rc 3 without `--artifact-only`).
 - Meter script missing, verdict line unparsable, meter timeout, budget overrun: each is a red, with
   the reason in `problems[]`.
-- A restricted run (`--only`, `--meter`) that found nothing wrong: `WAVE_SCAN_GREEN_PARTIAL`, exit 3
-  - visibly not the series contour and never a substitute for the full green.
+- A restricted run (`--only`, `--meter`) that found nothing wrong: `WAVE_SCAN_PARTIAL`, exit 3 -
+  visibly not the series contour, never a substitute for the full green, and not greppable as it.
+- A git-ignored `*.swift` under `Exolon/` (the bare `coverage/` rule at `.gitignore:17` matches at
+  any depth): the contour reddens and names the path - an ignore rule may not remove product code
+  from the scan.
+- A wave whose own product delta is empty (tooling wave on an open PR head): wave B's added-lines base
+  re-anchors to the root base and prints `reason=no-product-delta-on-this-branch`; a *non-empty* but
+  suspiciously small delta still trips the `≥7 files / ≥150 code lines` guard.
+- Controls that need the pre-edit bytes of a merged tool read them from the **route base**
+  (`route.json:base_commit`), never from `HEAD`, so they stay falsifiable after the commit; a probe
+  that would compare identical bytes refuses to pass (review-code R3 / review-test M2).
+- Certification bound to a head: every freeze artifact carries `head=<sha> dirty=<n>`;
+  `wave_e1_check --json` reports `stale_certification` and `evidence/freeze.sh` fails on it (M3).
 - `git status` noise from evidence-refreshing tools: `wave_scan` prints `tree_writes=…` so a run that
   moved the tree is visible instead of stale-ing a receipt silently.
 - A tooling wave with no product delta of its own: wave B's base re-anchors to the root and *prints

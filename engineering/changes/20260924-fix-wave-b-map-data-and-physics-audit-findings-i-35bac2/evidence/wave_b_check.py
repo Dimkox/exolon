@@ -656,13 +656,17 @@ def wave_base() -> str:
        отсутствует (голый clone без remote-tracking ref'а), скан НЕ уезжает на
        295690b и не зелёный «впустую»: это FAIL-CLOSED с exit 4. Ревью release
        поймало на этом ложно-зелёный прогон (2938 строк вместо дельта волны).
-    2. если merge-base(HEAD, origin/main) == HEAD, то у этой ветви НЕТ собственного
-       продуктового дельта (инструментальная волна поверх main, либо ветка == main).
-       Пустой скан красным делать нечем (это не поиск дефекта, а шум), поэтому база
-       перепривязывается к корневой базе 295690b — т.е. скан становится ШИРЕ, а не
-       уже: накопленный дельта A..HEAD снова поличится здесь (и в wave_scan.py),
-       а non-vacuity guard (файлов>=7, строк>=150) остаётся и по-прежнему краснеет.
-       Причина печатается, молчаливости нет."""
+    2. правило wave E1 исправлено ревью (review-code R1 / review-test M1 на 32e61e8):
+       перепривязка триггерится ИЗМЕРЕННОЙ пустотой собственного дельта, а не равенством
+       merge-base == HEAD. Равенство ловило только послеслиянное состояние, а на
+       HEAD открытого PR инструментальной волны merge-base как раз равен origin/main,
+       и скан по пустому дельта краснел бы ложно (файлов=0 строк=0). Пустой скан
+       красным делать нечем (это не поиск дефекта, а шум), поэтому при own_delta_code_lines==0
+       база перепривязывается к корневой 295690b — т.е. скан становится ШИРЕ, а не уже:
+       накопленный дельта A..HEAD поличится здесь (и в wave_scan.py), а non-vacuity
+       guard (файлов>=7, строк>=150) остаётся и по-прежнему краснеет на НЕпустом,
+       но подозрительно маленьком дельта. Причина печатается машиночитаемо
+       (WAVE_BASE=… own_delta_code_lines=… reason=…), молчаливости нет."""
     probe = subprocess.run(["git", "-C", str(ROOT), "show-ref", "--verify", "--quiet",
                             "refs/remotes/origin/main"], capture_output=True, text=True,
                            timeout=30, check=False)
@@ -685,11 +689,21 @@ def wave_base() -> str:
         print("FAIL-CLOSED: git merge-base HEAD origin/main не вернул базу — "
               "added-lines скан не может быть вычислен.", file=sys.stderr)
         raise SystemExit(4)
-    if base == head.stdout.strip():
-        print("  wave_base: merge-base(HEAD, origin/main) == HEAD — собственного продуктового "
-              "дельта у этой ветви нет; added-lines скан перепривязан к корневой базе "
-              "295690b (шире, не уже; issue #21)")
+    _ = head  # head нужен только для диагностики топологии; решение ниже — по измеренному дельта
+    own = git_added_lines(base)
+    if own is None:
+        print("  wave_base: WAVE_BASE=%s own_delta=unknown reason=git-diff-unavailable "
+              "(scan краснеет честно, ниже)" % base[:7])
+        return base
+    own_code = sum(1 for _path, line in own if strip_comments(line).strip())
+    if own_code == 0:
+        print("  wave_base: WAVE_BASE=%s own_delta_files=%d own_delta_code_lines=0 "
+              "reason=no-product-delta-on-this-branch re_anchor=295690b "
+              "(шире, не уже; issue #21; guard>=7 файлов / >=150 строк остаётся)"
+              % (base[:7], len({path for path, _ in own})))
         return "295690b"
+    print("  wave_base: WAVE_BASE=%s own_delta_code_lines=%d reason=own-delta-present"
+          % (base[:7], own_code))
     return base
 
 

@@ -76,8 +76,12 @@ remains permanently externally-blocked (no Apple hardware; issue #15 stays open 
 `engineering/tools/wave_scan.py` — one command that re-polices the whole A–E chain: root-anchored
 union parse of every Swift file touched since `295690b`, per-wave attribution scan of added lines
 (no committed wave escapes it), and a cross-meter suite running all merged meters with recorded
-verdict counts (`--json`, budgets, fail-closed on missing remote refs). Meters of merged waves stay
-authoritative standalone; wave_scan is the regression net across rebases.
+verdict counts (`--json`, budgets, fail-closed on missing remote refs). The attribution union also
+covers **untracked** new product sources, and a `*.swift` that an ignore rule hides under `Exolon/`
+reddens the contour instead of vanishing from it. Exit codes: 0 series-green, 1 red, 2 usage,
+3 clean-but-partial (`WAVE_SCAN_PARTIAL`, never greppable as the series verdict). Meters of merged
+waves stay authoritative standalone; wave_scan is the regression net across rebases. Re-certify the
+head in one command with `engineering/changes/20260925-wave-e1-verification-tooling-from-the-a-d-chain-8f7b02/evidence/freeze.sh`.
 
 ## Level content contract
 

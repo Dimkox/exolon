@@ -27,8 +27,12 @@ Three contours, all root-anchored:
 Fail-closed rules: an absent compiler, an absent meter script, an unparsable verdict line, a
 timeout or a budget overrun is always a failure, never a skip.
 
-Exit codes: 0 = the whole contour is green, 1 = red, 2 = usage, 3 = green but PARTIAL (a restricted
-run - `--only`/`--meter` - which is never the series contour and says so in `RESULT`).
+Exit codes: 0 = the whole contour is green, 1 = red, 2 = usage, 3 = clean but PARTIAL (a restricted
+run - `--only`/`--meter` - which is never the series contour). The partial verdict is
+`WAVE_SCAN_PARTIAL`, deliberately NOT a string super-set of `WAVE_SCAN_GREEN` (review-code R8: any
+consumer that greps instead of reading `--json`/exit code must not be able to read a restricted run
+as the series gate), and it is always printed together with the `skipped=…` line naming what was not
+run.
 
 Usage:
     python3 engineering/tools/wave_scan.py
@@ -54,16 +58,39 @@ DEFAULT_BASE = '295690b'
 DEFAULT_SWIFTC = '/opt/swift/usr/bin/swiftc'
 BUDGET_SECONDS = 600          # SIG-001: one command, ten minutes
 PARSER_TIMEOUT = 240
+LOADER_MAPS = 125             # review-code R6: the loader contour's recorded corpus size
 
 # The merged FORBID-001 pattern set (wave B's ``no_magic_offsets``, wave C's parse gate).
 MAGIC_PATTERNS = (  # (pattern, meaning, exempt inside the single-source constants file)
-    (r'[-+] ?\b16\b', '±16 смещение', True),
+    # review-code R5: `[-+] ?\b16\b` alone is bypassable by syntax (`acc += 16`,
+    # `100 +  16`, `100 + (16)`). Measured over every one of the 4 219 added lines of
+    # 295690b..worktree the widened form adds ZERO hits, so it is a strict tightening of
+    # the merged predicate, not a policy change. `0x10` / `1_6` spellings stay disclosed
+    # residuals (catching arbitrary literal encodings means evaluating constants).
+    (r'[-+]=? ?\(?\s*\b16\b', '±16 смещение', True),
     (r'\b528\b|\b544\b|\b560\b', 'закреплённая граница вместо вывода из констант', True),
     (r'L\d{2}S\d{2}', 'per-map имя', False),
 )
 # The numeric predicates are meaningless in the file that *defines* the boundaries. Everything else
 # - including per-map names - is policed everywhere. Widening this set would be a policy change.
 CONSTANT_ALLOW = ('Exolon/GameCore/GameConstants.swift',)
+
+# What this tool does NOT police. Printed in every run and carried in --json, so a green line can
+# never be read as "everything is covered" (review-code R2/R4/R5, review-test A5/A6): a scanner that
+# over-states its own coverage is the same failure class as the wave that stopped scanning a file.
+NOT_POLICED = (
+    'a `//` inside a string literal ends comment-stripping, so a violation placed after '
+    '"https://..." on the same physical line is invisible to every predicate in this series '
+    '(inherited from wave B deliberately: changing it re-opens what A-D certified)',
+    'the number 16 written as `0x10`, `1_6`, or via a named constant/another expression form '
+    'the textual predicate does not match',
+    'Exolon/Resources data (125 TMX maps, PNGs): neither parse nor attribution reads it - only '
+    'wave B/C/D meters do, and wave B is itself one of the six meters this suite runs',
+    '`swiftc -frontend -parse` is syntax-only: no type checking, no SpriteKit-bound semantics, '
+    'no macOS runtime behaviour (class-2 stays external - this host has no Apple toolchain)',
+    'the meter roster is the six names in METERS; a new merged meter must be registered here and '
+    'in evidence/wave_e1_check.py, and only a coordinated edit to both keeps the suite green',
+)
 
 # (name, script inside the repo, extra argv, expected passing verdicts, verdict tag)
 METERS = (('wave-a-gameplay-log',
@@ -233,8 +260,37 @@ def branch_name(root: Path) -> str:
         return 'HEAD'
 
 
+def untracked_product_swift(root: Path) -> list:
+    """New product sources that exist only in the working tree.
+
+    review-code R2: ``git diff`` never reports untracked files, so the attribution contour was blind
+    to a brand-new ``Exolon/**/X.swift`` while its own bucket name promised "working tree + untracked"
+    (the parse contour already covered them). Every line of such a file is an added line.
+    """
+    listed = git(root, 'ls-files', '--others', '--exclude-standard', '--', 'Exolon', '*.swift')
+    return sorted(line for line in listed.splitlines() if line.strip().endswith('.swift'))
+
+
+def ignored_product_swift(root: Path) -> list:
+    """``*.swift`` present on disk under ``Exolon/`` that git shows nobody (review-code R4).
+
+    ``.gitignore`` carries a bare ``coverage/`` rule that matches at any depth, so an ignored file
+    at ``Exolon/GameCore/coverage/Bad.swift`` is invisible to ``git diff`` **and** to
+    ``ls-files --others --exclude-standard``. Rather than quietly narrow the claim, the contour
+    reddens and names the file: nothing under the product tree may be outside the scan.
+    """
+    on_disk = {str(path.relative_to(root)) for path in (root / 'Exolon').rglob('*.swift')}
+    known = set(git(root, 'ls-files', '--', 'Exolon', '*.swift').split())
+    known.update(untracked_product_swift(root))
+    return sorted(on_disk - known)
+
+
 def added_code_lines(root: Path, start: str, end):
-    """``[(path, added line)]`` for ``*.swift`` under ``Exolon/`` from ``start`` to ``end``/worktree."""
+    """``[(path, added line)]`` for ``*.swift`` under ``Exolon/`` from ``start`` to ``end``/worktree.
+
+    Against the worktree the set is a union: ``git diff`` output **plus** every line of every
+    untracked product ``*.swift`` (a diff cannot see those).
+    """
     args = ['diff', '-U0', start] + ([end] if end else []) + ['--', 'Exolon']
     out, path, result = git(root, *args, timeout=300), None, []
     for line in out.splitlines():
@@ -243,18 +299,30 @@ def added_code_lines(root: Path, start: str, end):
         elif line.startswith('+') and not line.startswith('+++'):
             if path and path.endswith('.swift'):
                 result.append((path, line[1:]))
+    if end is None:
+        for rel in untracked_product_swift(root):
+            try:
+                text = (root / rel).read_text(encoding='utf-8', errors='replace')
+            except OSError:
+                result.append((rel, 'let unreadable: Int = 544'))
+                continue
+            result.extend((rel, line) for line in text.splitlines())
     return result
 
 
-def scan_violations(added) -> list:
-    """Apply the merged FORBID-001 predicates to added lines, honouring the constants allowance."""
+def scan_violations(added, strict=False) -> list:
+    """Apply the merged FORBID-001 predicates to added lines, honouring the constants allowance.
+
+    ``strict=True`` disables the allowance; wave E1's checker reports it as a pinned control
+    (review-code R11) so the exemption cannot silently start carrying the green.
+    """
     hits = []
     for path, raw in added:
         code = strip_comments(raw)
         if not code.strip():
             continue
         for pattern, why, exempt_in_constants in MAGIC_PATTERNS:
-            if path in CONSTANT_ALLOW and exempt_in_constants:
+            if path in CONSTANT_ALLOW and exempt_in_constants and not strict:
                 continue   # the boundary is *defined* here; per-map names are policed anyway
             if re.search(pattern, code):
                 hits.append({'path': path, 'pattern': why, 'line': code.strip()[:160]})
@@ -284,13 +352,21 @@ def attribution_gate(root: Path, base: str) -> dict:
     for bucket in buckets:
         bucket['violations'] = sum(1 for hit in details if hit['bucket'] == bucket['name'])
     scanned_zero = [b['name'] for b in buckets if b['code_lines'] == 0]
+    untracked = untracked_product_swift(root)
+    ignored = ignored_product_swift(root)
     section = {'base': base, 'code_lines': code_total, 'files': len(files), 'file_list': files,
                'buckets': buckets, 'violations': len(details), 'violation_details': details,
                'constant_allow_list': list(CONSTANT_ALLOW), 'problems': [],
-               'empty_buckets': scanned_zero}
+               'empty_buckets': scanned_zero, 'untracked_files': untracked,
+               'ignored_swift': ignored, 'not_policed': list(NOT_POLICED),
+               'strict_violations_without_allow_list': len(scan_violations(root_added, strict=True))}
     for hit in details:
         section['problems'].append(f"FORBID-001 added {hit['path']} [{hit['bucket']}]: "
                                    f"{hit['pattern']}: {hit['line'][:110]}")
+    for rel in ignored:
+        section['problems'].append(f'FORBID-001 coverage: {rel} exists under Exolon/ but git lists '
+                                   'it neither as tracked nor as untracked (an ignore rule hides it '
+                                   'from every contour) - name it or move it out of the product tree')
     if code_total < 150 or len(files) < 7:
         section['problems'].append(f'the root-anchored scan is strangely empty: '
                                    f'files={len(files)} code lines={code_total}')
@@ -323,9 +399,15 @@ def verdicts(tag: str, stdout: str):
     if tag == 'B':
         passed = sum(1 for line in lines if re.match(r'^(PASS|OK) ', line))
         failed = sum(1 for line in lines if re.match(r'^(FAIL|MISMATCH) ', line))
-        if 'ALL_WAVE_B_CHECKS_MATCH_SPEC' not in stdout and failed == 0 and passed == 0:
-            raise ValueError('no verdict lines and no RESULT marker')
-        return passed, failed, ('ALL_WAVE_B_CHECKS_MATCH_SPEC' if failed == 0 else 'MISMATCH')
+        # review-code R7: the verdict_line a transcript quotes must be the meter's OWN line. The
+        # first implementation synthesised ALL_WAVE_B_CHECKS_MATCH_SPEC whenever no FAIL line was
+        # seen - which is exactly what a fail-closed exit 4 (missing refs/remotes/origin/main)
+        # prints nothing at all, so the machine-readable line claimed a success marker the meter
+        # never emitted.
+        marker = [line for line in lines if line.startswith('RESULT:')]
+        if not marker:
+            raise ValueError('no "RESULT:" marker (a fail-closed wave_b_check exit prints none)')
+        return passed, failed, marker[-1][:140]
     if tag == 'C':
         found = [re.search(r'RESULT: (\S+) \| probes=(\d+) failed=(\d+)', line) for line in lines]
         found = [m for m in found if m]
@@ -346,7 +428,9 @@ def verdicts(tag: str, stdout: str):
         if not found:
             raise ValueError('no "REAL MAPS ok=n/n failures=n" line')
         m = found[-1]
-        good = m.group(1) == m.group(2) and m.group(3) == '0'
+        # `ok == total` alone would certify a shrunken corpus (measured: 100/100 with ten maps
+        # deleted). AC-003 records 125/125, so 125 is asserted, not echoed.
+        good = (m.group(1) == m.group(2) == str(LOADER_MAPS) and m.group(3) == '0')
         return (1 if good else 0), (0 if good else 1), m.group(0)
     raise ValueError(f'unknown verdict tag {tag}')
 
@@ -426,9 +510,14 @@ def summarize(doc: dict, out=sys.stdout) -> None:
               f'passed={entry["passed"]:<3} failed={entry["failed"]:<3} rc={entry["rc"]} '
               f'green={"yes" if entry["green"] else "NO"} {entry["seconds"]}s '
               f'{entry["verdict_line"][:60]}', file=out)
-    if doc['meters']['skipped']:
-        print(f'SUMMARY meter       skipped={",".join(doc["meters"]["skipped"])} (partial suite)',
-              file=out)
+    if doc['meters']['skipped'] or doc['partial']:
+        skipped = doc['meters']['skipped'] or [name for name, _, _, _, _ in METERS]
+        print(f'SUMMARY meter       skipped={",".join(skipped)} (partial run, not the series '
+              f'contour: sections={",".join(doc["sections_run"])})', file=out)
+    disclosed = doc['attribution'].get('not_policed') or []
+    if disclosed:
+        print(f'SUMMARY not-policed {len(disclosed)} disclosed limits '
+              f'(--json attribution.not_policed); first: {disclosed[0][:76]}...', file=out)
     totals = doc['totals']
     print(f'SUMMARY TOTAL       meters={totals["meters_green"]}/{totals["meters_run"]} green '
           f'parse_failures={totals["parse_failures"]} attribution_violations='
@@ -471,7 +560,7 @@ def build_doc(root: Path, base: str, swiftc: str, sections: list, selected, budg
     clean = (not problems and totals['meters_green'] == totals['meters_run']
              and totals['meters_run'] > 0) or (not problems and not sections_run_meters(sections))
     result = 'WAVE_SCAN_GREEN' if (clean and full) else (
-        'WAVE_SCAN_GREEN_PARTIAL' if clean else 'WAVE_SCAN_RED')
+        'WAVE_SCAN_PARTIAL' if clean else 'WAVE_SCAN_RED')
     return {'tool': 'wave_scan', 'root': str(root), 'base': base, 'head': head_sha(root),
             'swiftc': swiftc, 'sections_run': sections, 'partial': bool(selected) or not full,
             'budget_seconds': budget, 'seconds': elapsed, 'parse': parse, 'attribution': att,
@@ -525,7 +614,7 @@ def main(argv=None) -> int:
         summarize(doc)
     if doc['result'] == 'WAVE_SCAN_GREEN':
         return 0
-    return 3 if doc['result'] == 'WAVE_SCAN_GREEN_PARTIAL' else 1
+    return 3 if doc['result'] == 'WAVE_SCAN_PARTIAL' else 1
 
 
 if __name__ == '__main__':

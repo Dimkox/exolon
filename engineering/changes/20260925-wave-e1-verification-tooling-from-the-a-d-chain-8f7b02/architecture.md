@@ -103,7 +103,17 @@ governance evidence.
    `.git` pointer, so any ref-writing command in it hits the shared repository (the wave-C
    `refs/heads/origin/main` incident); `clone_tree()` is the only isolation primitive this package uses.
 6. **Verdict parsing is implemented twice on purpose** (`wave_scan.verdicts()` and
-   `wave_e1_check.count_verdicts()`) so INV-001's agreement is not a tautology.
+   `wave_e1_check.count_verdicts()`) so INV-001's agreement is not a tautology - and both parsers
+   echo the meter's own `RESULT:` line instead of inventing a success marker for a fail-closed run.
+7. **A control's "before" side is a commit, never `HEAD`.** `CHANGE_BASE` is read from
+   `route.json.base_commit`; `_git_show`/`git_show_base` resolve the pre-edit bytes there, the change
+   surface is `CHANGE_BASE..HEAD ∪ working tree`, and one probe refuses to pass when the bytes it
+   compares are identical. Clone controls mirror the **real** ref topology (`origin/main` = the route
+   base) with an explicit `post-merge` variant, because pinning `origin/main := HEAD` made every
+   control run in a state the open PR never has.
+8. **Certification is bound to a head by construction.** `evidence/freeze.sh` regenerates all five
+   artifacts in one ordered pass (scan → ruff → check → grok_verify), stamps each with
+   `head=<sha> dirty=<n>`, and fails if any of them does not name the head it started on.
 
 ## Risks and mitigations
 
