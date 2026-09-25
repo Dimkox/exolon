@@ -1,0 +1,52 @@
+# Rb-1 closure — the parse gate must cover COMMITTED changes, not only the working diff
+
+Reproduced 2026-09-25 in a **standalone** `git clone --no-hardlinks` of this branch (its own refs, no
+shared worktree pointer), at head `ed687a0` plus one scratch commit appending syntax garbage to
+`Exolon/GameCore/Weapons/BlasterBullet.swift` — a file wave C never edits, which wave B rewrote, and
+which is therefore already **committed**.
+
+* scratch commit: `7fc4d25` — "SCRATCH rb1: committed syntax garbage in BlasterBullet.swift"
+* working tree afterwards: `git status --porcelain | wc -l` = **0** (clean). That is the whole point:
+  nothing about this tree looks dirty to a working-diff scan.
+
+## Target sets on that exact tree
+
+| scan | definition | files | sees BlasterBullet.swift? |
+| --- | --- | ---: | --- |
+| OLD | `git diff --name-only HEAD -- '*.swift'` (working diff only) | **0** | **no** — the gate parses nothing at all |
+| NEW | `git diff 295690b..HEAD` ∪ working diff ∪ untracked | **19** | **yes** |
+
+## Verdict on that tree, with the fixed checker
+
+```
+RESULT: WAVE_C_PROBES_FAIL | probes=9 failed=1 safe_models_are_labeled     (rc=1)
+    ! swiftc -frontend -parse failed for Exolon/GameCore/Weapons/BlasterBullet.swift:
+      BlasterBullet.swift:63:12: error: consecutive statements on a line must be separated by ';'
+```
+
+Exactly one probe fails, and it fails naming the poisoned file. The garbage is caught **even though
+the working tree is clean and wave C never touches that file**. Under the OLD derivation the same tree
+was entirely green — which is the Rb-1 hole: after a rebase a working-diff-only scan covers almost
+nothing, so the syntax gate added in the previous cycle would have been silently vacuous on this very
+branch. The gate is only real if its target set is derived from history as well as from the index.
+
+## Companion control, evaluated on every run
+
+`parse_gate_covers_committed_changes` requires the target set to (a) strictly exceed the working-diff
+set and (b) contain at least one of `BlasterBullet` / `TMXTileMapRenderer` / `Grenade` — files that
+only earlier waves changed. If the derivation ever regresses back to the working diff, the probe
+reddens by itself rather than quietly scanning nothing.
+
+Fixed in the same pass: parse verdicts are keyed by **repository-relative path**, not basename. This
+tree contains two different `main.swift` files (the app entry point and each harness's driver), and the
+old key made them overwrite each other's result — one file's verdict could hide the other's failure.
+
+## Two further cross-route notes recorded here
+
+1. **The old checker on the same tree** (`ed687a0`, before this cycle's fixes) failed 4 probes for a
+   different reason — stale citation anchors and the broken `GameConstants` contour, not the garbage.
+   Noted so nobody reads that run as the Rb-1 evidence; the run above, with the current checker, is.
+2. **Applying wave B's own FORBID-001 added-line patterns** (`±16`, `528|544|560`, per-map name) to the
+   combined A+B+C product diff: **2826 added code lines, 0 violations** — wave C's lines are clean
+   under wave B's rule, independent of wave B's own meter being base-confused post-merge (tasks.md
+   D23/R6).

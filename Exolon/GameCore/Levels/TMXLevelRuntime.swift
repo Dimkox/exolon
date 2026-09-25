@@ -470,15 +470,21 @@ final class TMXLevelRuntime {
                     // defect being fixed is that the marker used to vanish without a trace.
                     // The record is read only by the debug overlay, so no gameplay path changes.
                     appendSafeModelMarker(kind: .inertScenery, sourceBlock: source,
-                                          sx: sx, bottomY: bottomY)
+                                          sx: sx, topY: map.pixelHeight - syTop)
                 case .unconfirmedAction:
                     // blk_gunMachine_BOTTOM is the only formerly-dropped family with a positive
-                    // action record (type 11 at its own cell), but the type cannot be identified
-                    // from anything in this repository: 56 type-11 actions exist and only 18 are
-                    // exported here, and the other 38 sit in maps with no BOTTOM marker at all.
-                    // So the marker is recorded and labeled, and deliberately not armed.
+                    // action record (type 11 at its own cell). The gun-machine MECHANIC is
+                    // documented in this repository (ORIGINAL_MECHANICS.md:36-41: bullet origin
+                    // turret.left + 2 / turret.bottom + 56, bullets travel left and are
+                    // blaster-immune, the turret is grenade-destroyable for 150 points; :170
+                    // requires gun machines) and the upper entity is already implemented as the
+                    // shipped `turret`. What is NOT in-tree is the numeric type-11 -> entity
+                    // binding that would say what this separate lower cell is: 56 type-11 actions
+                    // exist in the original table, only 18 are exported alongside a BOTTOM marker,
+                    // and the other 38 sit in maps that have no BOTTOM marker at all. So the
+                    // marker is recorded and labeled, and deliberately not armed.
                     appendSafeModelMarker(kind: .unconfirmedAction, sourceBlock: source,
-                                          sx: sx, bottomY: bottomY)
+                                          sx: sx, topY: map.pixelHeight - syTop)
                 case nil:
                     // The matcher met nothing. Record the name so the coverage meter fails on it
                     // instead of the map silently losing content.
@@ -536,11 +542,15 @@ final class TMXLevelRuntime {
         }
     }
 
-    /// Record a source marker that the factory can only express as a labeled safe model. The
-    /// footprint is the measured cell box converted to pixels the same way `beaconBase` converts
-    /// its own (4x3 cells -> 64x48 pt), anchored so its top edge sits at the marker's source row.
+    /// Record a source marker that the factory can only express as a labeled safe model. The box is
+    /// anchored exactly the way `.beaconBase` anchors its documented 4x3 rect: the marker's own
+    /// source row is the TOP cell of the footprint, so the box covers source rows
+    /// `sourceY .. sourceY + heightCells - 1`. That means `rect.maxY == pixelHeight - sourceY*16`
+    /// — the same top edge `.beaconBase` produces from `pixelHeight - (sourceY + 3)*16` plus
+    /// `height: 48` — and `wave_c_check.py::safe_models_are_labeled` pins this identity, so the
+    /// anchor and this comment cannot drift apart again.
     private func appendSafeModelMarker(kind: TMXSourceMarkerKind, sourceBlock: String,
-                                       sx: CGFloat, bottomY: CGFloat) {
+                                        sx: CGFloat, topY: CGFloat) {
         let cells = TMXSourceMarkerKind.safeModelFootprintCells(sourceBlock: sourceBlock)
         let width = CGFloat(cells.width) * 16
         let height = CGFloat(cells.height) * 16
@@ -548,7 +558,7 @@ final class TMXLevelRuntime {
             kind: kind,
             sourceBlock: sourceBlock,
             label: kind.safeModelLabel,
-            rect: CGRect(x: sx, y: max(0, bottomY - height), width: width, height: height),
+            rect: CGRect(x: sx, y: max(0, topY - height), width: width, height: height),
             mapResource: name
         ))
     }

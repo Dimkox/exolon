@@ -1,52 +1,59 @@
-# RED baseline meter run — change f2d90a, task 2 (REGENERATED; supersedes the 20:05 revision)
+# RED baseline meter run — change f2d90a, task 2 (post-rebase regeneration)
 #
-# Provenance (test review F7): produced by the checker committed in the worktree, so artifact
-# and checker agree control-for-control.
-#   checker sha256 = 5ad27c981b33a67984b9b089930c5b3e0e47baeeba9891164fe92bc4401edbc0
-#   IDENTICAL to the worktree checker
+# Base measured: 3407c37 = origin/main after waves A and B merged — the tree this branch now
+# replaces. An earlier revision measured 295690b; numbers are identical because no wave before C
+# touched source_marker handling.
 #
-# How the pre-change tree was obtained (product only — never the meter, data or contract):
-#   1. copy the worktree to /tmp/red-base (repo .git pointer kept, so git show resolves)
-#   2. git checkout 295690b -- Exolon/
-#   3. verify  git diff 295690b -- Exolon/  -> EMPTY; loader = 352 lines;
-#      0 hits for TMXSourceMarkerKind / unmatchedSourceMarkers
-#   4. copy the FINAL wave_c_check.py + disposition table + golden in, then run
+# Isolation: standalone `git clone --no-hardlinks` of the repository checked out at 3407c37 (its
+# own refs, no shared worktree pointer), with the committed checker, disposition table, golden and
+# contract copied in unmodified; only Exolon/ is at the base revision.
 #
-# The 20:05 revision it replaces came from an earlier checker (4 controls in
-# unchanged_marker_output incl. the since-removed branch_edit_detected, no check_citation).
-# Headline numbers were already right; the detail blocks were not. That is the whole point of F7.
+# clone checker sha256    = 0f8db7454acde565534a603ff2fa20ed8c9ac9a13f2a544b55d07ff0afb3cc53
+# worktree checker sha256 = 0f8db7454acde565534a603ff2fa20ed8c9ac9a13f2a544b55d07ff0afb3cc53
+#   IDENTICAL — this red artifact and the committed green checker are one revision
+#
+# P1-7 defect at the base being replaced: 76 of 127 source_marker objects resolve, 51 silently
+# dropped on 32 maps, 8 of 11 distinct sourceBlock values claimed, no recorder for the rest.
+# The 6 green probes are controls that had to stay green across the fix.
+# The 22 citation failures are the guard working: at base there is no classifier arm to point at.
+#
+# Controls named at base: 62 vs 64 on the fixed tree. The two absent at base are the executed-
+# product controls (product_execution_agrees, product_negative_control_holds) in
+# marker_coverage_all_maps: at base the meter's own Swift probe program does not compile (no
+# TMXSourceMarkerKind), so the probe refuses to publish an unexecuted product number — it fails
+# closed instead of falling back to a Python replica.
 
 ignored_types_disposition    FAIL
     ! blk_gunMachine_BOTTOM: table claims substring 'gunMachine_BOTTOM' which the product does not test
     ! blk_mushroom: table claims substring 'mushroom' which the product does not test
     ! blk_waggon: table claims substring 'waggon' which the product does not test
     ! formerly-ignored families still unresolved: blk_gunMachine_BOTTOM, blk_mushroom, blk_waggon
-    ! blk_beacon_base: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:391-404 does not contain 'case .beaconBase:'
-    ! blk_beacon_base: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
-    ! blk_beam_down: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:367-371 does not contain 'case .forceField:'
-    ! blk_beam_down: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
-    ! blk_beam_up: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:367-371 does not contain 'case .forceField:'
-    ! blk_beam_up: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
-    ! blk_blinker: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:377-379 does not contain 'case .blinker:'
-    ! blk_blinker: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
-    ! blk_changing_room: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:382-390 does not contain 'case .changingRoom:'
-    ! blk_changing_room: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
-    ! blk_control_beacon: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:405-417 does not contain 'case .controlBeacon:'
-    ! blk_control_beacon: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
-    ! blk_gunMachine_BOTTOM: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:427-434 does not contain 'case .unconfirmedAction:'
-    ! blk_gunMachine_BOTTOM: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
-    ! blk_mushroom: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:418-426 does not contain 'case .inertScenery:'
-    ! blk_mushroom: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
-    ! blk_stage_end: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:380-381 does not contain 'case .stageEnd:'
-    ! blk_stage_end: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
-    ! blk_topdown_electro: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:372-376 does not contain 'case .highVoltage:'
-    ! blk_topdown_electro: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
-    ! blk_waggon: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:418-426 does not contain 'case .inertScenery:'
-    ! blk_waggon: citation Exolon/GameCore/Levels/TMXMapLoader.swift:407-420 is outside the file (352 lines)
+    ! blk_beacon_base: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:438-451 does not contain 'case .beaconBase:'
+    ! blk_beacon_base: citation Exolon/GameCore/Levels/TMXMapLoader.swift:660-660 is outside the file (595 lines)
+    ! blk_beam_down: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:416-418 does not contain 'case .forceField:'
+    ! blk_beam_down: citation Exolon/GameCore/Levels/TMXMapLoader.swift:655-655 is outside the file (595 lines)
+    ! blk_beam_up: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:416-418 does not contain 'case .forceField:'
+    ! blk_beam_up: citation Exolon/GameCore/Levels/TMXMapLoader.swift:655-655 is outside the file (595 lines)
+    ! blk_blinker: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:424-426 does not contain 'case .blinker:'
+    ! blk_blinker: citation Exolon/GameCore/Levels/TMXMapLoader.swift:657-657 is outside the file (595 lines)
+    ! blk_changing_room: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:429-437 does not contain 'case .changingRoom:'
+    ! blk_changing_room: citation Exolon/GameCore/Levels/TMXMapLoader.swift:659-659 is outside the file (595 lines)
+    ! blk_control_beacon: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:452-464 does not contain 'case .controlBeacon:'
+    ! blk_control_beacon: citation Exolon/GameCore/Levels/TMXMapLoader.swift:661-661 is outside the file (595 lines)
+    ! blk_gunMachine_BOTTOM: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:474-487 does not contain 'case .unconfirmedAction:'
+    ! blk_gunMachine_BOTTOM: citation Exolon/GameCore/Levels/TMXMapLoader.swift:664-664 is outside the file (595 lines)
+    ! blk_mushroom: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:465-473 does not contain 'case .inertScenery:'
+    ! blk_mushroom: citation Exolon/GameCore/Levels/TMXMapLoader.swift:662-662 is outside the file (595 lines)
+    ! blk_stage_end: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:427-428 does not contain 'case .stageEnd:'
+    ! blk_stage_end: citation Exolon/GameCore/Levels/TMXMapLoader.swift:658-658 is outside the file (595 lines)
+    ! blk_topdown_electro: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:419-423 does not contain 'case .highVoltage:'
+    ! blk_topdown_electro: citation Exolon/GameCore/Levels/TMXMapLoader.swift:656-656 is outside the file (595 lines)
+    ! blk_waggon: citation Exolon/GameCore/Levels/TMXLevelRuntime.swift:465-473 does not contain 'case .inertScenery:'
+    ! blk_waggon: citation Exolon/GameCore/Levels/TMXMapLoader.swift:663-663 is outside the file (595 lines)
     ! AC-002 is not product-executed on this host (product build failed: Label)")
 31 | }
 
-/tmp/wave-c-swift-6ea2p5d8/main.swift:33:17: error: cannot find 'TMXSourceMarkerKind' in scope
+/tmp/wave-c-swift-92ohjudf/main.swift:33:17: error: cannot find 'TMXSourceMarkerKind' in scope
 31 | }
 32 | for block in blockCount.keys.sorted() {
 33 |     let cells = TMXSourceMarkerKind.safeModelFootprintCells(sourceBlock: block)
@@ -87,7 +94,7 @@ marker_baseline_reproduced   PASS
     markers_lost                     51
     markers_total                    127
     measured_with_legacy_table       true
-    stale_mirrors                    {"baseline_agrees": true, "mirrors": []}
+    stale_mirrors                    {"baseline_agrees": true, "divergence": ["v3_measurements.py still reports 76/127 (rc=0) about a tree where the product resolves 76/127; owner-route cleanup owed, see tasks.md R1", "linux_static_audit.py still reports 76/127 (rc=0) about a tree where the product resolves 76/127; owner-route cleanup owed, see tasks.md R1"], "mirrors": [{"file": "engineering/changes/20260919-exol...
 marker_coverage_all_maps     FAIL
     ! 3 of 11 distinct sourceBlock values are unclaimed: blk_gunMachine_BOTTOM, blk_mushroom, blk_waggon
     ! 51 of 127 markers resolve to nothing, on 32 maps
@@ -96,7 +103,7 @@ marker_coverage_all_maps     FAIL
     ! AC-001 is not product-executed on this host (product build failed: Label)")
 31 | }
 
-/tmp/wave-c-swift-6ea2p5d8/main.swift:33:17: error: cannot find 'TMXSourceMarkerKind' in scope
+/tmp/wave-c-swift-92ohjudf/main.swift:33:17: error: cannot find 'TMXSourceMarkerKind' in scope
 31 | }
 32 | for block in blockCount.keys.sorted() {
 33 |     let cells = TMXSourceMarkerKind.safeModelFootprintCells(sourceBlock: block)
@@ -154,7 +161,7 @@ safe_models_are_labeled      FAIL
     ! FORBID-002 is not product-executed on this host (product build failed: Label)")
 31 | }
 
-/tmp/wave-c-swift-6ea2p5d8/main.swift:33:17: error: cannot find 'TMXSourceMarkerKind' in scope
+/tmp/wave-c-swift-92ohjudf/main.swift:33:17: error: cannot find 'TMXSourceMarkerKind' in scope
 31 | }
 32 | for block in blockCount.keys.sorted() {
 33 |     let cells = TMXSourceMarkerKind.safeModelFootprintCells(sourceBlock: block)
@@ -174,19 +181,20 @@ safe_models_are_labeled      FAIL
     ! blk_waggon: the product has no kind 'inertScenery' to compare the disposition against
     ! blk_gunMachine_BOTTOM: the product has no kind 'unconfirmedAction' to compare the disposition against
     ! GameScene.swift never reads safeModelMarkers: a recorded safe model has no debug rendering (FORBID-002 "in debug rendering")
+    ! cannot locate the .beaconBase arm
     classifier_kinds                 []
-    controls                         {"bogus_substring_rejected": true, "honest_overlay_binding_accepted": false, "overlay_deletion_detected": true, "overlay_label_strip_detected": true, "parse_gate_detects_a_broken_file": true, "safe_relabelled_as_typed_rejected": true, "typed_promoted_to_safe_rejected": true, "undeclared_kind_rejected": true, "unlabeled_placeholder_rejected": true}
+    controls                         {"anchor_beacon_side_shift_detected": false, "anchor_parity_honest_accepted": false, "anchor_regressed_to_bottomY_detected": false, "anchor_single_row_shift_detected": false, "bogus_substring_rejected": true, "honest_overlay_binding_accepted": false, "overlay_deletion_detected": true, "overlay_label_strip_detected": true, "parse_gate_covers_committed_changes": true, "parse_gate...
     labels                           {}
     markers_covered_by_safe_models   51
     product_labels                   {}
     rendering_evidence_limit         "source-structure only: SpriteKit cannot be compiled or run on Linux (`import SpriteKit` fails at TMXLevelRuntime.swift:1), so the on-screen outline itself still needs the macOS spot in test-plan.md"
     safe_model_families              ["blk_gunMachine_BOTTOM", "blk_mushroom", "blk_waggon"]
-    swift_parse                      {"GameScene.swift": "ok", "TMXLevelRuntime.swift": "ok", "TMXMapLoader.swift": "ok"}
+    swift_parse                      {"targets": ["AppDelegate.swift", "BlasterBullet.swift", "FixedTickDriver.swift", "GameConstants.swift", "GameScene.swift", "GameplayEventLog.swift", "GameplayEventSink.swift", "Grenade.swift", "InputState.swift", "LauncherBonusState.swift", "LevelObstacles.swift", "Player.swift", "StageBoundaryLedger.swift", "TMXLevelRuntime.swift", "TMXMapLoader.swift", "TMXTileMapRenderer.sw...
 unchanged_marker_output      PASS
     beam_rect_pinned                 ["x: sx, y: max(0, bottomY - 240), width: 48, height: 272"]
     branches_changed_vs_base         []
     branches_located                 ["beacon_base", "beam_", "blinker", "changing_room", "control_beacon", "stage_end", "topdown_electro"]
-    compared_against                 "295690b7fc72 (TMXLevelRuntime.swift)"
+    compared_against                 "3407c37 (TMXLevelRuntime.swift)"
     controls                         {"branch_comment_edit_ignored": true, "branch_rect_height_edit_detected": true, "branch_rect_width_edit_detected": true, "branch_statement_added_detected": true, "bucket_change_detected": true, "deviation_cannot_wildcard": true, "deviation_exact_and_cited_honored": true, "deviation_uncited_rejected": true, "deviation_wrong_target_rejected": true, "geometry_change_detected": tru...
     covered_maps                     37
     covered_markers                  76
@@ -199,14 +207,15 @@ zone_index_formula           PASS
     false_mismatches_if_filename     117
     keyless_maps                     ["L01S01", "L01S02", "L01S03", "L01S04", "L01S05", "L01S06", "L01S07", "L01S08"]
     maps_with_zone_number            117
+WARNING (not a failure of this change): v3_measurements.py still reports 76/127 (rc=0) about a tree where the product resolves 76/127; owner-route cleanup owed, see tasks.md R1
+WARNING (not a failure of this change): linux_static_audit.py still reports 76/127 (rc=0) about a tree where the product resolves 76/127; owner-route cleanup owed, see tasks.md R1
 RESULT: WAVE_C_PROBES_FAIL | probes=9 failed=3 ignored_types_disposition,marker_coverage_all_maps,safe_models_are_labeled
-rc=1
 
-## Why THIS run carries 57 named controls and the green run 59
-At base the meter's own Swift probe program does not COMPILE: it calls
-TMXSourceMarkerKind.classify, which the pre-fix loader does not define. So
-swift_product_evidence() returns None and marker_coverage_all_maps omits its two
-execution controls (product_execution_agrees, product_negative_control_holds) while
-appending the problem 'AC-001 is not product-executed on this host'. The meter refuses to
-publish an executed product number it cannot execute - it does not fall back to a quiet
-Python replica and call it green. Same reason the same probe is RED here.
+## Agreement across the two bases
+| quantity | 295690b | 3407c37 (this artifact) |
+| --- | ---: | ---: |
+| markers total / covered / lost | 127 / 76 / 51 | 127 / 76 / 51 |
+| maps with a loss | 32 | 32 |
+| distinct values claimed | 8 of 11 | 8 of 11 |
+| failing probes | 3 (coverage, disposition, safe-models) | 3 (same three) |
+| rc | 1 | 1 |

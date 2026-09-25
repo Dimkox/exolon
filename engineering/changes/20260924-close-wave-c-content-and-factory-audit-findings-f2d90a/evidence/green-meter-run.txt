@@ -1,15 +1,20 @@
-# GREEN meter run — change f2d90a (post test-review fix cycle)
-# tree: /home/pall/projects/.exolon-wave-c/exolon   route base: 295690b
-# command: python3 wave_c_check.py    (stdlib only; timed below)
-# checker sha256: 5ad27c981b33a67984b9b089930c5b3e0e47baeeba9891164fe92bc4401edbc0
-# the SAME bytes produced baseline-meter-red.txt, so artifact and checker agree (test review F7)
+# GREEN meter run — change f2d90a (micro-batch N1/N2 applied; post-rebase base 3407c37)
+# tree: /home/pall/projects/.exolon-wave-c/exolon
+# branch head: the commit containing this file (`git log -1 --format=%h`); base replaced:
+#   3407c37 (origin/main after waves A+B); route base 295690b
+# command: python3 wave_c_check.py  (stdlib only; timed below; budget <=120 s)
+# checker sha256: 0f8db7454acde565534a603ff2fa20ed8c9ac9a13f2a544b55d07ff0afb3cc53
+# the SAME bytes generated baseline-meter-red.txt at 3407c37 (F7 binding re-verified)
 #
-# AC-001 127/127 marker objects (11/11 distinct sourceBlock values), silent-drop path removed and
-#   disposition column enforced as a normative equivalence (test review G1/G2 repro red);
-# AC-002 machine-reread file:line citations; AC-003 manifest pinned; AC-004 every tamper RE-SEALED
-#   before judgement, incl. the reviewer's C10/C11 and keyed K10-K12 (see f1-tamper-proof.txt);
-# AC-005 balanced-paren rect capture + git-blob-derived base (7 controls); FORBID-001/002;
-# FORBID-002's debug-rendering clause now covered by overlay_deletion_detected (reviewer case R2).
+# N1: the .unconfirmedAction label no longer claims the mechanic is undocumented in-tree; it states
+#   ORIGINAL_MECHANICS.md:36-41 documents it and :170 requires it, and that only the numeric
+#   type-11 -> entity binding for the separate lower cell is absent. Still recorded, still NOT armed.
+#   The table row was rewritten from the Swift literal, so product and table cannot disagree; the
+#   executed evidence still supplies the string (unlabeled/bogus-substring flips stay live).
+# N2: safe-model box anchored at the marker's own source row (topY = pixelHeight - syTop), matching
+#   .beaconBase's documented 4x3 conversion instead of sitting 32 pt low; the meter now re-derives
+#   both top edges from the source text and requires arithmetic agreement (not a parse success).
+# AC-005: branches_changed_vs_base = [], arm_deviations = [] (unchanged from the rebase outcome).
 
 ignored_types_disposition    PASS
     citations_verified               22
@@ -70,18 +75,18 @@ no_invented_content          PASS
     unique_maps_now                  101
 safe_models_are_labeled      PASS
     classifier_kinds                 ["forceField", "highVoltage", "blinker", "stageEnd", "changingRoom", "beaconBase", "controlBeacon", "inertScenery", "unconfirmedAction"]
-    controls                         {"bogus_substring_rejected": true, "honest_overlay_binding_accepted": true, "overlay_deletion_detected": true, "overlay_label_strip_detected": true, "parse_gate_detects_a_broken_file": true, "safe_relabelled_as_typed_rejected": true, "typed_promoted_to_safe_rejected": true, "undeclared_kind_rejected": true, "unlabeled_placeholder_rejected": true}
-    labels                           {"blk_gunMachine_BOTTOM": "SAFE-MODEL unconfirmed-action: a distinct source action cell exists but its type is not identifiable in-tree; behaviour deliberately NOT implemented", "blk_mushroom": "SAFE-MODEL inert-scenery: imported static artwork, no action in the source table", "blk_waggon": "SAFE-MODEL inert-scenery: imported static artwork, no action in the source table"}
+    controls                         {"anchor_beacon_side_shift_detected": true, "anchor_parity_honest_accepted": true, "anchor_regressed_to_bottomY_detected": true, "anchor_single_row_shift_detected": true, "bogus_substring_rejected": true, "honest_overlay_binding_accepted": true, "overlay_deletion_detected": true, "overlay_label_strip_detected": true, "parse_gate_covers_committed_changes": true, "parse_gate_dete...
+    labels                           {"blk_gunMachine_BOTTOM": "SAFE-MODEL unconfirmed-action: the mechanic IS documented in-tree (ORIGINAL_MECHANICS.md:36-41, required by :170); only the numeric type-11 -> entity binding for this second cell is absent, so it is recorded and behaviour deliberately NOT implemented", "blk_mushroom": "SAFE-MODEL inert-scenery: imported static artwork, no action in the source table", ...
     markers_covered_by_safe_models   51
-    product_labels                   {"forceField": "", "inertScenery": "SAFE-MODEL inert-scenery: imported static artwork, no action in the source table", "unconfirmedAction": "SAFE-MODEL unconfirmed-action: a distinct source action cell exists but its type is not identifiable in-tree; behaviour deliberately NOT implemented"}
+    product_labels                   {"forceField": "", "inertScenery": "SAFE-MODEL inert-scenery: imported static artwork, no action in the source table", "unconfirmedAction": "SAFE-MODEL unconfirmed-action: the mechanic IS documented in-tree (ORIGINAL_MECHANICS.md:36-41, required by :170); only the numeric type-11 -> entity binding for this second cell is absent, so it is recorded and behaviour deliberately NOT ...
     rendering_evidence_limit         "source-structure only: SpriteKit cannot be compiled or run on Linux (`import SpriteKit` fails at TMXLevelRuntime.swift:1), so the on-screen outline itself still needs the macOS spot in test-plan.md"
     safe_model_families              ["blk_gunMachine_BOTTOM", "blk_mushroom", "blk_waggon"]
-    swift_parse                      {"GameScene.swift": "ok", "TMXLevelRuntime.swift": "ok", "TMXMapLoader.swift": "ok"}
+    swift_parse                      {"targets": ["AppDelegate.swift", "BlasterBullet.swift", "FixedTickDriver.swift", "GameConstants.swift", "GameScene.swift", "GameplayEventLog.swift", "GameplayEventSink.swift", "Grenade.swift", "InputState.swift", "LauncherBonusState.swift", "LevelObstacles.swift", "Player.swift", "StageBoundaryLedger.swift", "TMXLevelRuntime.swift", "TMXMapLoader.swift", "TMXTileMapRenderer.sw...
 unchanged_marker_output      PASS
     beam_rect_pinned                 ["x: sx, y: max(0, bottomY - 240), width: 48, height: 272"]
     branches_changed_vs_base         []
     branches_located                 ["beacon_base", "beam_", "blinker", "changing_room", "control_beacon", "stage_end", "topdown_electro"]
-    compared_against                 "295690b7fc72 (TMXLevelRuntime.swift)"
+    compared_against                 "3407c37 (TMXLevelRuntime.swift)"
     controls                         {"branch_comment_edit_ignored": true, "branch_rect_height_edit_detected": true, "branch_rect_width_edit_detected": true, "branch_statement_added_detected": true, "bucket_change_detected": true, "deviation_cannot_wildcard": true, "deviation_exact_and_cited_honored": true, "deviation_uncited_rejected": true, "deviation_wrong_target_rejected": true, "geometry_change_detected": tru...
     covered_maps                     37
     covered_markers                  76
@@ -98,47 +103,44 @@ WARNING (not a failure of this change): v3_measurements.py still reports 76/127 
 WARNING (not a failure of this change): linux_static_audit.py still reports 76/127 (rc=0) about a tree where the product resolves 127/127; owner-route cleanup owed, see tasks.md R1
 RESULT: ALL_WAVE_C_PROBES_PASS | probes=9 failed=0
 
-real	0m2.632s
-user	0m2.118s
-sys	0m0.530s
+real	0m4.337s
+user	0m3.392s
+sys	0m0.960s
 rc=0
 
-## Control census (measured from --json, not copied from a previous revision)
-  ignored_types_disposition    PASS controls= 6  all_true=True
-  level_pair_manifest_pinned   PASS controls= 5  all_true=True
-  manifest_selfcheck           PASS controls=11  all_true=True
-  marker_baseline_reproduced   PASS controls= 3  all_true=True
-  marker_coverage_all_maps     PASS controls= 6  all_true=True
-  no_invented_content          PASS controls= 5  all_true=True
-  safe_models_are_labeled      PASS controls= 9  all_true=True
-  unchanged_marker_output      PASS controls=11  all_true=True
-  zone_index_formula           PASS controls= 3  all_true=True
-  TOTAL: 59 named controls, 59 true
+## Control census (measured from --json this run)
+  ignored_types_disposition    PASS controls= 6 all_true=True
+  level_pair_manifest_pinned   PASS controls= 5 all_true=True
+  manifest_selfcheck           PASS controls=11 all_true=True
+  marker_baseline_reproduced   PASS controls= 3 all_true=True
+  marker_coverage_all_maps     PASS controls= 6 all_true=True
+  no_invented_content          PASS controls= 5 all_true=True
+  safe_models_are_labeled      PASS controls=14 all_true=True
+  unchanged_marker_output      PASS controls=11 all_true=True
+  zone_index_formula           PASS controls= 3 all_true=True
+  TOTAL: 64 named controls, 64 true
 
-## Stale-mirror cross-check emitted on every run (test review F5; not a failure of this change)
-WARNING (not a failure of this change): v3_measurements.py still reports 76/127 (rc=0) about a tree where the product resolves 127/127; owner-route cleanup owed, see tasks.md R1
-WARNING (not a failure of this change): linux_static_audit.py still reports 76/127 (rc=0) about a tree where the product resolves 127/127; owner-route cleanup owed, see tasks.md R1
+## Anchor-parity falsification (each mutation caught by ARITHMETIC, not by a parse failure)
+  honest tree                                    parity_broken=False expected=False OK
+  regressed to the historical bottomY anchor     parity_broken=True  expected=True  OK
+  one-row caller drift (shape preserved)         parity_broken=True  expected=True  OK
+  beacon arm moved a row (parity target shifts)  parity_broken=True  expected=True  OK
 
-## Product execution contour
-committed harness run.sh: REAL MAPS ok=125/125 failures=0, delta = exactly 1 import line, no-shim build still fails
-meter swift_product_evidence(): compiled+EXECUTED classify, loaded 125/125, unmatched {}
-swiftc -frontend -parse executed by the meter for: TMXMapLoader.swift, TMXLevelRuntime.swift, GameScene.swift
-NOT type-checked on Linux (measured, disclosed in test-plan.md): TMXLevelRuntime.swift, GameScene.swift (no SpriteKit module)
+## Executed contour + parse gate
+  loader + byte-verified GameConstants.swift + probe: loaded 125/125, unmatched {}, no-shim fails
+  parse targets: 19 swift files (committed diff UNION working diff), all ok
 
-## git status
- M Exolon/GameCore/GameScene.swift
+## git status / product diff
  M Exolon/GameCore/Levels/TMXLevelRuntime.swift
  M Exolon/GameCore/Levels/TMXMapLoader.swift
- M README.md
-?? engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/
-?? engineering/contracts/
-?? engineering/reports/level-content-uniqueness-v1.md
+ M engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/analysis-repo_explorer.md
+ M engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/baseline-meter-red.txt
+ M engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/green-meter-run.txt
+ M engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/marker-disposition-v1.json
+ M engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/wave_c_check.py
+ M engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/release.md
+ M engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/tasks.md
+?? engineering/changes/20260924-close-wave-c-content-and-factory-audit-findings-f2d90a/evidence/review-code-rebase.md
 
-## diffstat vs route base
- Exolon/GameCore/GameScene.swift              | 14 ++++-
- Exolon/GameCore/Levels/TMXLevelRuntime.swift | 63 ++++++++++++++++---
- Exolon/GameCore/Levels/TMXMapLoader.swift    | 92 ++++++++++++++++++++++++++++
- README.md                                    |  7 +++
- 4 files changed, 168 insertions(+), 8 deletions(-)
-
-## pbxproj (wave-A 4-edit rule; nothing listed = untouched)
+## pbxproj untouched by wave C
+  (empty above)

@@ -25,12 +25,9 @@
       "images": [],
       "label_source": false,
       "mutations": [
-        "forceFields.append",
-        "rootNode.addChild"
+        "beamBoxes.append"
       ],
-      "nodes": [
-        "field"
-      ],
+      "nodes": [],
       "numeric_literals": [
         "0",
         "240",
@@ -132,7 +129,7 @@
       "textures": []
     }
   },
-  "base_commit": "295690b7fc724e57b37b5fac86b71c1da7d8b032",
+  "base_commit": "3407c37",
   "branch_fingerprint_source": "computed from `git show 295690b7fc72:TMXLevelRuntime.swift`, never from the working tree, so editing this golden cannot make AC-005 agree with itself",
   "branch_fingerprints": {
     "beacon_base": {
@@ -159,12 +156,9 @@
       "images": [],
       "label_source": false,
       "mutations": [
-        "forceFields.append",
-        "rootNode.addChild"
+        "beamBoxes.append"
       ],
-      "nodes": [
-        "field"
-      ],
+      "nodes": [],
       "numeric_literals": [
         "0",
         "240",

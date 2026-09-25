@@ -56,23 +56,28 @@ ALL_WAVE_C_PROBES_PASS | probes=9 failed=0`, rc=0, **2.46 s** (≤ 120 s, stdlib
       rc=0 for `TMXMapLoader.swift`, `TMXLevelRuntime.swift`, `GameScene.swift` — and the parse loop
       is now executed **by the meter itself** (`safe_models_are_labeled::swift_parse`, with
       `parse_gate_detects_a_broken_file` proving it can fail), not just reported in prose.
-      The committed Linux harness `run.sh` still builds the product loader and reports **`REAL MAPS
-      ok=125/125 failures=0`**, keeps its 1-import-line delta rule and its no-shim negative control.
+      The committed Linux harness `run.sh` **no longer compiles on the merged tree** (D21): B moved
+      the collision query into `TMXMapLoader.swift`, which now references `GameConstants`, so the
+      contour fails at `error: cannot find 'GameConstants' in scope`. Up to wave B it reported
+      **`REAL MAPS ok=125/125 failures=0`** with its 1-import-line delta rule and no-shim control.
       **Attribution, precisely (test review F4):** `run.sh` *compiles* the classifier (it now lives in
       `TMXMapLoader.swift`, so it is genuinely type-checked — a real gain over `-frontend -parse`) and
       *executes the parser*; it never calls `classify` (`grep -c classify harness/main.swift` = 0).
       Classifier **execution** is `wave_c_check.py::swift_product_evidence`, which is where the
-      executed 127/127 and `unmatched: {}` numbers come from.
+      executed 127/127 and `unmatched: {}` numbers come from — that contour was extended in this
+      cycle to compile `GameConstants.swift` too, so it runs on the merged tree (D21).
       `ruff check .` and `bandit -c bandit.yaml -r .` clean.
       `python3 scripts/grok_verify.py --mode pr` recorded at the end (see `verification` receipt).
-9. [x] **This file updated; no git operations performed.**
+9. [x] **This file updated.** Git operations in the rebase cycle (per controller instruction):
+   `git fetch`, `git rebase origin/main` (conflict resolved), one local commit of the post-rebase
+   fixes, and **no push**. See the rebase-cycle section.
 
 ## Gate state at hand-off
 
-`python3 evidence/wave_c_check.py`: **9/9 probes PASS, rc=0, ~2.8 s**, with **59 named controls, all
+`python3 evidence/wave_c_check.py`: **9/9 probes PASS, rc=0, ~4.3 s** (120 s budget; the extra ~1.3 s is the parse gate now covering 19 committed+working Swift files), with **64 named controls, all
 true** (per-probe table regenerated in `evidence/green-meter-run.txt`; the count is re-measured from
-`--json` output, never copied from a previous revision — it was 52 before the test review and 48 of
-those were honest). Product execution active: `product_executed: true`, `loaded 125/125`,
+`--json` output, never copied from a previous revision — it was 52 before the test review (48 of those honest) and the delta re-review
+measured 59; the Rb-1 guard made it 60, and the N2 anchor-parity controls in D27 make it **64**). Product execution active: `product_executed: true`, `loaded 125/125`,
 `unmatched: {}`, no-shim negative control true. Stdlib-only verified by AST import scan.
 
 Gate evidence for this revision: the reviewer's F1/C10/C11 and R2 cases are **external** mutation runs
@@ -132,6 +137,8 @@ audit agents writing into this package while the gate ran — expected noise, no
   exported with a BOTTOM marker, and the other 38 sit in 18 maps that have no BOTTOM marker at all.
   Its kind is therefore `.unconfirmedAction` with the reason in the label, and the separate
   "acquire `data_zone_data.asm` type-11" work stays out of scope (as the merged analysis ordered).
+  Scope correction in **D26**: the mechanic itself is documented in-tree; only the numeric
+  type-11 -> entity binding is missing.
 - **D3 — one fixture in the pin probe mutates an in-memory copy, not a file on disk.** The synthetic
   divergent fixture is built by adding an object / changing one tile value in an `ElementTree` copy of
   `L05S03`, so no fixture file can ever be mistaken for shipped content under FORBID-001. It still
@@ -268,8 +275,8 @@ Consequences for this branch, and what was prepared for them:
   by `formula_distinguishes_base_zero_from_base_one`, which fails on a mis-transcribed formula.
   Also replaced `uniqueness_shift_detected` (`unique != 125`) with a counting check that forcing one
   digest to be novel must raise uniqueness by exactly one. A source scan now finds **0** controls
-  written as `= not problems` and no `x or not x` tautologies. Census: **59 named controls, all
-  true** (per-probe table in `evidence/green-meter-run.txt`); the count is re-measured per run, never
+  written as `= not problems` and no `x or not x` tautologies. Census at that revision: **59 named
+  controls, all true** (64 after the N2 anchor-parity controls in D27) (per-probe table in `evidence/green-meter-run.txt`); the count is re-measured per run, never
   restated from memory.
 - **D17 — test review F2/F3: the debug-rendering clause is now covered, and the type-check ceiling is
   measured instead of asserted.** Deleting the whole `GameScene` safe-model overlay loop used to leave
@@ -290,9 +297,136 @@ Consequences for this branch, and what was prepared for them:
   (`stale_mirror_report` → `WARNING … v3_measurements.py still reports 76/127 … owner-route cleanup
   owed`) without editing another route's committed evidence. `baseline-meter-red.txt` was regenerated
   by the **committed** checker against a verified byte-exact base tree (`git checkout 295690b --
-  Exolon/`, empty diff), so artifact and checker agree control-for-control; the 57-vs-59 control delta
+  Exolon/`, empty diff), so artifact and checker agree control-for-control; the 62-vs-64 control delta
   between the red and green runs is explained in the artifact itself (at base the meter's Swift probe
-  program does not compile, so it refuses to publish an unexecuted product number).
+  program does not compile, so it refuses to publish an unexecuted product number; the two absent
+  controls are the executed-product ones).
+
+## Rebase cycle onto `3407c37` (waves A and B merged) — what happened, measured
+
+- **D19 — the rebase itself.** `git fetch --all --prune` then `git rebase origin/main`.
+  **Two** conflicts, not the forecast one: the foreseen
+  `TMXLevelRuntime.swift` `source_marker`/`forceField` hunk, plus **`README.md`** (both wave A's
+  "Structured gameplay event log" section and wave C's "Level content contract" section were
+  appended at the same place — a pure both-added conflict, resolved by keeping both).
+  Resolution of the Swift hunk followed `ac005-rebase-protocol.txt`: **my** exhaustive switch
+  structure kept, **B's** beam semantics adopted inside the arm (`let box = …` +
+  `beamBoxes.append(box)`), B's post-loop `TMXBeamGrouping.groups(for:)` + `BeamFieldModel` pool
+  block untouched. Post-merge invariants verified: 0 conflict markers, 9 arms + `case nil:`,
+  `unmatchedSourceMarkers.append` intact, the only `default:` left is the pre-existing outer
+  object-**name** one at `:488`, `swiftc -frontend -parse` rc=0. Result `ed687a0`.
+- **D20 — the re-baseline was executed and the deviation hatch turned out NOT to be needed.**
+  `--record-baseline --base 3407c37` (the base this branch now replaces). `unchanged_marker_output`
+  then reports `branches_changed_vs_base: []`, `deviations_honored: []`, `compared_against:
+  "3407c37 (TMXLevelRuntime.swift)"`, and `arm_deviations` stays **empty**. The forecast single
+  deviation did not materialise because the conflict resolution adopted B's arm body *verbatim*:
+  the beam arm's fingerprint (`beamBoxes.append`, one `CGRect`, literals 0/240/272/48) is identical
+  to the new base's. Recording a deviation the data does not show would have been exactly the
+  self-confirming artefact the audits have been hunting, so none was written. The hatch remains
+  armed and tested: 4 `deviation_*` controls plus the earlier end-to-end proof.
+- **D21 — wave B's loader change broke two Linux contours, mine and the committed harness.**
+  B moved the shared collision-surface query **into** `TMXMapLoader.swift`, which now references
+  `GameConstants`; the file no longer compiles standalone. Consequences, both measured:
+  (a) the committed harness `…/20260919-…-7db1f3/evidence/harness/run.sh` now **fails** (rc=1) at
+  `error: cannot find 'GameConstants' in scope`, so its documented `REAL MAPS ok=125/125` is not
+  reproducible on the merged tree — a one-line fix on their side (add
+  `Exolon/GameCore/GameConstants.swift` to the build at `run.sh:51`); **not edited here**, it is
+  another package's committed evidence and the break is wave B's, not mine;
+  (b) my own `swift_product_evidence` broke the same way, so I extended it to compile
+  `GameConstants.swift` alongside the loader — copied **byte-verified unmodified** (the copy is
+  compared to the product file and the probe refuses on mismatch), keeping the loader's
+  one-import-line delta rule and the no-shim negative control. Executed result on the merged tree:
+  `loaded 125/125`, `unmatched: {}`, `product_negative_control_holds: true`.
+- **D22 — Rb-1: the parse gate now covers committed history, not just the working diff.**
+  `swift_targets()` = `git diff --name-only 295690b..HEAD -- *.swift` ∪ working diff ∪ untracked,
+  which post-rebase yields **19 files** including A's `Diagnostics/*` and B's
+  `BlasterBullet`/`TMXTileMapRenderer`/`Grenade`/`LevelObstacles` — none of which a
+  working-diff-only scan would ever see again. New control
+  `parse_gate_covers_committed_changes` reddens if the gate ever shrinks back to the working diff,
+  and the verdict map is now keyed by **repository-relative path** because this tree has two
+  different `main.swift` files that were silently overwriting each other's verdict under the old
+  basename key. Independently: applying B's own FORBID-001 added-line patterns to the merged
+  A+B+C product diff gives **0 violations** over 2826 added code lines.
+  End-to-end proof (committed garbage in `BlasterBullet.swift`, working tree clean: OLD scan = 0 files
+  and fully green, NEW scan = 19 files and exactly `safe_models_are_labeled` reddens naming the file):
+  [`evidence/rb1-committed-garbage-proof.txt`](evidence/rb1-committed-garbage-proof.txt), which also
+  records a caveat so nobody misreads an earlier run — on the same scratch tree the **pre-fix** checker
+  failed 4 probes for unrelated reasons (stale citations + the broken contour), not for the garbage.
+- **D23 — cross-route findings from running wave B's meter as my interference check.**
+  `wave_b_check.py` on this branch: **every semantic probe PASSes** (125/125 geometry equivalence
+  incl. 1437 rects base==new==executed, beams 10 fields × 25 HP = 250, spawn 119/125, pistons 46/46
+  lethal, cull bounds, single surface query, zone formula) — my merge broke none of B's assertions.
+  One probe fails, `no_magic_offsets`, and it is a **diff-scope artifact, not a code conflict**:
+  their `wave_base()` is `merge-base(HEAD, origin/main)`, which while B was a live branch resolved
+  to A's tip `17a742a` (correct: their own changes), but now that B is merged into `main` it resolves
+  to `3407c37`, so their scan sees only wave C's 3 files / 95 code lines and trips their own
+  "scan strangely empty" sanity threshold (`n_files>=7 and n_code>=150`). Reproduced in a
+  **standalone clone** with `origin/main` pointed at `17a742a`: same meter, same tree → `added-lines:
+  332 стронок кода в 9 изменённых продуктовых файлах`, **`ALL_WAVE_B_CHECKS_MATCH_SPEC`, rc=0**.
+  So their green transcript is intact and my lines are inside their scan scope and clean; the
+  durable fix is theirs (pin the scan to their own PR range, e.g. `17a742a..a4bc23f`, instead of a
+  `merge-base` with a moving `origin/main`). Reported, not edited.
+- **D24 — a self-inflicted hazard during this cycle, detected and repaired.** Reproducing B's green
+  state first used `cp -a` of this **worktree**, whose `.git` is a *pointer* into
+  `/home/pall/projects/exolon/.git/worktrees/exolon2`; a `git branch -f origin/main 17a742a` run
+  there therefore wrote into the **shared** repository, creating a local branch literally named
+  `origin/main` that shadowed the remote (making `git rev-parse origin/main` answer `17a742a`, which
+  would have poisoned any later base computation, including my own `swift_targets` and the
+  controller's merge). Detected by checking refs immediately after; repaired with
+  `git update-ref -d refs/heads/origin/main` and verified: only `refs/remotes/origin/main = 3407c37`
+  remains, `git status -sb` shows the expected tracking line, index clean (`git diff --cached`
+  empty), `git diff HEAD -- Exolon/` empty. All later isolation work used
+  `git clone --no-hardlinks` (independent refs), and the scratch copies were deleted.
+
+
+
+- **D25 — what was deliberately NOT re-pointed.** The contract keeps
+  `generated_from_commit: 295690b` and therefore `self_check.body_sha256 = 13b3f1f2dd314863…`.
+  Verified reason: `git diff --name-only 295690b..origin/main -- Exolon/Resources` is **empty**, so the
+  125 pinned digests, the 24 pairs and the 4 backdrop-identical flags describe exactly the same bytes
+  at both commits; rebinding the field would churn the contract body, invalidate the digest value that
+  the code reviewer independently recomputed and cited, and buy nothing. `no_invented_content`
+  correspondingly still anchors its blob comparison at `295690b` — and it is that comparison, not the
+  date field, that carries FORBID-001. AC-005's base is a separate matter and **was** re-pointed to
+  `3407c37` (D20), because there the pre-change text really did move.
+
+## Micro-batch (post-rebase verifier PASS) — N1/N2/N3
+
+- **D26 — N1: a shipped claim was false and is now scoped correctly.** The `.unconfirmedAction`
+  `safeModelLabel` (and the enum/arm comments, the disposition row and §2 of the characterization)
+  asserted the gun-machine type "is not identifiable in-tree". `ORIGINAL_MECHANICS.md:36-41` documents
+  the mechanic in-repo — bullet origin `turret.left + 2` / `turret.bottom + 56`, bullets travel left
+  and are blaster-immune, the turret is grenade-destroyable for 150 points — and `:170` lists gun
+  machines as required; the docs-researcher audit had already marked that VERIFIED. What is genuinely
+  absent is only the **numeric type-11 → entity binding** for the *separate lower* cell (56 type-11
+  actions in the original table, 18 exported alongside a BOTTOM marker, the other 38 in maps with none).
+  The disposition is unchanged — recorded safe model, behaviour deliberately not implemented and **not
+  armed** (arming is out of scope). The label literal is pinned against the committed table by
+  `safe_models_are_labeled`, and the table row was rewritten from the Swift literal itself so the two
+  cannot disagree; the executed product evidence still supplies the string, so the
+  `unlabeled_placeholder_rejected` / `bogus_substring_rejected` flips remain live.
+- **D27 — N2: the safe-model box sat 32 pt low while its comment claimed beaconBase parity.**
+  `appendSafeModelMarker` anchored `max(0, bottomY - height)`, and since
+  `bottomY = pixelHeight - syTop - 32`, the box covered source rows `sy+2 .. sy+4` — two rows under the
+  marker — on all 32 affected maps, while `.beaconBase` (the cited equivalence:
+  `pixelHeight - (sourceY + 3)*16`, `height: 48`) covers `sy .. sy+2`. Fixed to the truth the comment
+  promised: callers now pass `topY: map.pixelHeight - syTop`, so `rect.maxY == pixelHeight - sourceY*16`
+  exactly matches the beacon arm. This is debug-overlay geometry only — no collision, damage, score or
+  spawn path reads `safeModelMarkers`, so AC-005 and the 76 covered markers are unaffected (verified:
+  `branches_changed_vs_base` still empty). To stop prose and code drifting again, the meter now
+  re-derives both top edges arithmetically from the source text and requires them to agree
+  (`safe_model_anchor_problems`), with four controls — `anchor_parity_honest_accepted`,
+  `anchor_regressed_to_bottomY_detected`, `anchor_single_row_shift_detected`,
+  `anchor_beacon_side_shift_detected`. `anchor_parity_broken` deliberately counts only parity verdicts
+  and refuses to treat a parse failure as a detection, because a control that "fires" when it cannot
+  read the source asserts nothing.
+- **D28 — N3 recorded, not acted on.** Wave B's `wave_b_check.py` will exit rc=1 on **any** later
+  rebased branch, by design of its own `wave_base()` (`merge-base(HEAD, origin/main)`): once wave B is
+  merged, that resolves to a base whose diff against HEAD no longer contains wave B's changes, so its
+  `no_magic_offsets` sanity threshold (`n_files>=7 and n_code>=150`) cannot be met. All of B's semantic
+  probes still pass on this tree, and their green transcript reproduces once the base is restored.
+  Re-anchoring that scan is **wave E's scope**, not wave C's; noted here so a later verifier reading a
+  red `no_magic_offsets` on a rebased branch does not mistake it for wave C interference.
 
 ## Residual risks
 
@@ -324,7 +458,15 @@ Consequences for this branch, and what was prepared for them:
   injecting a *type* error (`forceFields.append(field.thisIsNotAMember)`) leaves all 9 probes green.
   Closing this needs the macOS build: `addDebugRect(_:color:alpha:label:)`,
   `currentLevel.safeModelMarkers` and the exhaustive `switch` must be confirmed by `xcodebuild`
-  (test-plan E2E). A hand-written SpriteKit stub was rejected as false assurance.
+  (test-plan E2E). A hand-written SpriteKit stub was rejected as false assurance — the delta test
+  review endorses that refusal ("a stub would type-check the scene against fiction").
+  **Sequencing note:** the delta reviewer's merge condition ("`xcodebuild` must run and be recorded
+  before merge, else F3 is must-fix") has since been **overruled by the owner's constraint** — no
+  macOS hardware or Developer ID exists, so the condition is structurally unsatisfiable. `release.md`
+  records the re-rule and F3 stands as an **accepted permanent residual**; the compensating controls
+  on record are the executed parse gate over all 19 committed+working Swift files (D22), the
+  overlay-consumer source assertions (D23/F2), and the compiled+executed contour for the file that
+  owns this change's logic (D21).
 - **R2b** — **AC-005 cannot see a collaborator's own behaviour change (test review F4).** It pins the
   marker records and each branch's *source text* (mutations, nodes, textures, balanced-paren `CGRect`
   geometry, numeric literals). Verified non-result: `LevelObstacles.swift` `var hitPoints = 25 → 1`
@@ -334,6 +476,20 @@ Consequences for this branch, and what was prepared for them:
 - **R3** — `unmatchedSourceMarkers` is now recorded but nothing in the shipped game surfaces it at
   runtime; the enforcement point is this meter (and any future content import that adds a new
   `sourceBlock`). If runtime visibility is wanted, it belongs with the debug-HUD work, not here.
+- **R5 (owner action, cross-route)** — the committed Linux harness
+  `engineering/changes/20260919-…-7db1f3/evidence/harness/run.sh` **does not compile on the merged
+  tree** since wave B moved the collision query into `TMXMapLoader.swift` (now references
+  `GameConstants`): rc=1, `error: cannot find 'GameConstants' in scope`. Its documented
+  `REAL MAPS ok=125/125` is therefore not reproducible by anyone re-running it. One-line fix in that
+  package: add `"$ROOT/Exolon/GameCore/GameConstants.swift"` to the build at `run.sh:51`. Deliberately
+  not done here (another route's committed evidence; the break is not wave C's). Wave C's own contour
+  is fixed and does run on the merged tree (D21).
+- **R6 (owner action, cross-route)** — wave B's `wave_b_check.py::no_magic_offsets` fails on any
+  branch after their own merge, because its base is `merge-base(HEAD, origin/main)`: post-merge that
+  yields wave C's diff (3 files / 95 lines) and trips their `n_files>=7 and n_code>=150` sanity
+  threshold. All their semantic probes pass, and their green state reproduces when the base is
+  restored (D23). Suggested durable fix: pin the added-lines scan to their own PR range rather than a
+  moving `origin/main`.
 - **R4** — The manifest is bound to `generated_from_commit: 295690b`. If the owner authorizes
   regenerating any of the 48 duplicated maps, the manifest must be regenerated in that same change
   (`--write-manifest` refuses if the pair set stops matching the pinned ruling).

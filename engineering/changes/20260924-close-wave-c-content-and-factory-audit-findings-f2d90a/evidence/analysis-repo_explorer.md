@@ -93,7 +93,10 @@ collision hole.
   at own cell 18/18, offset `(-1,+2)` from a `blk_gunMachine_TOP` turret 1:1 per map. But type 11 has 56
   instances in the original and only 18 exported, and the other 38 appear in 18 maps with **no** BOTTOM
   marker at all, where they show as vertical pairs. So type 11 ≠ "lower gun barrel" on in-repo evidence;
-  `ORIGINAL_MECHANICS.md:36-41` documents only the turret that already exists. No `gunMachine*` asset.
+  `ORIGINAL_MECHANICS.md:36-41` documents the gun-machine mechanic as ONE entity whose bullet origin
+  (`turret.left + 2`, `turret.bottom + 56`) is the already-shipped `turret`, and `:170` lists gun machines
+  as required; what is absent in-tree is only the numeric type-11 → entity binding for the *separate
+  lower* cell. No `gunMachine*` asset.
 
 **Ruling carried into the design:** none of the three can be given invented behaviour. All three resolve to
 the *typed, labeled* safe model (recorded inert-scenery entity), which is the brief's tier-2
@@ -231,3 +234,26 @@ Two method notes from the same review pass:
   and compares against the working tree's switch arms; the committed golden only records the same
   base-derived values plus the data digest (`baseline-prechange-digest.json`, digest
   `545e281f470c0900…`, unchanged across the edit).
+
+## Corrections after review (appended; the text above is left as written pre-edit)
+
+- **C1 — §2's `blk_gunMachine_BOTTOM` bullet understated what is in-tree.** Saying the mechanic's
+  documentation "cannot be identified from anything in this repository" was **false**:
+  `ORIGINAL_MECHANICS.md:36-41` documents the gun machine fully in-repo (bullet origin
+  `turret.left + 2` / `turret.bottom + 56`, bullets travel left and are blaster-immune, the turret is
+  grenade-destroyable for 150 points) and `:170` explicitly lists gun machines among the markers that
+  must have a runtime implementation. The scope of what is missing is narrower: the **numeric
+  type-11 → entity binding** that would say what the *separate lower* cell is, given 56 type-11 actions
+  exist while only 18 accompany a BOTTOM marker and the other 38 sit in maps without one. The
+  disposition (recorded safe model, never armed) is unchanged and still the right call; the shipped
+  label, this report §2 and `marker-disposition-v1.json` now say it that way. Raised by the
+  controller's micro-batch N1; `analysis-docs_researcher.md` had already marked the mechanic VERIFIED.
+- **C2 — §8's footprint note encoded a wrong anchor.** It described the safe-model box as
+  "beaconBase-equivalent", but the implemented `max(0, bottomY - height)` puts the box top two source
+  rows **below** the marker (32 pt low on all 32 affected maps), whereas `.beaconBase`'s own conversion
+  `pixelHeight - (sourceY + 3)*16` with `height: 48` puts the top at the marker's row. The helper now
+  anchors at `topY = pixelHeight - syTop` and `wave_c_check.py` pins the arithmetic
+  (`safe_model_anchor_problems` + `anchor_parity_broken`, controls
+  `anchor_parity_honest_accepted` / `anchor_regressed_to_bottomY_detected` /
+  `anchor_single_row_shift_detected` / `anchor_beacon_side_shift_detected`), so comment and code can no
+  longer drift apart. Raised by the micro-batch N2 (round-1 code-review F1).

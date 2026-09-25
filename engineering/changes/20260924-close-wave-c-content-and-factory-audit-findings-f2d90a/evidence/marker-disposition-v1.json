@@ -5,7 +5,7 @@
   ],
   "change_id": "20260924-close-wave-c-content-and-factory-audit-findings-f2d90a",
   "citation_policy": {
-    "as_of": "working tree of change f2d90a (route base 295690b + this change's uncommitted product edits). The runtime_arm/classifier_test ranges are NOT as-of a commit: they are re-read from the current tree by ignored_types_disposition on every run, so if an edit moves an arm the citation reddens the meter instead of going stale silently. Re-bind them after any merge that touches these files.",
+    "as_of": "re-bound by `--rebind-citations` against the current working tree; each run of ignored_types_disposition re-reads these spans, so a shift reddens the meter instead of leaving a stale citation. Re-run after every rebase or edit that moves these files.",
     "checked_by": "wave_c_check.py::ignored_types_disposition",
     "classifier_anchor_file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
     "route_base": "295690b",
@@ -34,13 +34,13 @@
         "classifier_test": {
           "expect": "sourceBlock.contains(\"beam_\")",
           "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
-          "lines": "407-420"
+          "lines": "655-655"
         },
         "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:356-360 at route base 295690b",
         "runtime_arm": {
           "expect": "case .forceField:",
           "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
-          "lines": "367-371"
+          "lines": "416-418"
         }
       },
       "count": 10,
@@ -61,13 +61,13 @@
         "classifier_test": {
           "expect": "sourceBlock.contains(\"beam_\")",
           "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
-          "lines": "407-420"
+          "lines": "655-655"
         },
         "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:356-360 at route base 295690b",
         "runtime_arm": {
           "expect": "case .forceField:",
           "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
-          "lines": "367-371"
+          "lines": "416-418"
         }
       },
       "count": 10,
@@ -88,13 +88,13 @@
         "classifier_test": {
           "expect": "sourceBlock.contains(\"beacon_base\")",
           "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
-          "lines": "407-420"
+          "lines": "660-660"
         },
         "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:380-393 at route base 295690b",
         "runtime_arm": {
           "expect": "case .beaconBase:",
           "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
-          "lines": "391-404"
+          "lines": "438-451"
         }
       },
       "count": 13,
@@ -115,13 +115,13 @@
         "classifier_test": {
           "expect": "sourceBlock.contains(\"control_beacon\")",
           "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
-          "lines": "407-420"
+          "lines": "661-661"
         },
         "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:394-406 at route base 295690b",
         "runtime_arm": {
           "expect": "case .controlBeacon:",
           "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
-          "lines": "405-417"
+          "lines": "452-464"
         }
       },
       "count": 13,
@@ -142,13 +142,13 @@
         "classifier_test": {
           "expect": "sourceBlock.contains(\"changing_room\")",
           "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
-          "lines": "407-420"
+          "lines": "659-659"
         },
         "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:371-379 at route base 295690b",
         "runtime_arm": {
           "expect": "case .changingRoom:",
           "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
-          "lines": "382-390"
+          "lines": "429-437"
         }
       },
       "count": 4,
@@ -169,13 +169,13 @@
         "classifier_test": {
           "expect": "sourceBlock.contains(\"stage_end\")",
           "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
-          "lines": "407-420"
+          "lines": "658-658"
         },
         "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:369-370 at route base 295690b",
         "runtime_arm": {
           "expect": "case .stageEnd:",
           "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
-          "lines": "380-381"
+          "lines": "427-428"
         }
       },
       "count": 5,
@@ -196,13 +196,13 @@
         "classifier_test": {
           "expect": "sourceBlock.contains(\"blinker\")",
           "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
-          "lines": "407-420"
+          "lines": "657-657"
         },
         "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:366-368 at route base 295690b",
         "runtime_arm": {
           "expect": "case .blinker:",
           "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
-          "lines": "377-379"
+          "lines": "424-426"
         }
       },
       "count": 19,
@@ -223,13 +223,13 @@
         "classifier_test": {
           "expect": "sourceBlock.contains(\"topdown_electro\")",
           "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
-          "lines": "407-420"
+          "lines": "656-656"
         },
         "route_base": "Exolon/GameCore/Levels/TMXLevelRuntime.swift:361-365 at route base 295690b",
         "runtime_arm": {
           "expect": "case .highVoltage:",
           "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
-          "lines": "372-376"
+          "lines": "419-423"
         }
       },
       "count": 2,
@@ -250,13 +250,13 @@
         "classifier_test": {
           "expect": "sourceBlock.contains(\"mushroom\")",
           "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
-          "lines": "407-420"
+          "lines": "662-662"
         },
         "route_base": "not covered by the matcher at route base 295690b: blk_mushroom was one of the 51 markers the chain dropped without a signal",
         "runtime_arm": {
           "expect": "case .inertScenery:",
           "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
-          "lines": "418-426"
+          "lines": "465-473"
         }
       },
       "count": 9,
@@ -293,13 +293,13 @@
         "classifier_test": {
           "expect": "sourceBlock.contains(\"waggon\")",
           "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
-          "lines": "407-420"
+          "lines": "663-663"
         },
         "route_base": "not covered by the matcher at route base 295690b: blk_waggon was one of the 51 markers the chain dropped without a signal",
         "runtime_arm": {
           "expect": "case .inertScenery:",
           "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
-          "lines": "418-426"
+          "lines": "465-473"
         }
       },
       "count": 24,
@@ -331,18 +331,18 @@
       "substring": "waggon"
     },
     {
-      "basis": "the only losing family with a positive action record (type 11 at own cell 18/18, offset (-1,+2) from a blk_gunMachine_TOP turret), but type 11 has 56 instances in the original and only 18 were exported - the other 38 sit in 18 maps with no BOTTOM marker and appear as vertical pairs, so type 11 cannot be identified as a lower gun on in-repo evidence; ORIGINAL_MECHANICS.md:36-41 documents only the existing turret; no gunMachine* asset; recorded, never dropped, never armed",
+      "basis": "mechanic documented IN-TREE: ORIGINAL_MECHANICS.md:36-41 (bullet origin turret.left+2 / turret.bottom+56, bullets travel left and are blaster-immune, turret grenade-destroyable worth 150 points) and :170 requires gun machines; the upper entity is already shipped as `turret`. Absent in-tree is only the numeric type-11 -> entity binding for this separate lower cell: 56 type-11 actions exist in the original table, only 18 are exported alongside a BOTTOM marker, the other 38 sit in maps with no BOTTOM marker at all. Recorded, never armed, never guessed. No gunMachine* asset exists in Exolon/Resources.",
       "citations": {
         "classifier_test": {
           "expect": "sourceBlock.contains(\"gunMachine_BOTTOM\")",
           "file": "Exolon/GameCore/Levels/TMXMapLoader.swift",
-          "lines": "407-420"
+          "lines": "664-664"
         },
         "route_base": "not covered by the matcher at route base 295690b: blk_gunMachine_BOTTOM was one of the 51 markers the chain dropped without a signal",
         "runtime_arm": {
           "expect": "case .unconfirmedAction:",
           "file": "Exolon/GameCore/Levels/TMXLevelRuntime.swift",
-          "lines": "427-434"
+          "lines": "474-487"
         }
       },
       "count": 18,
@@ -352,7 +352,7 @@
         3
       ],
       "kind": "unconfirmedAction",
-      "label": "SAFE-MODEL unconfirmed-action: a distinct source action cell exists but its type is not identifiable in-tree; behaviour deliberately NOT implemented",
+      "label": "SAFE-MODEL unconfirmed-action: the mechanic IS documented in-tree (ORIGINAL_MECHANICS.md:36-41, required by :170); only the numeric type-11 -> entity binding for this second cell is absent, so it is recorded and behaviour deliberately NOT implemented",
       "maps": 15,
       "maps_list": [
         "L01S24",

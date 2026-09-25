@@ -64,6 +64,8 @@ Before this change these 32 maps silently lost the listed markers; each one is n
 
 **Total: 51 markers on 32 maps, 0 dropped.**
 
+Disposition balance over the 127 marker **objects** (11 distinct `sourceBlock` **values**): typed 50 · safe-model 51 · no-op 21 · write-only 5. Under AC-001 this column is normative evidence, so 127/127 means **resolved**, not **behaviour implemented**.
+
 Read "resolved" narrowly: a safe model means the factory no longer *loses* the marker, not
 that its original behaviour is *implemented*. The 51 safe-model markers add no physics,
 damage, score or spawn path; `blk_gunMachine_BOTTOM` in particular is recorded as an
@@ -80,4 +82,3 @@ safe_model: {"beaconBase": false, "blinker": false, "changingRoom": false, "cont
 safe_model_footprint_cells : {"blk_beacon_base": "4x3", "blk_beam_down": "4x3", "blk_beam_up": "4x3", "blk_blinker": "4x3", "blk_changing_room": "4x3", "blk_control_beacon": "4x3", "blk_gunMachine_BOTTOM": "4x3", "blk_mushroom": "4x3", "blk_stage_end": "4x3", "blk_topdown_electro": "4x3", "blk_waggon": "5x3"}
 note: safeModelFootprintCells has a 4x3 fallback, so it prints for every family; only the three safe-model rows are meaningful here
 ```
-

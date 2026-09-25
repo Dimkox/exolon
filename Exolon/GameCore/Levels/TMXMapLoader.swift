@@ -616,8 +616,11 @@ enum TMXSourceMarkerKind: String, CaseIterable {
     /// baked `Original Static Scenery` image layer. The source table records no action here, so
     /// the runtime records it and deliberately adds no behaviour.
     case inertScenery
-    /// A distinct action cell exists in the source data but its type cannot be identified from
-    /// anything in this repository. Recorded and labeled, never armed and never guessed.
+    /// A second, distinct action cell that travels with an already-implemented entity. The
+    /// mechanic itself IS documented in this repository (`ORIGINAL_MECHANICS.md:36-41`, and
+    /// `:170` requires gun machines); what is absent in-tree is only the numeric
+    /// type-11 -> entity binding that would say what this extra cell is. Recorded and labeled,
+    /// never armed and never guessed.
     case unconfirmedAction
 
     /// A safe model is a recorded, labeled substitution for content the factory cannot express
@@ -638,7 +641,7 @@ enum TMXSourceMarkerKind: String, CaseIterable {
         case .inertScenery:
             return "SAFE-MODEL inert-scenery: imported static artwork, no action in the source table"
         case .unconfirmedAction:
-            return "SAFE-MODEL unconfirmed-action: a distinct source action cell exists but its type is not identifiable in-tree; behaviour deliberately NOT implemented"
+            return "SAFE-MODEL unconfirmed-action: the mechanic IS documented in-tree (ORIGINAL_MECHANICS.md:36-41, required by :170); only the numeric type-11 -> entity binding for this second cell is absent, so it is recorded and behaviour deliberately NOT implemented"
         case .forceField, .highVoltage, .blinker, .stageEnd, .changingRoom, .beaconBase, .controlBeacon:
             return ""
         }

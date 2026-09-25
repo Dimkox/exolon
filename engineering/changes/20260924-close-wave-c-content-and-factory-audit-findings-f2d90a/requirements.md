@@ -31,10 +31,12 @@
   accepted), including `declare_nonidentical_pair_rejected` (the divergent-pair case, moved into the
   probe AC-004 names) and `unkeyed_reseal_rejected`; plus the 5 pin-probe controls. Independent
   external reproduction of the reviewer's shipping cases: `evidence/f1-tamper-proof.txt`.
-- [x] **AC-005** Given the 76 markers the matcher already covered, when this change is applied, then their
-  factory output is digest-identical: the 76 marker records *and* each branch's fingerprint (mutations,
-  nodes, textures and **balanced-paren-captured** `CGRect` geometry). The pre-change side is read from
-  `git show 295690b:TMXLevelRuntime.swift`, so the probe cannot be satisfied by editing a golden.
+- [x] **AC-005** Given the 76 markers the matcher already covered, when this change is applied, then
+  their factory **branch** output is digest-identical — a source-level fingerprint per arm (the 76 marker
+  records plus mutations, nodes, textures, **balanced-paren-captured** `CGRect` geometry and numeric
+  literals), read against the immutable base blob via `git show <base>:TMXLevelRuntime.swift`, so the
+  probe cannot be satisfied by editing a golden. Scope of the claim, stated: it is *branch source text
+  for this file*, **not** transitive collaborator behaviour (R2b / reviewer case C06).
   Evidence: `wave_c_check.py::unchanged_marker_output`; golden digest `545e281f470c0900…` in
   `evidence/baseline-prechange-digest.json`; the mutation controls in
   `evidence/bypass-closure-proof.txt`.
@@ -51,7 +53,9 @@
 - [x] **INV-001** `zone_index == (stage-1)*25 + (scene-1)` is derived and validated for all 125 maps,
   while the raw `zoneNumber` property exists on **117 of 125** (`L01S01…L01S08` honestly record null) and
   every present property equals the derived index. The canonicalization version is declared once at
-  document level and bound to every hash transitively through the recomputable `self_check.body_sha256`.
+  document level and bound to every hash through `self_check.body_sha256` — which since the test-review
+  fix is a **keyed** seal plus **live re-derivation of every data claim**, not a recomputable checksum;
+  see `evidence/level-content-v1-binding-note.md` for what the seal does and does not protect.
   Evidence: `wave_c_check.py::zone_index_formula`, `manifest_selfcheck`.
 - [x] **OBJ-001 / SIG-001** 0 silently ignored markers, manifest pinned, controls flip, and both tables
   regenerate with one stdlib-only command in **~2.4 s** against a 120 s budget.

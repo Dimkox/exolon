@@ -59,6 +59,7 @@ RES = ROOT / 'Exolon' / 'Resources'
 RUNTIME_SWIFT = ROOT / 'Exolon' / 'GameCore' / 'Levels' / 'TMXLevelRuntime.swift'
 LOADER_SWIFT = ROOT / 'Exolon' / 'GameCore' / 'Levels' / 'TMXMapLoader.swift'
 GAME_SCENE_SWIFT = ROOT / 'Exolon' / 'GameCore' / 'GameScene.swift'
+GAME_CONSTANTS_SWIFT = ROOT / 'Exolon' / 'GameCore' / 'GameConstants.swift'
 #: The three Swift files this change touches. All are syntax-gated; only the loader is compiled and
 #: executed (test review F3 records why the other two cannot be, on this host).
 CHANGED_SWIFT = (LOADER_SWIFT, RUNTIME_SWIFT, GAME_SCENE_SWIFT)
@@ -463,6 +464,17 @@ def swift_product_evidence():
         loader_lines = read(LOADER_SWIFT).splitlines(True)
         (work / 'TMXMapLoader.swift').write_text(
             loader_lines[0] + 'import FoundationXML\n' + ''.join(loader_lines[1:]), encoding='utf-8')
+        # Wave B (PR #19) moved the shared collision-surface query INTO TMXMapLoader.swift, which
+        # made the loader reference GameConstants: it no longer compiles standalone, and the
+        # committed harness in 20260919-…-7db1f3 broke the same way. GameConstants.swift is
+        # CoreGraphics+Foundation only, so it joins the contour as an UNMODIFIED product file -
+        # copied and byte-compared, never rewritten here.
+        constants_src = read(GAME_CONSTANTS_SWIFT)
+        (work / 'GameConstants.swift').write_text(constants_src, encoding='utf-8')
+        if read(work / 'GameConstants.swift') != constants_src:
+            _SWIFT_EVIDENCE = {'available': False,
+                               'reason': 'GameConstants.swift copy is not byte-identical to the product file'}
+            return None
         (work / 'shim.swift').write_text(shim_source.read_text(encoding='utf-8'), encoding='utf-8')
         (work / 'main.swift').write_text(SWIFT_PROBE_MAIN, encoding='utf-8')
         shim_build = subprocess.run(['swiftc', '-emit-module', '-emit-library', '-module-name',
@@ -474,17 +486,17 @@ def swift_product_evidence():
             _SWIFT_EVIDENCE = {'available': False, 'reason': 'shim build failed: %s'
                                % shim_build.stderr[-300:]}
             return None
-        linked = subprocess.run(['swiftc', '-I', str(work), '-L', str(work), '-lCoreGraphics',
-                                 str(work / 'TMXMapLoader.swift'), str(work / 'main.swift'),
-                                 '-o', str(work / 'probe')],
+        contour = [str(work / 'TMXMapLoader.swift'), str(work / 'GameConstants.swift'),
+                   str(work / 'main.swift')]
+        linked = subprocess.run(['swiftc', '-I', str(work), '-L', str(work), '-lCoreGraphics']
+                                + contour + ['-o', str(work / 'probe')],
                                 capture_output=True, text=True, timeout=240)
         if linked.returncode != 0:
             _SWIFT_EVIDENCE = {'available': False, 'reason': 'product build failed: %s'
                                % linked.stderr[-400:]}
             return None
         # negative control: the very same sources must NOT build without the shim
-        without = subprocess.run(['swiftc', str(work / 'TMXMapLoader.swift'), str(work / 'main.swift'),
-                                  '-o', str(work / 'probe-noshim')],
+        without = subprocess.run(['swiftc'] + contour + ['-o', str(work / 'probe-noshim')],
                                  capture_output=True, text=True, timeout=240)
         ran = subprocess.run([str(work / 'probe')], capture_output=True, text=True, timeout=240,
                              env=dict(os.environ, TMX_RESOURCES=str(RES), LD_LIBRARY_PATH=str(work)))
@@ -666,6 +678,27 @@ def overlay_binding_problems(text):
     return problems
 
 
+def swift_targets(base_commit=None):
+    """Swift files the parse gate must cover: the union of everything this branch changed in
+    COMMITS since the route base and everything still dirty in the working tree.
+
+    Deriving the list from the working diff alone (the original implementation) let a file that was
+    already committed by an earlier wave in the series - or by this branch in an earlier commit -
+    leave the gate entirely (test review delta Rb-1). After a rebase that is the common case, not
+    the edge case: waves A and B rewrote BlasterBullet, TMXTileMapRenderer, Grenade and more, and
+    none of them appear in a working diff on this branch any more.
+    """
+    base = base_commit or BASE_COMMIT
+    relative = set()
+    for args in (['diff', '--name-only', '%s..HEAD' % base, '--', '*.swift'],
+                 ['diff', '--name-only', 'HEAD', '--', '*.swift'],
+                 ['ls-files', '--others', '--exclude-standard', '*.swift']):
+        listed = git(*args)
+        if listed.returncode == 0:
+            relative.update(line for line in listed.stdout.splitlines() if line.strip())
+    return sorted((ROOT / rel for rel in relative), key=lambda p: str(p))
+
+
 def swift_parse_gate(paths):
     """`swiftc -frontend -parse` as an executed check rather than a prose claim (test review F2).
 
@@ -677,12 +710,19 @@ def swift_parse_gate(paths):
         return None
     results = {}
     for path in paths:
+        # Keyed by repository-relative path, never by basename: this tree has more than one
+        # `main.swift` (the app entry point and each harness's driver), and a basename key made
+        # two different files overwrite each other's verdict.
+        try:
+            key = path.relative_to(ROOT).as_posix()
+        except ValueError:
+            key = str(path)
         if not path.is_file():
-            results[path.name] = 'file missing'
+            results[key] = 'file missing'
             continue
         done = subprocess.run(['swiftc', '-frontend', '-parse', str(path)],
                               capture_output=True, text=True, timeout=240)
-        results[path.name] = 'ok' if done.returncode == 0 else (
+        results[key] = 'ok' if done.returncode == 0 else (
             done.stderr.strip().splitlines() or ['parse failed'])[0][:160]
     return results
 
@@ -699,10 +739,108 @@ def parse_gate_selftest():
         good = work / 'Fine.swift'
         good.write_text('struct Fine {\n    let x: Int\n}\n', encoding='utf-8')
         verdicts = swift_parse_gate([bad, good])
-        return bool(verdicts) and verdicts.get('Broken.swift') != 'ok' \
-            and verdicts.get('Fine.swift') == 'ok'
+        broken = next((v for k, v in verdicts.items() if k.endswith('Broken.swift')), None)
+        fine = next((v for k, v in verdicts.items() if k.endswith('Fine.swift')), None)
+        return broken is not None and broken != 'ok' and fine == 'ok'
     finally:
         shutil.rmtree(work, ignore_errors=True)
+
+
+def safe_model_anchor_problems(runtime_text):
+    """Bind the safe-model box anchor to what its own comment promises.
+
+    The comment claims `.beaconBase`-equivalent conversion. Rather than trust the prose, this
+    re-derives both top edges arithmetically from the source text with a sample marker row and
+    requires them to agree: `.beaconBase` builds
+    `y = pixelHeight - (sourceY + N) * scale` with `height: H`, so its top edge is
+    `pixelHeight - (sourceY + N)*scale + H`; the safe-model helper must therefore anchor at
+    `pixelHeight - sourceY*scale`, i.e. the marker's own row is the TOP cell. A drift here sat the
+    debug overlay 32 pt low on all 32 affected maps while the comment still said "same as
+    beaconBase" (micro-batch N2), so the claim and the code are now one assertion.
+    """
+    problems = []
+    sample_sy, sample_pixel_height = 5, 384
+    case_body = source_marker_case(runtime_text)
+
+    scale = re.search(r'let syTop\s*=\s*CGFloat\(.*?\)\s*\*\s*(\d+)', case_body)
+    if not scale:
+        return ['cannot parse the sourceY pixel scale from the source_marker case']
+    scale = int(scale.group(1))
+
+    beacon = re.search(r'case \.beaconBase:(.*?)case \.', runtime_text, re.S)
+    if not beacon:
+        return ['cannot locate the .beaconBase arm']
+    body = beacon.group(1)
+    b_off = re.search(r'map\.pixelHeight - \(sourceY \+ (\d+)\) \* %d' % scale, body)
+    b_h = re.search(r'height:\s*(\d+)', body)
+    if not (b_off and b_h):
+        return ['cannot parse the .beaconBase rect geometry (offset cells / height px)']
+    beacon_cells, beacon_height = int(b_off.group(1)), int(b_h.group(1))
+    if beacon_height != beacon_cells * scale:
+        problems.append('.beaconBase height %d px is not %d cells * %d, so the parity target is unclear'
+                        % (beacon_height, beacon_cells, scale))
+    beacon_top = sample_pixel_height - (sample_sy + beacon_cells) * scale + beacon_height
+
+    helper = re.search(r'func appendSafeModelMarker\(.*?\n    \}', runtime_text, re.S)
+    if not helper:
+        return problems + ['no appendSafeModelMarker helper to check']
+    text = runtime_text[helper.start():helper.end()]
+    # The doc comment making the claim sits ABOVE the func, and spans several `///` lines: walk the
+    # whole block, or the check never sees the sentence it is supposed to hold to account.
+    lines = runtime_text.splitlines(keepends=True)
+    func_line = runtime_text[:helper.start()].count('\n')          # 0-based index of `private func`
+    start = func_line
+    while start - 1 >= 0 and lines[start - 1].lstrip().startswith('///'):
+        start -= 1
+    annotated = ''.join(lines[start:func_line]) + text
+    anchor = re.search(r'y:\s*max\(0,\s*([A-Za-z_]\w*)\s*-\s*height\)', text)
+    h_factor = re.search(r'let height = CGFloat\(cells\.height\) \* (\d+)', text)
+    if not anchor:
+        return problems + ['the safe-model rect no longer anchors as `max(0, <var> - height)`']
+    if not h_factor or int(h_factor.group(1)) != scale:
+        return problems + ['the safe-model height does not use the same %d px cell scale' % scale]
+    var = anchor.group(1)
+    # Only real call sites: `kind: .caseName` distinguishes them from the func definition, whose
+    # `topY: CGFloat` is a type annotation and was previously being read as an argument.
+    callers = re.findall(r'appendSafeModelMarker\(\s*kind:\s*\.\w+[^)]*?%s:\s*([^)\n]+)\)'
+                         % re.escape(var), runtime_text, re.S)
+    if len(callers) < 2:
+        problems.append('expected the safe model to be recorded from both safe arms, found %d '
+                        'call site(s): %s' % (len(callers), callers))
+    if var == 'bottomY':
+        # the historical form: `let bottomY = map.pixelHeight - syTop - 32` sits two rows low
+        problems.append('safe-model box anchors on bottomY (two rows below the marker), which is '
+                        'NOT the .beaconBase conversion the helper comment claims')
+        safe_top = sample_pixel_height - sample_sy * scale - 32
+    elif callers and all(c.strip() == 'map.pixelHeight - syTop' for c in callers):
+        safe_top = sample_pixel_height - sample_sy * scale
+    else:
+        problems.append('safe-model %s is not supplied as `map.pixelHeight - syTop` at every call '
+                        'site (%s)' % (var, callers or 'no call sites found'))
+        safe_top = None
+    if safe_top is not None and safe_top != beacon_top:
+        problems.append('safe-model top edge %d != .beaconBase top edge %d for sourceY=%d, '
+                        'pixelHeight=%d: the overlay is %d px off the row its comment claims'
+                        % (safe_top, beacon_top, sample_sy, sample_pixel_height,
+                           abs(safe_top - beacon_top)))
+    if 'sourceY .. sourceY + heightCells - 1' not in annotated:
+        problems.append('the helper comment no longer states the row span the check enforces')
+    return problems
+
+
+def anchor_parity_broken(runtime_text):
+    """True only when the anchor ARITHMETIC disagrees with the claimed conversion.
+
+    Deliberately narrow: it looks for the parity verdicts ('top edge', 'bottomY anchor',
+    'not supplied as'), not for any problem string, and it refuses to count a parse failure as a
+    detection — otherwise the control would report success while asserting nothing, which is the
+    vacuity this file's controls exist to avoid.
+    """
+    found = safe_model_anchor_problems(runtime_text)
+    if any(p.startswith('cannot ') or p.startswith('no ') or p.startswith('expected the safe')
+           for p in found):
+        return False
+    return any('top edge' in p or 'anchors on bottomY' in p or 'not supplied as' in p for p in found)
 
 
 def disposition_consistency(rows, product_is_safe):
@@ -1693,7 +1831,13 @@ def safe_models_are_labeled():
     # FORBID-002's rendering clause, and the syntax gate for every Swift file in the diff.
     scene_src = read(GAME_SCENE_SWIFT)
     problems.extend(overlay_binding_problems(scene_src))
-    parsed = swift_parse_gate(CHANGED_SWIFT)
+    # The box anchor must equal the conversion its own comment claims (micro-batch N2).
+    drift = safe_model_anchor_problems(runtime_src)
+    problems.extend(drift)
+    targets = swift_targets()
+    if GAME_SCENE_SWIFT not in targets:
+        targets = targets + [GAME_SCENE_SWIFT]      # FORBID-002's consumer must always be gated
+    parsed = swift_parse_gate(targets)
     if parsed is None:
         problems.append('swiftc is unavailable on this host, so no Swift file in this diff was even '
                         'syntax-gated; the claim must not be reported as verified')
@@ -1719,13 +1863,37 @@ def safe_models_are_labeled():
         'overlay_deletion_detected': bool(overlay_binding_problems(loop_only)),
         'overlay_label_strip_detected': bool(overlay_binding_problems(no_label)),
         'parse_gate_detects_a_broken_file': parse_gate_selftest(),
+        # Anchor parity must be falsifiable in both directions, not merely asserted once:
+        # the honest file passes, the historical `bottomY` form and a one-row shift both fail.
+        'anchor_parity_honest_accepted': not drift,
+        'anchor_regressed_to_bottomY_detected': anchor_parity_broken(
+            runtime_src.replace('sx: CGFloat, topY: CGFloat', 'sx: CGFloat, bottomY: CGFloat')
+            .replace('y: max(0, topY - height)', 'y: max(0, bottomY - height)')
+            .replace('topY: map.pixelHeight - syTop', 'bottomY: bottomY')),
+        'anchor_single_row_shift_detected': anchor_parity_broken(
+            # a shape-preserving one-row drift: the rect still reads `max(0, topY - height)`, so
+            # this can only be caught by the arithmetic, not by a parse failure
+            runtime_src.replace('topY: map.pixelHeight - syTop', 'topY: map.pixelHeight - syTop - 16')),
+        'anchor_beacon_side_shift_detected': anchor_parity_broken(
+            runtime_src.replace('map.pixelHeight - (sourceY + 3) * 16',
+                               'map.pixelHeight - (sourceY + 4) * 16')),
+        # Rb-1 guard: the gate must not shrink back to the working diff only. A file that is clean
+        # against HEAD but changed since the route base (anything an earlier wave committed) has to
+        # be in the target set, or a rebase silently drops most of the tree out of the gate.
+        'parse_gate_covers_committed_changes': (
+            bool({str(p) for p in swift_targets()} -
+                 {str(ROOT / r) for r in (git('diff', '--name-only', 'HEAD', '--', '*.swift').stdout
+                                          .splitlines())})
+            and any('BlasterBullet' in str(p) or 'TMXTileMapRenderer' in str(p) or
+                    'Grenade' in str(p) for p in swift_targets())),
     }
     ok = not problems and all(controls.values())
     return ok, {
         'safe_model_families': sorted(m['sourceBlock'] for m in safe),
         'markers_covered_by_safe_models': sum(m['count'] for m in safe),
         'labels': meter_labels, 'product_labels': labels, 'classifier_kinds': kinds,
-        'swift_parse': parsed if parsed else 'swiftc unavailable',
+        'swift_parse': {'targets': sorted(p.name for p in targets),
+                        'verdicts': parsed if parsed else 'swiftc unavailable'},
         'rendering_evidence_limit': 'source-structure only: SpriteKit cannot be compiled or run on '
                                     'Linux (`import SpriteKit` fails at TMXLevelRuntime.swift:1), so '
                                     'the on-screen outline itself still needs the macOS spot in '
@@ -2067,6 +2235,13 @@ def write_dispositions():
     lines += ['', '**Total: %d markers on %d maps, 0 dropped.**' % (
         sum(by_block[b]['count'] for b in FORMERLY_IGNORED if b in by_block),
         len({n for b in FORMERLY_IGNORED for n in corpus.get(b, ())})), '',
+        'Disposition balance over the %d marker **objects** (%d distinct `sourceBlock` **values**): '
+        '%s. Under AC-001 this column is normative evidence, so 127/127 means **resolved**, not '
+        '**behaviour implemented**.'
+        % (total, len(corpus),
+           ' · '.join('%s %d' % (disp, sum(row['count'] for row in table['markers']
+                                          if row['disposition'] == disp))
+                      for disp in ('typed', 'safe-model', 'no-op', 'write-only'))), '',
         'Read "resolved" narrowly: a safe model means the factory no longer *loses* the marker, not',
         'that its original behaviour is *implemented*. The 51 safe-model markers add no physics,',
         'damage, score or spawn path; `blk_gunMachine_BOTTOM` in particular is recorded as an',
@@ -2087,8 +2262,83 @@ def write_dispositions():
     else:
         lines += ['## Product execution', '',
                   'Not run on this host: %s' % swift_evidence_unavailable_reason(), '']
+    while lines and not lines[-1].strip():
+        lines.pop()          # a trailing blank line is a `git diff --check` failure ("new blank
+                             # line at EOF"), and the gate runs that check on every PR
     COVERAGE_DOC.write_text('\n'.join(lines) + '\n', encoding='utf-8')
     print('wrote %s' % COVERAGE_DOC.relative_to(ROOT))
+    return 0
+
+
+def find_anchor_span(path, expected, first_only=True):
+    """Locate the line span that actually contains `expected` in `path`, so citations can be
+    re-bound by command instead of by hand after any edit that shifts lines (a rebase makes every
+    hand-written range wrong - that is exactly what the citation guard is for)."""
+    lines = read(path).splitlines()
+    hits = [i for i, line in enumerate(lines, start=1) if expected in line]
+    if not hits:
+        return None
+    start = hits[0]
+    if expected.startswith('case .') or expected.startswith('func '):
+        # arm / method: run to the next sibling label at the same indent
+        indent = len(lines[start - 1]) - len(lines[start - 1].lstrip())
+        end = start
+        for i in range(start, len(lines)):
+            stripped = lines[i].strip()
+            cur = len(lines[i]) - len(lines[i].lstrip())
+            if i > start - 1 + 0 and cur <= indent and (
+                    stripped.startswith('case .') or stripped.startswith('case nil')
+                    or stripped.startswith('default:') or stripped.startswith('static func ')
+                    or stripped.startswith('func ')):
+                end = i
+                break
+            end = i + 1
+        # trim trailing blank lines
+        while end > start and not lines[end - 1].strip():
+            end -= 1
+        return '%d-%d' % (start, end)
+    return '%d-%d' % (start, start)
+
+
+def rebind_citations():
+    """Rewrite every row's runtime_arm / classifier_test line ranges from the current tree."""
+    if not DISPOSITION_PATH.exists():
+        print('REFUSED: no disposition table at %s' % DISPOSITION_PATH)
+        return 1
+    doc = json.loads(read(DISPOSITION_PATH))
+    moved, failed = 0, []
+    for row in doc['markers']:
+        citations = row.get('citations') or {}
+        for key in ('runtime_arm', 'classifier_test'):
+            anchor = citations.get(key)
+            if not anchor:
+                failed.append('%s/%s has no anchor' % (row['sourceBlock'], key))
+                continue
+            path = ROOT / anchor['file']
+            if not path.is_file():
+                failed.append('%s/%s: %s missing' % (row['sourceBlock'], key, anchor['file']))
+                continue
+            span = find_anchor_span(path, anchor['expect'])
+            if span is None:
+                failed.append('%s/%s: %r not found in %s' % (row['sourceBlock'], key,
+                                                              anchor['expect'], anchor['file']))
+                continue
+            if span != anchor['lines']:
+                moved += 1
+            anchor['lines'] = span
+        base = citations.get('route_base', '')
+        if base and 'route base' not in base:
+            citations['route_base'] = base + ' (route base 295690b)'
+    if failed:
+        for note in failed:
+            print('REFUSED: %s' % note)
+        return 1
+    doc['citation_policy']['as_of'] = (
+        're-bound by `--rebind-citations` against the current working tree; each run of '
+        'ignored_types_disposition re-reads these spans, so a shift reddens the meter instead of '
+        'leaving a stale citation. Re-run after every rebase or edit that moves these files.')
+    DISPOSITION_PATH.write_text(json.dumps(doc, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+    print('rebound citations: %d anchors moved, %d failures' % (moved, len(failed)))
     return 0
 
 
@@ -2099,6 +2349,9 @@ def main(argv=None):
     parser.add_argument('--record-baseline', action='store_true')
     parser.add_argument('--write-manifest', action='store_true')
     parser.add_argument('--write-dispositions', action='store_true')
+    parser.add_argument('--rebind-citations', action='store_true',
+                        help='recompute every disposition citation line span from the current tree '
+                             '(run after a rebase or any edit that shifts the cited files)')
     parser.add_argument('--base', help='base commit ref for --record-baseline (use after a rebase '
                                        'that legitimately moved an arm; record the ruling in '
                                        'deviation_ruling afterwards)')
@@ -2109,6 +2362,8 @@ def main(argv=None):
         return write_manifest()
     if args.write_dispositions:
         return write_dispositions()
+    if args.rebind_citations:
+        return rebind_citations()
     results = {}
     for name, probe in PROBES:
         if args.only and args.only != name:
