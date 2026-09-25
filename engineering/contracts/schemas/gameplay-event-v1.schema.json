@@ -97,7 +97,8 @@
     "path": {
       "type": "string",
       "minLength": 1,
-      "x-only-in": "log.begin"
+      "x-only-in": "log.begin",
+      "x-note": "the field NAMED path is log.begin\u0027s; path-shaped values overall live in exactly two record kinds \u2014 log.begin (path) and log.rotate (from_path, to_path) \u2014 so this annotation is not a claim that the log never names a file twice"
     },
     "seed": {
       "type": "string",
@@ -178,7 +179,8 @@
     "exoskeleton_cause": [
       "changing_room",
       "cheat",
-      "reset"
+      "reset",
+      "stage_boundary"
     ],
     "pickup_kind": [
       "grenade_pack",
@@ -243,7 +245,9 @@
       "not_stage_end"
     ],
     "stage_component_id": [
-      "lives_x1000"
+      "lives_x1000",
+      "bravery_no_exoskeleton",
+      "timed_phase_ladder"
     ],
     "x-extension-rule": "a new stage_component_id (wave D's bravery/timed ladder) must be appended here, to GameplayStageComponent and to GameplayStageComponentSequence in the SAME commit: envelope_schema_valid rejects an id this enum does not declare, and gameplay_log_check's predicate_b takes its allowed ids from this list, so the schema stays the single authority."
   },
@@ -1406,7 +1410,9 @@
           },
           "component_id": {
             "enum": [
-              "lives_x1000"
+              "lives_x1000",
+              "bravery_no_exoskeleton",
+              "timed_phase_ladder"
             ]
           },
           "points": {

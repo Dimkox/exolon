@@ -1,0 +1,29 @@
+{
+  "change_id": "20260924-complete-wave-d-specification-and-release-audit-8341b7",
+  "created_at": "2026-09-24T19:41:56+00:00",
+  "history": [
+    {
+      "at": "2026-09-24T19:41:56+00:00",
+      "from": null,
+      "reason": "created",
+      "to": "draft"
+    },
+    {
+      "at": "2026-09-24T20:04:31+00:00",
+      "from": "draft",
+      "reason": "owner gate answered: design approved, timed=tick ladder, warp granted, Track B human-only; typed AC-001..007 filled",
+      "to": "scoped"
+    },
+    {
+      "at": "2026-09-24T20:04:31+00:00",
+      "from": "scoped",
+      "reason": "scope_and_design_approval GRANTED by owner 2026-09-24 (ask_user_question record); production_action_approval remains reserved for Track B human run",
+      "to": "approved"
+    }
+  ],
+  "route_id": "8341b7aa6eb4",
+  "schema_version": 1,
+  "status": "approved",
+  "title": "Complete wave-D specification and release audit findings in the Exolon game: P1-10 (end-of-stage bonuses are incomplete versus ORIGINAL_MECHANICS - bravery bonus 10000 and timed bonus 0/1000/3000/5000/7000 at stage boundaries 24/49/74/99/124, plus-one-life capped at 9, exoskeleton cleared and ammo refilled 99/10 - restore the full stage-end sequence in coordination with the wave-A StageBoundaryLedger) and the remaining P1-11 scope (extend the committed release-layer verifier and engineering/runbooks/macos-probe.sh so signing, notarization and archive are checked end-to-end on a clean macOS machine; Linux-decidable parts committed, the macOS run documented as an external handout).",
+  "updated_at": "2026-09-24T20:04:31+00:00"
+}

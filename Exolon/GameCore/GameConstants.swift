@@ -86,4 +86,33 @@ enum GameConstants {
     /// Named because `player.death_settled.delay_us` must not be restated at the call site, where a
     /// silent change would make the record lie.
     static let deathSettleDelay: TimeInterval = 70.0 / 60.0
+
+    // MARK: Stage-end sequence (`ORIGINAL_MECHANICS.md:138-146`, wave D / audit P1-10)
+
+    /// Hard cap on lives. The stage boundary used to borrow `GameState.startingLives` for this,
+    /// which conflated "what a new game starts with" with "what the boundary award may not
+    /// exceed"; the two only coincide by accident. The norm says "Add one life, capped at 9".
+    static let maxLives = 9
+
+    /// The bravery award for completing a stage without having taken the exoskeleton (`:142`).
+    static let braveryBonus = 10_000
+
+    /// Fixed steps per timed-bonus phase. **OWNER-APPROVED DEVIATION - NOT CANONICAL.**
+    /// `ORIGINAL_MECHANICS.md:143` describes a bonus *cursor* whose *selected phase* picks one of
+    /// `0/1000/3000/5000/7000`: an interactive minigame this remake does not implement and that no
+    /// source in or outside the tree dates (docs_researcher §1.3 ruled it SILENT on cadence, slot
+    /// order, input and units). The norm names the five values and no cadence; the only timing hint
+    /// in the document (`:131-136`, the 700-loop pursuer at "roughly 20-30 seconds") belongs to a
+    /// different mechanic and was deliberately not reused as a derivation. The owner chose a
+    /// deterministic tick ladder over deferring the clause (change 20260924-...-8341b7, gate
+    /// ruling 2), giving `phase = min(4, elapsed / phaseTicks)` at one phase per 30 s of
+    /// simulation on the canonical 60 Hz step. UNCONFIRMED vs original: a future interactive cursor
+    /// re-targets this constant's meaning and must not have to move the code. What the norm fixes -
+    /// and what `stage_boundary_check.py` asserts - is the *shape* below: five phases, exactly
+    /// these values, monotonically non-increasing in elapsed steps, saturating at the last phase.
+    static let phaseTicks = 1_800
+
+    /// Timed bonus per phase, best first (the five canonical values of `:143`). Index with
+    /// `GameplayStageComponentSequence.phase(in:)`.
+    static let timedBonusLadder = [7_000, 5_000, 3_000, 1_000, 0]
 }

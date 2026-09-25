@@ -183,7 +183,61 @@ final class GameScene: SKScene {
         emitTitleEnter()
         setGameplayNodesPaused(true)
         updateDebugText()
+        #if DEBUG
+        applyDebugWarpIfNeeded(environment: ProcessInfo.processInfo.environment)
+        #endif
     }
+
+    #if DEBUG
+    /// Owner gate ruling 4 of change 20260924-...-8341b7: a **bounded** debug warp that puts the
+    /// player at a named zone so a stage-end observation (probe item E16, the bravery latch, the
+    /// timed ladder) does not cost an 11-minute real walk on a machine the project does not own.
+    ///
+    /// Three properties, each of them checked by `stage_boundary_check.py::warp_debug_only`:
+    ///  * **Debug-only by compilation.** The whole feature - declaration, call site and parsing -
+    ///    lives inside `#if DEBUG`, so it is absent from a Release binary rather than merely
+    ///    disabled at runtime. `SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG` is declared in the
+    ///    project-level Debug configuration, because the absence of that line would make the gate
+    ///    accidental rather than stated.
+    ///  * **Inert when unset.** No variable, no jump, no output.
+    ///  * **Bounded target.** The value must be exactly one of the 125 level names the game itself
+    ///    ships (`includedLevels`), so a typo is reported and ignored, and no caller-supplied
+    ///    string can ever reach `TMXLevelRuntime(resource:)`. Anything else is refused on stderr.
+    ///
+    /// The jump goes through the real `transition(to:)`, which is what makes it a valid
+    /// observation: P1-9's accumulator discard, the zone record, the checkpoint write, the
+    /// `isStageStart` spawn rule and - since wave D - the stage clock the timed ladder measures
+    /// against are all the production ones. The scene is then restored to exactly the state the
+    /// launch code produced (title up, gameplay paused), because the warp is an observation aid
+    /// and not a flow change: pressing FIRE continues from the warped zone.
+    static func debugWarpTarget(environment: [String: String], allowed: Set<String>) -> String? {
+        guard let raw = environment["EXOLON_DEBUG_WARP"] else { return nil }
+        let target = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard target.count == 6, target.hasPrefix("L"),
+              allowed.contains(target) else { return nil }
+        return target
+    }
+
+    private func applyDebugWarpIfNeeded(environment: [String: String]) {
+        guard environment["EXOLON_DEBUG_WARP"] != nil else { return }
+        guard let target = GameScene.debugWarpTarget(environment: environment,
+                                                    allowed: includedLevels) else {
+            fputs("EXOLON_DEBUG_WARP ignored: the value must be one of the shipped level "
+                  + "names, format LxxSyy\n", stderr)
+            return
+        }
+        let flowBefore = flowState
+        fputs("EXOLON_DEBUG_WARP=\(target) at step \(tickDriver.stepCount) via transition(to:)\n",
+              stderr)
+        transition(to: target)
+        flowState = flowBefore
+        setGameplayNodesPaused(true)
+        stepLabel.text = "STEP 9 · \(target) · ZONE \(String(format: "%03d", gameState.zone))"
+        hud.update(state: gameState)
+        updateTitleOverlayText()
+        updateDebugText()
+    }
+    #endif
 
     override func update(_ currentTime: TimeInterval) {
         // P1-9: the clamp, the accumulator, the 15-step budget and the catch-up loop now live in
@@ -305,6 +359,13 @@ final class GameScene: SKScene {
         if jumpJustPressed, !player.isDying {
             if currentLevel.changingRooms.contains(where: { $0.intersects(player.movementHitbox) }) {
                 player.toggleExoskeleton(cause: .changingRoom)
+                // P1-10 bravery latch (`ORIGINAL_MECHANICS.md:142`, owner ruling): this is the one
+                // activation site, so the edge is recorded here rather than polled from
+                // `hasExoskeleton` at the boundary - polling cannot see a suit that was put on and
+                // taken off again inside the same stage, and the norm is about *having taken* it.
+                if player.hasExoskeleton {
+                    stageBoundaries.noteExoskeletonActivated(atStep: tickDriver.stepCount)
+                }
                 playerNode.update(from: player, dt: 0)
                 showBanner(player.hasExoskeleton ? "EXOSKELETON ON" : "EXOSKELETON OFF")
                 consumedUpInteraction = true
@@ -628,7 +689,11 @@ final class GameScene: SKScene {
             if player.movementHitbox.intersects(pickup.hitbox) {
                 pickup.collect()
                 let before = gameState.grenades
-                gameState.grenades = 10
+                // `ORIGINAL_MECHANICS.md:107-109`: a refill to exactly 10, not an additive pickup.
+                // The same number is restored at death and at the stage boundary, so it lives in
+                // `GameState` once; a literal here was free to drift from the two other sites
+                // (wave D / P1-10 shared-constant ruling).
+                gameState.grenades = GameState.startingGrenades
                 emitPickup(kind: .grenadePack, countBefore: before, countAfter: gameState.grenades,
                            at: pickup.hitbox.origin)
             }
@@ -638,7 +703,7 @@ final class GameScene: SKScene {
             if player.movementHitbox.intersects(pickup.hitbox) {
                 pickup.collect()
                 let before = gameState.ammo
-                gameState.ammo = 99
+                gameState.ammo = GameState.startingAmmo
                 emitPickup(kind: .ammoPack, countBefore: before, countAfter: gameState.ammo, at: pickup.hitbox.origin)
             }
         }
@@ -751,23 +816,41 @@ final class GameScene: SKScene {
     ///
     /// The old "deliberately dormant until later steps add Zones 024/049/074/099/124" comment was
     /// stale: all 125 zones ship since Step 9, so the guard was live and farmable.
+    ///
+    /// Wave D (P1-10, owner gate rulings 2/3/4) completes the clause list in the **ledger**, not
+    /// here: the scene still only samples the trigger, applies what the ledger decided and
+    /// witnesses it. The two things this function owns are the observation the ledger cannot have -
+    /// the fixed-step coordinate the timed ladder is measured against - and the exoskeleton clear,
+    /// which is a player mutation and therefore must not move into a Foundation-only ledger.
     private func applyOriginalStageBoundaryIfNeeded(completedZone: Int) {
         let outcome = stageBoundaries.outcome(zone: completedZone,
                                              lives: gameState.lives,
-                                             startingLives: GameState.startingLives,
+                                             maxLives: GameConstants.maxLives,
                                              startingAmmo: GameState.startingAmmo,
-                                             startingGrenades: GameState.startingGrenades)
+                                             startingGrenades: GameState.startingGrenades,
+                                             context: stageBoundaries.context(atStep: tickDriver.stepCount),
+                                             awardSequence: GameplayStageComponentSequence.waveD)
         switch outcome {
         case .notApplicable:
             return
         case .suppressed(_, let reason):
             events.emitStageBoundarySuppressed(reason)
         case let .awarded(award):
+            // Award is computed against the lives the player still holds; the +1 is applied after,
+            // which is the order `ORIGINAL_MECHANICS.md:141-144` lists and the order the
+            // lives_x1000 identity is asserted in (`stage_boundary_check.py`).
             awardPoints(award.points, reason: .stageBoundary)
             if award.refillsAmmoAndGrenades {
                 gameState.lives = award.livesAfter
                 gameState.ammo = award.startingAmmo
                 gameState.grenades = award.startingGrenades
+            }
+            if award.clearsExoskeleton {
+                // `:145`/`:117`. A cause-carrying transition, so the clear is on the wire and is
+                // distinguishable from a restart or a cheat; the bravery latch survives it (the
+                // latch is cleared only when the next stage begins).
+                player.setExoskeleton(false, cause: .stageBoundary)
+                playerNode.update(from: player, dt: 0)
             }
             emitStageBoundary(award: award)
         }
@@ -793,6 +876,14 @@ final class GameScene: SKScene {
         addChild(currentLevel.rootNode)
         gameState.zone = zoneNumber(for: levelName)
         let isStageStart = [0, 25, 50, 75, 100].contains(gameState.zone)
+        if isStageStart {
+            // P1-10: the timed ladder and the bravery latch are both measured from here, so the
+            // coordinate is the *stage*, not the playthrough (the suit persists through deaths
+            // until the stage end, `ORIGINAL_MECHANICS.md:115`). Recorded after the outgoing
+            // boundary was already awarded and witnessed by `checkScreenExit`, so a stage-end
+            // trigger can never consume the next stage's clock.
+            stageBoundaries.noteStageStarted(atStep: tickDriver.stepCount)
+        }
         let targetSpawn = isStageStart
             ? currentLevel.spawnCenter
             : CGPoint(x: currentLevel.spawnCenter.x, y: max(currentLevel.groundY + GameConstants.playerSpriteSize.height * 0.5, carriedY))
@@ -871,6 +962,11 @@ final class GameScene: SKScene {
             // A title start with no checkpoint is a new playthrough; continuing from a saved
             // checkpoint keeps the current one, which is what makes the P1-8 farm impossible.
             stageBoundaries.beginPlaythrough()
+            // A new playthrough always begins at zone 000, i.e. at the start of a stage, so the
+            // timed ladder and the bravery latch are armed from the same step (P1-10). The
+            // checkpoint cannot carry a stage-relative clock - `GameCheckpoint` stores no step -
+            // and this branch is the only reachable start, because startup clears the checkpoint.
+            stageBoundaries.noteStageStarted(atStep: tickDriver.stepCount)
         }
         changeFlow(to: .playing, cause: .firePress)
         setGameplayNodesPaused(false)
@@ -1129,6 +1225,7 @@ final class GameScene: SKScene {
         hasSavedCheckpoint = false
         emitCheckpointCleared(reason: .newGame)
         stageBoundaries.beginPlaythrough()
+        stageBoundaries.noteStageStarted(atStep: tickDriver.stepCount)
         clearTransientObjects()
         currentLevel.rootNode.removeFromParent()
         // Same defect class as P1-9 (repo_explorer section 8-4): this also swaps `currentLevel`

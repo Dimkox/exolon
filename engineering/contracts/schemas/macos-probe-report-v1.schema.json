@@ -1,0 +1,562 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "exolon.macos-probe-report/1",
+  "title": "Exolon macOS clean-machine probe report (wave-D Track A/B handout)",
+  "description": "Machine-readable companion of probe-report-<UTC>-<head7>.txt. Normative source: engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/analysis-integration_architect.md §6.2, with the ten consumer rules of §6.3 enforced by evidence/macos_handout_check.py. The JSON is derived from the raw transcript and never written by hand; a disagreement between the two is a FAIL. Nothing in this document may be read as a release attestation: fields whose facts are macOS-only are Class 2 (attested) or Class 3 (excluded) per §3.5.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "generated_utc",
+    "track",
+    "operational",
+    "environment",
+    "provenance",
+    "verdicts",
+    "raw_kv",
+    "selftest",
+    "track_b",
+    "attestation"
+  ],
+  "properties": {
+    "schema": {
+      "const": "exolon.macos-probe-report/1"
+    },
+    "generated_utc": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "track": {
+      "description": "A = clean build/archive/identity observation, no credentials. B = Developer ID signing plus notarization, human-only (owner ruling: Track B is structurally reserved).",
+      "enum": [
+        "A",
+        "B"
+      ]
+    },
+    "operational": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "probe_exit_code",
+        "probe_bash_version",
+        "probe_script_blob_sha1",
+        "verifier_script_blob_sha1",
+        "report_flush_verified",
+        "report_lines_expected",
+        "report_lines_written",
+        "raw_report_sha256",
+        "tree_clean_before_run",
+        "tree_clean_after_run"
+      ],
+      "properties": {
+        "probe_exit_code": {
+          "description": "Operational status only: 0 ran, 2 usage, 66 no project, 73 cannot write --out or the report never flushed, 75 not macOS, 77 refused, 78 misconfiguration. An exit code is never a verdict.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "probe_bash_version": {
+          "description": "Recorded because bash 3.2 does not set $! for a process substitution: the flush barrier must be version-independent (defect M-8).",
+          "type": "string",
+          "minLength": 1
+        },
+        "probe_script_blob_sha1": {
+          "description": "git blob sha1 of engineering/runbooks/macos-probe.sh as measured at repo_head. Anti-reuse: a report can never be reinterpreted against a later probe text (INV-003, measurement M-7).",
+          "type": "string",
+          "pattern": "^$|^[0-9a-f]{40}$"
+        },
+        "verifier_script_blob_sha1": {
+          "type": "string",
+          "pattern": "^$|^[0-9a-f]{40}$"
+        },
+        "report_flush_verified": {
+          "description": "The line-count barrier certified the transcript complete before the probe exited. false rejects the report outright (rule R2).",
+          "type": "boolean"
+        },
+        "report_lines_expected": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "report_lines_written": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "raw_report_sha256": {
+          "description": "sha256 of the committed probe-report-*.txt bytes; detects truncation that a line count alone could miss.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "tree_clean_before_run": {
+          "type": "boolean"
+        },
+        "tree_clean_after_run": {
+          "description": "C-16: a dirty tree after the run means the report is not reproducible from a clean clone (defect M-9).",
+          "type": "boolean"
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "macos_version",
+        "arch",
+        "xcodebuild",
+        "sdks",
+        "host_hash"
+      ],
+      "properties": {
+        "macos_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "arch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "xcodebuild": {
+          "description": "Verbatim `xcodebuild -version` output, whitespace collapsed.",
+          "type": "string",
+          "minLength": 1
+        },
+        "sdks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "host_hash": {
+          "description": "Hash of the host's ComputerName. No hostname, operator name or home path ever enters the handout.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo_head",
+        "tree_fingerprint",
+        "artifact_sha256",
+        "cdhash",
+        "submission_uuid"
+      ],
+      "properties": {
+        "repo_head": {
+          "description": "Full commit SHA the run measured; rule R3 requires it to resolve as a commit in this repository, otherwise the report is STALE and never green.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "tree_fingerprint": {
+          "description": "The route's fingerprint of the tested tree (SIG-001 binding).",
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "artifact_sha256": {
+          "description": "Digest of the container actually submitted for notarization; null on a Track-A run.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "cdhash": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{12,64}$"
+        },
+        "submission_uuid": {
+          "description": "Primary key of Apple's server-side record; the strongest object in the set because the operator's tooling cannot produce it.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        }
+      }
+    },
+    "verdicts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "toolchain",
+        "shared_scheme",
+        "build_rc",
+        "build",
+        "version_single_source",
+        "build_version_single_source",
+        "plist_unexpanded_placeholders",
+        "showdestinations_rc",
+        "archive_rc",
+        "archive",
+        "archive_failure_class",
+        "hardened_runtime",
+        "signing_identity_class",
+        "secure_timestamp",
+        "get_task_allow_present",
+        "notary_profile_present",
+        "notary_submit",
+        "notary_log_committed",
+        "stapler_staple",
+        "stapler_validate",
+        "spctl_assess",
+        "gatekeeper_representative",
+        "play_observations"
+      ],
+      "properties": {
+        "toolchain": {
+          "enum": [
+            "PASS",
+            "FAIL_NO_XCODE"
+          ]
+        },
+        "shared_scheme": {
+          "enum": [
+            "PRESENT",
+            "ABSENT",
+            "NOT_ATTEMPTED"
+          ]
+        },
+        "build_rc": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "build": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_ATTEMPTED",
+            "TOOL_ABSENT",
+            "REFUSED"
+          ]
+        },
+        "version_single_source": {
+          "enum": [
+            "MATCH",
+            "MISMATCH",
+            "NOT_ATTEMPTED"
+          ]
+        },
+        "build_version_single_source": {
+          "enum": [
+            "MATCH",
+            "MISMATCH",
+            "NOT_ATTEMPTED"
+          ]
+        },
+        "plist_unexpanded_placeholders": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "showdestinations_rc": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "archive_rc": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "archive": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_ATTEMPTED",
+            "TOOL_ABSENT",
+            "REFUSED"
+          ]
+        },
+        "archive_failure_class": {
+          "description": "C-11: NO_SCHEME after showdestinations_rc=0 is a contradiction the consumer must reject; SIGNING keeps P1-11's signing clause open without blaming the scheme.",
+          "enum": [
+            "NONE",
+            "SIGNING",
+            "NO_SCHEME",
+            "OTHER",
+            "NOT_ATTEMPTED"
+          ]
+        },
+        "hardened_runtime": {
+          "enum": [
+            "PRESENT",
+            "ABSENT",
+            "NOT_ATTEMPTED"
+          ]
+        },
+        "signing_identity_class": {
+          "enum": [
+            "ADHOC",
+            "DEVELOPER_ID",
+            "APPLE_DEVELOPMENT",
+            "UNKNOWN",
+            "NOT_ATTEMPTED"
+          ]
+        },
+        "secure_timestamp": {
+          "enum": [
+            "PRESENT",
+            "ABSENT",
+            "NOT_ATTEMPTED"
+          ]
+        },
+        "get_task_allow_present": {
+          "type": "boolean"
+        },
+        "notary_profile_present": {
+          "enum": [
+            "YES",
+            "NO",
+            "NOT_APPLICABLE",
+            "NOT_ATTEMPTED"
+          ]
+        },
+        "notary_submit": {
+          "enum": [
+            "ACCEPTED",
+            "INVALID",
+            "IN_PROGRESS",
+            "REFUSED",
+            "NOT_ATTEMPTED",
+            "TOOL_ABSENT"
+          ]
+        },
+        "notary_log_committed": {
+          "type": "boolean"
+        },
+        "stapler_staple": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_ATTEMPTED",
+            "TOOL_ABSENT",
+            "REFUSED"
+          ]
+        },
+        "stapler_validate": {
+          "enum": [
+            "WORKED",
+            "FAIL",
+            "NOT_ATTEMPTED",
+            "TOOL_ABSENT",
+            "REFUSED"
+          ]
+        },
+        "spctl_assess": {
+          "enum": [
+            "ACCEPTED_NOTARIZED_DEVELOPER_ID",
+            "ACCEPTED_OTHER",
+            "REJECTED",
+            "NOT_RUN",
+            "NOT_ATTEMPTED"
+          ]
+        },
+        "gatekeeper_representative": {
+          "description": "false unless the assessed copy actually carried com.apple.quarantine: Apple documents Gatekeeper assessment for downloaded software, so a locally built bundle cannot represent a distribution verdict.",
+          "type": "boolean"
+        },
+        "play_observations": {
+          "enum": [
+            "COMPLETE",
+            "PARTIAL",
+            "SKIPPED"
+          ]
+        }
+      }
+    },
+    "raw_kv": {
+      "description": "Every key=value line of the transcript, verbatim and first-occurrence-wins. The consumer re-reads the TXT and rejects a disagreement (rule R2).",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "selftest": {
+      "description": "§J: the probe parses its own canned strings so the Track-B parsers are Linux-auditable from the committed report. A non-PASS value means the producer is broken (rule R10).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "signing_parser",
+        "notary_status_parser",
+        "verdict_not_collapsed"
+      ],
+      "properties": {
+        "signing_parser": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "notary_status_parser": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "verdict_not_collapsed": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        }
+      }
+    },
+    "track_b": {
+      "description": "null on a Track-A run. Populated only when the double env gate plus the interactive attestation were satisfied by a human.",
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "identity_hash",
+        "authority_chain",
+        "notary_info_file",
+        "notary_log_file",
+        "container",
+        "stapled_target",
+        "manual_smoke"
+      ],
+      "properties": {
+        "identity_hash": {
+          "type": "string",
+          "pattern": "^$|^sha256:[0-9a-f]{6,64}$"
+        },
+        "authority_chain": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "notary_info_file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "notary_log_file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "container": {
+          "enum": [
+            "pkg",
+            "dmg",
+            "zip"
+          ]
+        },
+        "stapled_target": {
+          "enum": [
+            "container",
+            "app"
+          ]
+        },
+        "manual_smoke": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "gamepad",
+            "hud",
+            "audio",
+            "debugger_attach"
+          ],
+          "properties": {
+            "gamepad": {
+              "enum": [
+                "PASS",
+                "FAIL",
+                "NOT_ATTEMPTED"
+              ]
+            },
+            "hud": {
+              "enum": [
+                "PASS",
+                "FAIL",
+                "NOT_ATTEMPTED"
+              ]
+            },
+            "audio": {
+              "enum": [
+                "PASS",
+                "FAIL",
+                "NOT_ATTEMPTED"
+              ]
+            },
+            "debugger_attach": {
+              "enum": [
+                "PASS",
+                "FAIL",
+                "NOT_ATTEMPTED"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "attestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "class_1_rederivable",
+        "class_2_attested",
+        "class_3_excluded",
+        "operator_attested_by",
+        "human_present"
+      ],
+      "properties": {
+        "class_1_rederivable": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "class_2_attested": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "class_3_excluded": {
+          "description": "Facts a Linux verdict may never infer, inherited from PR #3 AC-010.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "operator_attested_by": {
+          "enum": [
+            "owner",
+            "unattested"
+          ]
+        },
+        "human_present": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "verdict5": {
+      "description": "The five-valued vocabulary of integration §2. rc=0 is not a member: an operational status may never be read as a verdict, and NOT_ATTEMPTED may never be read as a pass (FORBID-003).",
+      "enum": [
+        "PASS",
+        "FAIL",
+        "NOT_ATTEMPTED",
+        "TOOL_ABSENT",
+        "REFUSED"
+      ]
+    }
+  }
+}

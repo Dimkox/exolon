@@ -1,0 +1,29 @@
+# L0 characterization of Exolon/GameCore/GameScene.swift:622-631 at base 295690b
+# norm ORIGINAL_MECHANICS.md:138-146 lists six clauses; three were live.
+# This is the frozen 'before' of audit finding P1-10. Phase D-1 replaces it with the
+# L1 ledger table; a live check that still passed after the fix would prove nothing
+# (analysis-architect.md section 7).
+
+clause                   norm     observed  evidence
+lives_x1000              OM:141   PRESENT   Exolon/GameCore/GameScene.swift:627
+refill_ammo              OM:146   PRESENT   Exolon/GameCore/GameScene.swift:629
+refill_grenades          OM:146   PRESENT   Exolon/GameCore/GameScene.swift:630
+bravery_10000            OM:142   MISSING   -
+timed_ladder             OM:143   MISSING   -
+plus_one_life_capped_9   OM:144   PARTIAL   Exolon/GameCore/GameScene.swift:628
+clear_exoskeleton        OM:145   MISSING   -
+
+comment 'deliberately dormant' in the boundary body: TRUE
+includedLevels covers 125 levels; Exolon/Resources ships 125 .tmx maps
+=> the comment was FALSE on evidence: all five boundaries were live and farmable,
+   which is the severity fact recorded in brief.md and in the base finding.
+
+model at lives=9: awarded=9000 lives_after=9 (borrowed cap) ammo=99 grenades=10
+                  exoskeleton kept=True bravery=0 timed=0
+model at lives=1: awarded=1000 lives_after=2 ammo=99 grenades=10
+
+# post-wave-A / pre-wave-D shape, for the record:
+#   `StageBoundaryLedger` already owned the once-key and emitted one component
+#   (lives_x1000) through `bonus.stage_points` + `bonus.stage_component`; bravery,
+#   the timed ladder and the exoskeleton clear were still absent, and the life cap
+#   was still `startingLives` rather than an explicit `maxLives`.
