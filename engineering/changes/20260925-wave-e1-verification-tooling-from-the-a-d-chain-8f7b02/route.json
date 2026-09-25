@@ -1,0 +1,70 @@
+{
+  "allowed_agents": [
+    "repo_explorer",
+    "architect",
+    "docs_researcher",
+    "code_reviewer",
+    "test_reviewer",
+    "frontend_implementer"
+  ],
+  "analysis_agents": [
+    "repo_explorer",
+    "architect",
+    "docs_researcher"
+  ],
+  "base_commit": "0b0dea97997aa675dd6216284bda2d3476e10bbc",
+  "base_fingerprint": "bc105ad5d08cbde7c2ff04c5b86e0b0ac1da3471d4d2d544a708ba3022f2b0a2",
+  "complexity": "standard",
+  "created_at": "2026-09-25T04:04:10+00:00",
+  "delivery_expected": true,
+  "domains": [
+    "frontend"
+  ],
+  "human_gates": [],
+  "intent": "bugfix",
+  "primary_skill": "adaptive-delivery",
+  "quality_profiles": [
+    "base",
+    "frontend"
+  ],
+  "rationale": [
+    "bounded change without high-risk signals",
+    "intent=bugfix",
+    "domains=frontend",
+    "repository=generic",
+    "write-owner=frontend_implementer",
+    "analysis-wave=3/10"
+  ],
+  "repo": {
+    "bitrix_modules": [],
+    "domains": [],
+    "kind": "generic",
+    "languages": [],
+    "package_scripts": [],
+    "signals": []
+  },
+  "required_evidence": [
+    "verification",
+    "code_review",
+    "test_review"
+  ],
+  "review_agents": [
+    "code_reviewer",
+    "test_reviewer"
+  ],
+  "risk": "low",
+  "route_id": "8f7b0281a27b",
+  "schema_version": 1,
+  "session_id": "manual",
+  "status": "routed",
+  "task": "Wave E1 verification tooling from the A-D chain debt (issues #21/#22): add engineering/tools/wave_scan.py — a root-anchored (change-base 295690b..HEAD plus working tree plus untracked) union scanner that parses every touched Swift file with swiftc -frontend -parse, runs the per-wave added-lines attribution scan once from the root base so no committed wave is left unpoliced, and executes the merged per-package meters (A 28 checks, B 9, C 9, D handout+stage 10+10 and 11) as a cross-wave suite; fix the merged 20260919 loader harness run.sh file list (add GameConstants.swift, one line, recorded); mark v3_measurements.py mirrors as frozen-historical with a header (no behavior rewrite); harden wave B meter wave_base() to fail closed when origin/main is absent instead of silently widening to 295690b; make wave A M3 timing assert a soft warning band with the deterministic allocation grep kept hard; extend stage_boundary_check warp_debug_only to assert the owning target-block GUID. No Exolon/Resources edits, no gameplay semantics changes.",
+  "task_domains": [
+    "frontend"
+  ],
+  "workflow_skills": [
+    "adaptive-delivery",
+    "bugfix-workflow",
+    "frontend-change"
+  ],
+  "write_agent": "frontend_implementer"
+}

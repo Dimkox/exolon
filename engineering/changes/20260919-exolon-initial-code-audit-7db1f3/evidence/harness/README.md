@@ -13,7 +13,7 @@
 | `coregraphics_shim.swift` | 1 строка: `@_exported import Foundation` — даёт модуль `CoreGraphics` из `Foundation` на Linux |
 | `gen_fixtures.py` | 17 malformed-карт (чужой корень, пустой `<map/>`, gzip/zlib, опечатка в числе, утечка свойств, обрезанный/лишний base64, huge dims, layer без data и т.д.) |
 | `main.swift` | прогон фикстур + всего корпуса + геометрия зоны 009 |
-| `last-run.txt` | вывод прогона на HEAD `52795d1` (проскрабленный), `REAL MAPS ok=125/125 failures=0` |
+| `last-run.txt` | вывод прогона на HEAD `0b0dea9` (проскрабленный), `REAL MAPS ok=125/125 failures=0`, `rc=0`; пересоздан в wave E1 после добавления `Exolon/GameCore/GameConstants.swift` в список файлов шага 4 (см. «E1 provenance» в `run.sh`) |
 | `fixtures/` | генерируется, в git не входит |
 
 ## Запуск

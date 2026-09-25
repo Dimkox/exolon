@@ -1,0 +1,24 @@
+# ruff check with the repository's own ruff.toml (select E4,E7,E9,F; line-length 120; target py310)
+# head=7653f3381d65abab0c3095ceb773bbc826a464da  date=2026-09-25T10:20:24Z  dirty=12
+# certified_head=7653f3381d65abab0c3095ceb773bbc826a464da  cert_digest=d4a5d82ff4fc6cc2  certified_files=23  tree_fingerprint=6e765c91853335122e1150c6bf8a2bc5cbf8f3e9de1016103a23ccec0fa13559
+# NOTE: ruff.toml excludes engineering/, so the files are passed explicitly.
+
+## 1. wave E1's new tools (must be clean)
+$ python3 -m ruff check --output-format concise engineering/tools/wave_scan.py \
+      engineering/changes/20260925-…-8f7b02/evidence/wave_e1_check.py
+All checks passed!
+rc=0
+
+## 2. merged tools wave E1 touched (findings below are PRE-EXISTING lines of those files,
+##    not wave E1 edits; E1 deliberately did not "fix" them - they belong to their routes)
+$ python3 -m ruff check --output-format concise <the five merged files>
+engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/stage_boundary_check.py:421:21: E741 Ambiguous variable name: `l`
+engineering/changes/20260924-complete-wave-d-specification-and-release-audit-8341b7/evidence/stage_boundary_check.py:611:13: F841 Local variable `start_tick` is assigned to but never used
+engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py:59:34: F401 [*] `collections.defaultdict` imported but unused
+engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py:1245:11: F541 [*] f-string without any placeholders
+engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py:1246:11: F541 [*] f-string without any placeholders
+engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py:1449:15: F541 [*] f-string without any placeholders
+engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py:1450:15: F541 [*] f-string without any placeholders
+Found 7 errors.
+[*] 5 fixable with the `--fix` option (1 hidden fix can be enabled with the `--unsafe-fixes` option).
+rc=1

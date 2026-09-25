@@ -46,6 +46,7 @@ enum Harness {
     static let only = ProcessInfo.processInfo.environment["EXOLON_SCENARIO"]
 
     static var failures: [String] = []
+    static var warnings: [String] = []
     static var manifest: [String: [String]] = [:]
     static var notes: [String] = []
     static var ran: [String] = []
@@ -54,6 +55,18 @@ enum Harness {
         if !condition {
             failures.append("line \(line): \(label)")
             print("FAIL \(label)")
+        }
+    }
+
+    /// Load-sensitive bands report through this instead of `check`: a WARNING carrying the
+    /// measured value, never a failure. The deterministic twins of every soft band stay in
+    /// `check` (wave E1, issue #22 item 5 - M3 tripped twice under host load 16-18, passed 3/3
+    /// clean; a shared host must not be able to make the gate lie in either direction).
+    static func warn(_ condition: Bool, _ label: String, line: UInt = #line) {
+        if !condition {
+            warnings.append("line \(line): \(label)")
+            notes.append("WARNING soft-band \(label)")
+            print("WARNING \(label)")
         }
     }
 
@@ -1137,18 +1150,21 @@ func scenarioCostBudget() {
     // `.off` performs no drain at all (that is what makes it the kill switch), so this ring
     // laps by construction in the probe; the pipeline probe below is the one that must keep up.
     Harness.check(pipeline.stats.dropped == 0, "the pipeline probe did not overflow its ring: \(pipeline.stats.dropped)")
-    // M3 measured one beginTick + one emit at ~70 ns, so 60 of them belong in the single-digit
-    // microsecond band; a clock that measured nothing, or measured the wrong thing, fails here.
-    Harness.check(producerNs > 1 && producerNs * 60 < 5_000,
-                  "60 locked appends must stay near 4 us (M3), got \(producerNs * 60) ns")
-    // The spec budget is 5 %; assert with a 10x margin so a real regression is caught by the gate
-    // itself and not only by the reported figure (review R-10 / parent instruction).
-    Harness.check(percentOfTick <= 0.5,
-                  "level-2 emission must stay under 0.5 % of a tick (spec budget 5 %), got \(percentOfTick) %")
-    Harness.check(percentOfTick <= 5,
-                  "level-2 emission on the fixed step costs <= 5 % of a 16.67 ms tick, measured \(percentOfTick) %")
-    Harness.check(producerNs > 0.5 && producerNs < 1_000,
-                  "the append must land in the band the design was sized on (M2/M3: 55-70 ns), got \(producerNs) ns")
+    // Wave E1 (issue #22 item 5): the four absolute timing bands below measure wall-clock cost on
+    // whatever host runs the harness, so they are reported as WARNINGs with the measured value -
+    // they tripped under load 16-18 while the code was unchanged. Everything deterministic stays
+    // a hard `check`: the clock-measured-something floor, the >5x formatting-control RELATION two
+    // lines above, the 8x realtime drain floor, and the static allocation scan in the Python gate.
+    Harness.check(producerNs > 1,
+                  "the append clock must measure a real cost (sanity floor, not a budget), got \(producerNs) ns")
+    Harness.warn(producerNs * 60 < 5_000,
+                 "60 locked appends near 4 us (M3) is a load-sensitive band, got \(producerNs * 60) ns")
+    Harness.warn(percentOfTick <= 0.5,
+                 "level-2 emission under 0.5 % of a tick (spec budget 5 %) is load-sensitive, got \(percentOfTick) %")
+    Harness.warn(percentOfTick <= 5,
+                 "level-2 emission cost <= 5 % of a 16.67 ms tick is load-sensitive, measured \(percentOfTick) %")
+    Harness.warn(producerNs > 0.5 && producerNs < 1_000,
+                 "the append landing in the sizing band (M2/M3: 55-70 ns) is load-sensitive, got \(producerNs) ns")
     Harness.register("emission_cost", files: [], extras: [
         "producer_ns_per_event=\(String(format: "%.2f", producerNs))",
         "percent_of_tick=\(String(format: "%.4f", percentOfTick))",

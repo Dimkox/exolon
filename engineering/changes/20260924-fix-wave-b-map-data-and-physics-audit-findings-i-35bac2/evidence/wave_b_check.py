@@ -645,19 +645,66 @@ def git_show_base(rel: str):
 
 def wave_base() -> str:
     """База added-lines скана: актуальный rebase-base ветки (merge-base с
-    origin/main после перестановки на серию A→B→…), fallback — исторический
-    295690b. Иначе чужие волновые строки (например merge'нутый wave-A)
-    считались бы «нашими добавленными» и размывали атрибуцию FORBID-001.
+    origin/main после перестановки на серию A→B→…). Иначе чужие волновые строки
+    (например merge'нутый wave-A) считались бы «нашими добавленными» и размывали
+    атрибуцию FORBID-001.
     Base-порт renderer'а и TMX-манифест ПРИНЦИПИАЛЬНО остаются на 295690b —
-    это якоря бейса (git show / blob-хэши), а не diff-scope."""
+    это якоря бейса (git show / blob-хэши), а не diff-scope.
+
+    Два правила wave E1 (issue #21/#22 item 4), измеренных ревью серии:
+    1. молчаливо-широкого fallback больше нет. Если refs/remotes/origin/main
+       отсутствует (голый clone без remote-tracking ref'а), скан НЕ уезжает на
+       295690b и не зелёный «впустую»: это FAIL-CLOSED с exit 4. Ревью release
+       поймало на этом ложно-зелёный прогон (2938 строк вместо дельта волны).
+    2. правило wave E1 исправлено ревью (review-code R1 / review-test M1 на 32e61e8):
+       перепривязка триггерится ИЗМЕРЕННОЙ пустотой собственного дельта, а не равенством
+       merge-base == HEAD. Равенство ловило только послеслиянное состояние, а на
+       HEAD открытого PR инструментальной волны merge-base как раз равен origin/main,
+       и скан по пустому дельта краснел бы ложно (файлов=0 строк=0). Пустой скан
+       красным делать нечем (это не поиск дефекта, а шум), поэтому при own_delta_code_lines==0
+       база перепривязывается к корневой 295690b — т.е. скан становится ШИРЕ, а не уже:
+       накопленный дельта A..HEAD поличится здесь (и в wave_scan.py), а non-vacuity
+       guard (файлов>=7, строк>=150) остаётся и по-прежнему краснеет на НЕпустом,
+       но подозрительно маленьком дельта. Причина печатается машиночитаемо
+       (WAVE_BASE=… own_delta_code_lines=… reason=…), молчаливости нет."""
+    probe = subprocess.run(["git", "-C", str(ROOT), "show-ref", "--verify", "--quiet",
+                            "refs/remotes/origin/main"], capture_output=True, text=True,
+                           timeout=30, check=False)
+    if probe.returncode != 0:
+        print("FAIL-CLOSED: refs/remotes/origin/main отсутствует — базу added-lines скана "
+              "определить нечем; молчаливый откат на широкую базу 295690b убран в wave E1 "
+              "(он давал ложно-зелёный прогон в clone без remote-tracking ref'а). "
+              "Запустите git fetch origin main (или прогоните engineering/tools/wave_scan.py, "
+              "у которого база якорная).", file=sys.stderr)
+        raise SystemExit(4)
     try:
         proc = subprocess.run(["git", "-C", str(ROOT), "merge-base", "HEAD", "origin/main"],
                               capture_output=True, text=True, timeout=30, check=False)
-        if proc.returncode == 0 and proc.stdout.strip():
-            return proc.stdout.strip()
+        head = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"],
+                              capture_output=True, text=True, timeout=30, check=False)
+        base = proc.stdout.strip() if proc.returncode == 0 else ""
     except (OSError, subprocess.TimeoutExpired):
-        pass
-    return "295690b"
+        base = ""
+    if not base:
+        print("FAIL-CLOSED: git merge-base HEAD origin/main не вернул базу — "
+              "added-lines скан не может быть вычислен.", file=sys.stderr)
+        raise SystemExit(4)
+    _ = head  # head нужен только для диагностики топологии; решение ниже — по измеренному дельта
+    own = git_added_lines(base)
+    if own is None:
+        print("  wave_base: WAVE_BASE=%s own_delta=unknown reason=git-diff-unavailable "
+              "(scan краснеет честно, ниже)" % base[:7])
+        return base
+    own_code = sum(1 for _path, line in own if strip_comments(line).strip())
+    if own_code == 0:
+        print("  wave_base: WAVE_BASE=%s own_delta_files=%d own_delta_code_lines=0 "
+              "reason=no-product-delta-on-this-branch re_anchor=295690b "
+              "(шире, не уже; issue #21; guard>=7 файлов / >=150 строк остаётся)"
+              % (base[:7], len({path for path, _ in own})))
+        return "295690b"
+    print("  wave_base: WAVE_BASE=%s own_delta_code_lines=%d reason=own-delta-present"
+          % (base[:7], own_code))
+    return base
 
 
 def git_added_lines(base: str):

@@ -1,0 +1,101 @@
+{
+  "base": "295690b",
+  "cert_digest": "d4a5d82ff4fc6cc2",
+  "certification_bound": [
+    "wave-scan-end-to-end.txt@7653f33:d4a5d82ff4fc6cc2",
+    "ruff-new-tools.txt@7653f33:d4a5d82ff4fc6cc2"
+  ],
+  "certification_notes": [
+    "wave-e1-check-green.txt: certifies 18437cd33e19a5d1, this state is d4a5d82ff4fc6cc2 (freeze window)",
+    "wave-e1-check.json: certifies 18437cd33e19a5d1, this state is d4a5d82ff4fc6cc2 (freeze window)",
+    "grok-verify-pr.txt: certifies 18437cd33e19a5d1, this state is d4a5d82ff4fc6cc2 (freeze window)"
+  ],
+  "certification_uncertified": [],
+  "certified_files": 23,
+  "certified_head": "7653f3381d65abab0c3095ceb773bbc826a464da",
+  "change_base": "0b0dea97997aa675dd6216284bda2d3476e10bbc",
+  "checks": 11,
+  "failed": 0,
+  "head": "7653f3381d65abab0c3095ceb773bbc826a464da",
+  "recorded_at": "2026-09-25T10:20:24Z",
+  "recorded_dirty_paths": 12,
+  "recorded_rc": 0,
+  "result": "WAVE_E1_PROBES_PASS",
+  "results": {
+    "attribution_scan_flips": {
+      "binding": "AC-002",
+      "detail": "0 violations over 2938 added code lines in 16 product files across 6 buckets (wave-a=2494, wave-b=237, wave-c=95, wave-d=124, codex/wave-e1-verification-tooling-20260925 (committed on this branch)=0, uncommitted (working tree + untracked)=0); strict recount without the allowance also 0; plants reddened AND attributed (per-map/\u00b116/544 -> uncommitted (working tree + untracked), committed -> codex/wave-e1-verification-tooling-20260925 (committed on this branch), untracked new file -> uncommitted (working tree + untracked) with 3 pattern kinds); 3 arithmetic \u00b116 variants each red; ignored Exolon/GameCore/coverage/*.swift reddens the coverage guard; synthetic two-wave repo attributes an A-authored/B-edited line to wave-b; untracked product swift on the real tree now: 0",
+      "pass": true,
+      "seconds": 8.5
+    },
+    "b_meter_failclosed": {
+      "binding": "AC-006",
+      "detail": "remote-less clone: rc=4 with the explicit fail-closed error and no scan line; open-PR topology: green with 2938 added code lines in 16 files via wave_base: WAVE_BASE=0b0dea9 own_delta_files=0 own_delta_code_lines=0 ; post-merge topology: green; real-tree refs clean (18 refs, no refs/heads/origin/, origin/main=0b0dea9 ancestor of HEAD)",
+      "pass": true,
+      "seconds": 12.6
+    },
+    "cross_wave_suite_green": {
+      "binding": "AC-003 / SIG-001",
+      "detail": "6/6 meters green (wave-a-gameplay-log=28, wave-b-mapdata=9, wave-c-content=9, wave-d-handout=11, wave-d-stage=10, loader-harness-125maps=1), parse 0 failures, attribution 0 violations in 79.8 s; forced-red meter reddened the suite (2 failed), absent meter is red, deleting 25 maps reddened the loader contour (REAL MAPS ok=100/100 failures=0)",
+      "pass": true,
+      "seconds": 83.9
+    },
+    "loader_harness_green": {
+      "binding": "AC-004",
+      "detail": "step 4 compiles GameConstants.swift, run.sh rc=0 with REAL MAPS ok=125/125 failures=0 and both negative controls; last-run.txt + README re-recorded at HEAD 7653f33; reverting the line gives \"cannot find 'GameConstants' in scope\"",
+      "pass": true,
+      "seconds": 3.5
+    },
+    "m3_soft_band": {
+      "binding": "AC-007",
+      "detail": "python band soft (WARNING emission-cost band (load-sensitive, not a failure - wave E1 #22 item 5): level-2 e); 0 ns clock, control <5x and low drain still FAIL; on-disk allocating appendRecord reddens the hard scan; harness layer warns on the band yet fails on the deterministic twin",
+      "pass": true,
+      "seconds": 26.7
+    },
+    "no_silent_relaxation": {
+      "binding": "FORBID-002",
+      "detail": "B non-vacuity guard present + a planted \u00b116 still red at the root anchor; A hard checks byte-identical to the route base 0b0dea9 (not to HEAD); C edit is text-only against 0b0dea9; the constants-allowance exemption is pinned inert by AC-002; wave_scan fails closed without swiftc",
+      "pass": true,
+      "seconds": 1.8
+    },
+    "product_untouched": {
+      "binding": "FORBID-001",
+      "detail": "34 paths in the change surface (0b0dea9..HEAD + working), all inside engineering/tools + this package + 10 sanctioned merged edits (README.md:+38/-1, \u2026/harness/README.md:+1/-1, \u2026/harness/last-run.txt:+4/-2, \u2026/harness/run.sh:+7/-1, \u2026/evidence/v3_measurements.py:+12/-0, \u2026/evidence/wave_c_check.py:+5/-2, \u2026/evidence/stage_boundary_check.py:+83/-3, \u2026/evidence/wave_b_check.py:+55/-8, \u2026/evidence/gameplay_log_check.py:+26/-12, \u2026/harness/main.swift:+28/-12); Exolon/ and Exolon.xcodeproj byte-clean against the route base",
+      "pass": true,
+      "seconds": 0.1
+    },
+    "scan_covers_committed_union": {
+      "binding": "AC-001",
+      "detail": "committed union 20 .swift files (product 16 + evidence 4) all parse ok, selftest {'broken_reddens': True, 'broken_verdict': \"  | `- error: expected '}' in struct\", 'good_parses': True}; committed garbage reddened BlasterBullet.swift, untracked garbage entered the set (21 files)",
+      "pass": true,
+      "seconds": 2.0
+    },
+    "suite_standalone_agreement": {
+      "binding": "INV-001",
+      "detail": "standalone == suite for all 6 meters (wave-a-gameplay-log 28/28==28, wave-b-mapdata 9/9==9, wave-c-content 9/9==9, wave-d-handout 11/11==11, wave-d-stage 10/10==10, loader-harness-125maps 1/1==1); verdict lines: RESULT: PASS (28/28 checks passed) | REAL MAPS ok=125/125 failures=0",
+      "pass": true,
+      "seconds": 81.4
+    },
+    "v3_header_present": {
+      "binding": "AC-005",
+      "detail": "v3 header frozen (tokens (('frozen-historical', 'frozen_historical'), ('wave_c_check.py',), ('76', '51'), ('no behavior change', 'not maintained', '\u043d\u0435 \u043c\u0435\u043d\u044f\u043b\u043e\u0441\u044c'), ('pre-fix', '\u0434\u043e\u0444\u0438\u043a\u0441\u043e\u0432'), ('abort', 'crash', '\u043f\u0430\u0434\u0430\u0435\u0442'))), stdout and failure mode byte-identical to the pre-edit copy (rc=1, 0 chars); C meter green with 2 header-citing WARNINGs: WARNING (not a failure of this change): v3_measurements.py keeps a hand-copied copy of the matcher: it account",
+      "pass": true,
+      "seconds": 4.7
+    },
+    "warp_guid_bound": {
+      "binding": "AC-008",
+      "detail": "DEBUG in the project Debug block passes; moving it into 800...002/003/004 and duplicating it all redden (project-release=caught, target-debug=caught, target-release=caught, duplicate=caught); real pbxproj byte-unchanged",
+      "pass": true,
+      "seconds": 0.7
+    }
+  },
+  "root": "<repo>",
+  "seconds": 225.9,
+  "stale_certification": [
+    "wave-e1-check-green.txt: certifies 18437cd33e19a5d1, this state is d4a5d82ff4fc6cc2 (freeze window)",
+    "wave-e1-check.json: certifies 18437cd33e19a5d1, this state is d4a5d82ff4fc6cc2 (freeze window)",
+    "grok-verify-pr.txt: certifies 18437cd33e19a5d1, this state is d4a5d82ff4fc6cc2 (freeze window)"
+  ],
+  "tool": "wave_e1_check",
+  "tree_fingerprint": "6e765c91853335122e1150c6bf8a2bc5cbf8f3e9de1016103a23ccec0fa13559"
+}

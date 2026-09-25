@@ -1,0 +1,118 @@
+{
+  "acceptance_criteria": [
+    {
+      "id": "AC-001",
+      "statement": "engineering/tools/wave_scan.py exists and parses the full union of Swift files touched since change-base 295690b (committed range plus working tree plus untracked) with swiftc -frontend -parse, covering every wave's files including Diagnostics, BlasterBullet, TMXTileMapRenderer and Grenade; a planted syntax error in any committed one reddens the scan.",
+      "evidence": [
+        {"test": "engineering/changes/20260925-wave-e1-verification-tooling-from-the-a-d-chain-8f7b02/evidence/wave_e1_check.py::scan_covers_committed_union"}
+      ]
+    },
+    {
+      "id": "AC-002",
+      "statement": "The root-anchored attribution scan (added lines 295690b..HEAD union working, per-wave bucketed) reports zero violations for magic offsets and per-map literals across ALL merged waves (measured 0 today) and reddens on a planted per-map table in any merged file (control), closing issue #21's accumulated blind spot.",
+      "evidence": [
+        {"test": "engineering/changes/20260925-wave-e1-verification-tooling-from-the-a-d-chain-8f7b02/evidence/wave_e1_check.py::attribution_scan_flips"}
+      ]
+    },
+    {
+      "id": "AC-003",
+      "statement": "wave_scan runs the merged meters as a suite with recorded sub-results (A 28, B 9, C 9, D handout 11, D stage 10, loader harness 125/125) and exits green only if every one is green on the E1 head.",
+      "evidence": [
+        {"test": "engineering/changes/20260925-wave-e1-verification-tooling-from-the-a-d-chain-8f7b02/evidence/wave_e1_check.py::cross_wave_suite_green"}
+      ]
+    },
+    {
+      "id": "AC-004",
+      "statement": "The merged 20260919 loader harness run.sh compiles again after adding Exolon/GameCore/GameConstants.swift to its file list (one recorded line), reproducing REAL MAPS ok=125/125 failures=0 with its negative controls intact.",
+      "evidence": [
+        {"test": "engineering/changes/20260925-wave-e1-verification-tooling-from-the-a-d-chain-8f7b02/evidence/wave_e1_check.py::loader_harness_green"}
+      ]
+    },
+    {
+      "id": "AC-005",
+      "statement": "v3_measurements.py carries a frozen-historical header stating its 76/51/32 outputs describe the pre-fix tree (behavior untouched), and wave C's stale-mirror WARNING text is updated to point at the header instead of implying pending cleanup.",
+      "evidence": [
+        {"test": "engineering/changes/20260925-wave-e1-verification-tooling-from-the-a-d-chain-8f7b02/evidence/wave_e1_check.py::v3_header_present"}
+      ]
+    },
+    {
+      "id": "AC-006",
+      "statement": "Wave B meter wave_base() fails closed (explicit error, non-green) when refs/remotes/origin/main is absent instead of falling back to 295690b; verified by running in a remote-less clone where the old code false-greened.",
+      "evidence": [
+        {"test": "engineering/changes/20260925-wave-e1-verification-tooling-from-the-a-d-chain-8f7b02/evidence/wave_e1_check.py::b_meter_failclosed"}
+      ]
+    },
+    {
+      "id": "AC-007",
+      "statement": "Wave A M3 append-timing becomes a soft warning band (over-band prints WARNING with measured value, does not fail), while the deterministic allocation scan remains a hard failure proven by the injected-allocation control.",
+      "evidence": [
+        {"test": "engineering/changes/20260925-wave-e1-verification-tooling-from-the-a-d-chain-8f7b02/evidence/wave_e1_check.py::m3_soft_band"}
+      ]
+    },
+    {
+      "id": "AC-008",
+      "statement": "stage_boundary_check warp_debug_only asserts the DEBUG condition binds to the PROJECT block GUID and reddens when the condition is moved into a target Release block (reviewer mutation reproduced).",
+      "evidence": [
+        {"test": "engineering/changes/20260925-wave-e1-verification-tooling-from-the-a-d-chain-8f7b02/evidence/wave_e1_check.py::warp_guid_bound"}
+      ]
+    }
+  ],
+  "approvals": {
+    "required_scopes": []
+  },
+  "change_id": "20260925-wave-e1-verification-tooling-from-the-a-d-chain-8f7b02",
+  "contracts": {
+    "events": [],
+    "json_schema": [],
+    "openapi": []
+  },
+  "forbidden_outcomes": [
+    {
+      "id": "FORBID-001",
+      "statement": "Any change under Exolon/ (product sources, Resources, xcodeproj) — E1 is tooling-only; the merged-file touches are limited to the loader-harness one line and the two frozen-historical headers, each recorded in tasks.md.",
+      "evidence": [
+        {"test": "engineering/changes/20260925-wave-e1-verification-tooling-from-the-a-d-chain-8f7b02/evidence/wave_e1_check.py::product_untouched"}
+      ]
+    },
+    {
+      "id": "FORBID-002",
+      "statement": "Any hardening implemented by weakening a check (e.g. M3 soft band also softening the allocation grep, attribution scan narrowed to hide violations); each new leniency keeps its deterministic twin hard.",
+      "evidence": [
+        {"test": "engineering/changes/20260925-wave-e1-verification-tooling-from-the-a-d-chain-8f7b02/evidence/wave_e1_check.py::no_silent_relaxation"}
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "id": "INV-001",
+      "statement": "Every merged meter (A, B, C, D-handout, D-stage, loader harness) runs green on the E1 head through wave_scan as well as standalone; suite and standalone results agree byte-for-byte on verdict counts.",
+      "evidence": [
+        {"test": "engineering/changes/20260925-wave-e1-verification-tooling-from-the-a-d-chain-8f7b02/evidence/wave_e1_check.py::suite_standalone_agreement"}
+      ]
+    }
+  ],
+  "objective": {
+    "id": "OBJ-001",
+    "statement": "The A-D chain's verification debt is closed: one root-anchored tool polices the full accumulated delta and executes every merged meter as a suite; four measured tool defects fixed, each with a flipping control.",
+    "success_metric": "wave_e1_check.py all AC/INV/FORBID green; issues #21 and #22 items 1,2,5,6 demonstrably closed by named checks",
+    "target": "100% of listed checks pass on the final head"
+  },
+  "observability": [
+    {
+      "id": "SIG-001",
+      "metric": "wave_scan.py single command completes <=10 min and prints one machine-readable summary line per meter plus per-wave attribution counts",
+      "proves": ["OBJ-001"]
+    }
+  ],
+  "risk": {
+    "domains": [
+      "generic"
+    ],
+    "tier": "green"
+  },
+  "rollback": {
+    "maximum_steps": 1,
+    "strategy": "forward_fix"
+  },
+  "schema_version": 2
+}

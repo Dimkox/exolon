@@ -1,0 +1,21 @@
+# wave_scan.py end-to-end on the wave E1 tree
+# head=7653f3381d65abab0c3095ceb773bbc826a464da  date=2026-09-25T10:20:24Z  dirty=12  rc=0  wall=80s
+# certified_head=7653f3381d65abab0c3095ceb773bbc826a464da  cert_digest=d4a5d82ff4fc6cc2  certified_files=23  tree_fingerprint=6e765c91853335122e1150c6bf8a2bc5cbf8f3e9de1016103a23ccec0fa13559
+# command: python3 engineering/tools/wave_scan.py
+SUMMARY parse       files=20 (product=16 evidence=4 deleted=0) failures=0 selftest=True
+SUMMARY attribution   base=295690b code_lines=2938 files=16 violations=0 allow_list=Exolon/GameCore/GameConstants.swift
+  bucket wave-a                                       range=295690b..17a742a   files=12  code_lines=2494  violations=0
+  bucket wave-b                                       range=17a742a..3407c37   files=8   code_lines=237   violations=0
+  bucket wave-c                                       range=3407c37..817bf52   files=3   code_lines=95    violations=0
+  bucket wave-d                                       range=817bf52..0b0dea9   files=5   code_lines=124   violations=0
+  bucket codex/wave-e1-verification-tooling-20260925 (committed on this branch) range=0b0dea9..HEAD      files=0   code_lines=0     violations=0
+  bucket uncommitted (working tree + untracked)       range=HEAD..worktree     files=0   code_lines=0     violations=0
+SUMMARY meter       wave-a-gameplay-log    expected=28  passed=28  failed=0   rc=0 green=yes 64.1s RESULT: PASS (28/28 checks passed)
+SUMMARY meter       wave-b-mapdata         expected=9   passed=9   failed=0   rc=0 green=yes 3.0s RESULT: ALL_WAVE_B_CHECKS_MATCH_SPEC
+SUMMARY meter       wave-c-content         expected=9   passed=9   failed=0   rc=0 green=yes 4.0s RESULT: ALL_WAVE_C_PROBES_PASS | probes=9 failed=0
+SUMMARY meter       wave-d-handout         expected=11  passed=11  failed=0   rc=0 green=yes 5.8s SUMMARY checks=11 failed=0
+SUMMARY meter       wave-d-stage           expected=10  passed=10  failed=0   rc=0 green=yes 0.1s SUMMARY checks=10 failed=0
+SUMMARY meter       loader-harness-125maps expected=1   passed=1   failed=0   rc=0 green=yes 2.5s REAL MAPS ok=125/125 failures=0
+SUMMARY not-policed 6 disclosed limits (--json attribution.not_policed); first: a `//` inside a string literal ends comment-stripping, so a violation placed...
+SUMMARY TOTAL       meters=6/6 green parse_failures=0 attribution_violations=0 elapsed=80.0s budget=600s tree_writes=none
+RESULT: WAVE_SCAN_GREEN
