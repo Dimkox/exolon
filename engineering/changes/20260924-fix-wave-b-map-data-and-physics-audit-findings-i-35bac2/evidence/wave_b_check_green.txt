@@ -1,4 +1,4 @@
-# wave_b_check.py — финальный зелёный прогон ПОСЛЕ REBASE на post-A main 17a742a (head e520884)
+# wave_b_check.py — финальный зелёный прогон ПОСЛЕ REBASE на post-A main 17a742a (head 6c7dfe5 (post-rebase head; earlier transcript line referred to e520884 pre-amend))
 # cmd: python3 engineering/changes/20260924-fix-wave-b-map-data-and-physics-audit-findings-i-35bac2/evidence/wave_b_check.py
 # battery: 14 мутационных прогонов (A1–A8, B1–B4, M12, M13) — см. wave_b_ablations.txt (пред-ребейс; артефакт после ребейса байт-идентичен)
 # receipt binding: ПРЕЖНИЙ a5ad67be5a00… недействителен после ребейса; гейт/рекорд — за контроллером на свежем fingerprint

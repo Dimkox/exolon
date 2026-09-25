@@ -1,26 +1,41 @@
-# Requirements — Fix wave-B map-data and physics audit findings in the Exolon game: P1-2 (player spawn does not match the Collision surface: 59 of 125 maps spawn 16px above and 29 below the ground), P1-3 (bullets are culled at x>528 while the player can move to x=544 and 61 maps have Collision right of x=512), P1-5 (beam_up/beam_down pairs create two 25-hit-point fields instead of one shared 25-hit model), P1-1 (46 pistons on 27 maps use the wrong height anchor and frequently cannot damage the player). Ground every fix in the TMX Collision data; self-checking verifiers per finding with contradictory controls.
+# Requirements — wave B (map-data physics)
 
-> Typed authority: [`change-spec.yaml`](change-spec.yaml). This Markdown explains context and cannot override typed IDs, risk, acceptance criteria, forbidden outcomes, or approval scopes.
+> Typed authority: [`change-spec.yaml`](change-spec.yaml).
 
 ## Acceptance criteria
 
-- [ ] Given ..., when ..., then ...
+- [ ] AC-001 Given the shared surface query, when spawn feet are resolved, then for maps having a
+      Collision top within ±16 px of the `vitorc` marker the feet equal that surface (body-clear
+      PREFERRED, tie → lower Y), maps without one stay UNMOVED and enumerated; no spawn moves
+      >16 px; the 37/59/29 marker-vs-surface control reproduces under the old rule.
+- [ ] AC-002 Given the 46 pistons on 27 maps, when anchors resolve at-or-below the raised tread,
+      then all 46 are lethal (6/46 under the old anchor — control).
+- [ ] AC-003 Given beam_up/beam_down pairs, when fields are built, then one shared 25-HP pool per
+      x-overlapping group, destruction removes both segments together, sum == 25×pairs per map.
+- [ ] AC-004 Given derived projectile bounds, then blaster cull ≥ reachable clamp + bullet width,
+      no shot is born dead at any reachable x, grenades share the named-bound policy, x>510
+      transition unchanged.
+- [ ] AC-005 Then the full meter is deterministic stdlib ≤60 s and EVERY named control flips.
 
 ## Failure and edge cases
 
-- 
+- Column with no cell at/below tread → GLOBAL fallback plane (3 shaft maps; L01S15, L02S23,
+  L05S23) — documented, meter-proven lethal.
+- Equal-minX beam halves → index tie-break (grouping total order; precondition asserted in meter).
+- No swiftc → `TOOL_ABSENT` rc=3, never silent green.
+- merge-base attribution: added-lines scan widens, never narrows, when bases degenerate.
 
 ## Governance context
 
-Canonical governance JSON under `governance/` remains separately reviewed authority. Any rule, example, debt, or digest named here is non-authoritative context until the verifier rederives current governance evidence.
-
-- Applicable rule IDs:
-- Canonical-example deviations and evidence:
-- Intentional debt created, repaid, or accepted:
+No `governance/` in tree — n/a. Normative sources: issues #5/#6/#7/#9, audit v3 rows, merged
+P1-1/P1-2 probes; the ±16 window and preference-not-filter spawn rule are this change's rulings
+after audits (amendments 1–2 recorded in `change-spec.yaml`).
 
 ## Non-functional requirements
 
-- Security:
-- Reliability:
-- Performance:
-- Observability:
+- Security: n/a (no I/O surface added).
+- Reliability: no new state; physics math only; rollback = git revert.
+- Performance: one surface query built per level load (was 2–3 implicit scans); renderer merge
+  now shared — equal rect-for-rect, proven 125/125.
+- Observability: per-map delta tables (`wave_b_deltas.md`), green/ablation transcripts pinned in
+  evidence; wave-A event log now covers transitions where these rules apply.
