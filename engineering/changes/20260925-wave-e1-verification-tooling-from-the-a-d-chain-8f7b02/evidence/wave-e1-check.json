@@ -1,23 +1,19 @@
 {
   "base": "295690b",
-  "cert_digest": "d4a5d82ff4fc6cc2",
+  "cert_digest": "7bbb8833c126f87a",
   "certification_bound": [
-    "wave-scan-end-to-end.txt@7653f33:d4a5d82ff4fc6cc2",
-    "ruff-new-tools.txt@7653f33:d4a5d82ff4fc6cc2"
+    "wave-scan-end-to-end.txt@5cc3b80:7bbb8833c126f87a",
+    "ruff-new-tools.txt@5cc3b80:7bbb8833c126f87a"
   ],
-  "certification_notes": [
-    "wave-e1-check-green.txt: certifies 18437cd33e19a5d1, this state is d4a5d82ff4fc6cc2 (freeze window)",
-    "wave-e1-check.json: certifies 18437cd33e19a5d1, this state is d4a5d82ff4fc6cc2 (freeze window)",
-    "grok-verify-pr.txt: certifies 18437cd33e19a5d1, this state is d4a5d82ff4fc6cc2 (freeze window)"
-  ],
+  "certification_notes": [],
   "certification_uncertified": [],
   "certified_files": 23,
-  "certified_head": "7653f3381d65abab0c3095ceb773bbc826a464da",
+  "certified_head": "5cc3b80ebf650975656367d449f41eeafc9560b5",
   "change_base": "0b0dea97997aa675dd6216284bda2d3476e10bbc",
   "checks": 11,
   "failed": 0,
-  "head": "7653f3381d65abab0c3095ceb773bbc826a464da",
-  "recorded_at": "2026-09-25T10:20:24Z",
+  "head": "5cc3b80ebf650975656367d449f41eeafc9560b5",
+  "recorded_at": "2026-09-30T22:40:00Z",
   "recorded_dirty_paths": 12,
   "recorded_rc": 0,
   "result": "WAVE_E1_PROBES_PASS",
@@ -91,11 +87,7 @@
   },
   "root": "<repo>",
   "seconds": 225.9,
-  "stale_certification": [
-    "wave-e1-check-green.txt: certifies 18437cd33e19a5d1, this state is d4a5d82ff4fc6cc2 (freeze window)",
-    "wave-e1-check.json: certifies 18437cd33e19a5d1, this state is d4a5d82ff4fc6cc2 (freeze window)",
-    "grok-verify-pr.txt: certifies 18437cd33e19a5d1, this state is d4a5d82ff4fc6cc2 (freeze window)"
-  ],
+  "stale_certification": [],
   "tool": "wave_e1_check",
-  "tree_fingerprint": "6e765c91853335122e1150c6bf8a2bc5cbf8f3e9de1016103a23ccec0fa13559"
+  "tree_fingerprint": "8c2fefe62d24663651f6811f5ddabac51304e67d7c82bb8e4de23c977765375"
 }

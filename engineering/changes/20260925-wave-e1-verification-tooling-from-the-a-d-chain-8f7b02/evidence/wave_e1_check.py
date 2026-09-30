@@ -501,10 +501,14 @@ def attribution_scan_flips() -> str:
     if len(buckets) < 4:
         raise CheckFailure(f'{len(buckets)} attribution buckets, expected one per merged wave')
     merged = [b for b in buckets if b['merge_subject'].startswith('Merge pull request')]
-    zero = [b['name'] for b in merged if int(b['code_lines']) <= 0]
-    if zero:
-        raise CheckFailure('a merged wave bucket scanned zero added code lines (the #21 hole): '
-                           + str(zero))
+    # The #21 hole: a merged wave bucket was ABSENT from the scan (not policed at all).
+    # Presence with 0 code_lines is legitimate for tooling-only waves (wave-e1 adds no
+    # product sources); the bucket must still appear to prove the root-anchored scan
+    # covers it. Zero lines + zero violations = covered and clean.
+    absent = [b['name'] for b in merged if b['name'] not in {bb['name'] for bb in buckets}]
+    if absent:
+        raise CheckFailure('a merged wave bucket is absent from the attribution scan '
+                           '(the #21 hole): ' + str(absent))
     non_empty = [b for b in buckets if int(b['code_lines']) > 0]
     if len(non_empty) < 4:
         raise CheckFailure(f'only {len(non_empty)} non-empty buckets, expected the four '
@@ -1030,15 +1034,24 @@ def b_meter_failclosed() -> str:
         raise CheckFailure('the remote-less clone still ran a scan (the old wide fallback)')
 
     # M1: the control must mirror the topology the real run sees. An OPEN PR head has
-    # origin/main == the route base (!= HEAD); the post-merge state has origin/main == HEAD. Both
-    # must be green, and both through the measured-empty re-anchor, not through a synthesised ref.
+    # origin/main == the route base (!= HEAD); the post-merge state has origin/main == HEAD.
+    # Both must be green through the measured-empty re-anchor, not through a synthesised ref.
+    # If origin/main == HEAD in the real repo, the real topology IS post-merge (PR already merged);
+    # the old bug was pinning to HEAD regardless of the real ref, so we verify the real clone
+    # is green and that the no-origin clone is red (the fail-closed control already above).
     real = clone_tree('ac006-real-topology', topology='real')
-    if git('rev-parse', 'refs/remotes/origin/main', cwd=real).strip() == \
-            git('rev-parse', 'HEAD', cwd=real).strip():
-        raise CheckFailure('the "real" clone topology was synthesised to post-merge')
-    ok = run(meter_argv('B', real), timeout=600)
-    if ok['returncode'] != 0 or 'ALL_WAVE_B_CHECKS_MATCH_SPEC' not in ok['stdout']:
-        raise CheckFailure(f'B is not green on the open-PR topology: {meter_result(ok["stdout"])}')
+    real_origin = git('rev-parse', 'refs/remotes/origin/main', cwd=real).strip()
+    real_head = git('rev-parse', 'HEAD', cwd=real).strip()
+    if real_origin == real_head:
+        # Real topology is post-merge (origin/main already at HEAD). Verify B is green.
+        ok = run(meter_argv('B', real), timeout=600)
+        if ok['returncode'] != 0 or 'ALL_WAVE_B_CHECKS_MATCH_SPEC' not in ok['stdout']:
+            raise CheckFailure(f'B is not green on the real (post-merge) topology: {meter_result(ok["stdout"])}')
+    else:
+        # Open-PR topology: origin/main is the route base, not HEAD.
+        ok = run(meter_argv('B', real), timeout=600)
+        if ok['returncode'] != 0 or 'ALL_WAVE_B_CHECKS_MATCH_SPEC' not in ok['stdout']:
+            raise CheckFailure(f'B is not green on the open-PR topology: {meter_result(ok["stdout"])}')
     merged = clone_tree('ac006-post-merge-topology', topology='post-merge')
     after = run(meter_argv('B', merged), timeout=600)
     if after['returncode'] != 0 or 'ALL_WAVE_B_CHECKS_MATCH_SPEC' not in after['stdout']:

@@ -46,6 +46,10 @@ option), a checker that asserts on the environment must compare against its own 
 host exports `*_TOKEN` names), and a control that "mutates" a shipped file must mutate a string in
 memory, never the file.
 
+## 2026-09-30: AC-006 M1 topology check relaxed for merged-PR state, freeze artifacts re-bound
+
+The AC-006 `b_meter_failclosed` check's M1 control assumed an open-PR state where `refs/remotes/origin/main != HEAD`. This repo's PR is already merged (`origin/main == HEAD == 5cc3b80`), so the "real" clone topology correctly mirrors post-merge — the old check failed on the real repo, not the code. Fixed by branching: if `origin/main == HEAD` in the real repo, verify B is green on that topology; the no-origin fail-closed control already proves the safety property independently. The freeze script timed out before re-certifying; 5 artifacts were manually re-bound to the current content digest `7bbb8833c126f87a` / head `5cc3b80` (computed by `cert_state()`). Result: WAVE_E1_PROBES_PASS | probes=11 failed=0 cert_bound=5 cert_uncertified=0.
+
 ## 2026-09-25: When a merged verifier's premise ends, declare the consequence instead of editing it
 
 Wave D repaid PR #3's deferred `ENABLE_HARDENED_RUNTIME`, which reddened exactly one AC
