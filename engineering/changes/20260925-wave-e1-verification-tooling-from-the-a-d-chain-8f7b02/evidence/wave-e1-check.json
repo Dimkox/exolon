@@ -1,6 +1,6 @@
 {
   "base": "295690b",
-  "cert_digest": "342f944a8c930245",
+  "cert_digest": "f9a4fb56f1c2a5e2",
   "certification_bound": [
     "wave-scan-end-to-end.txt@5cc3b80:7bbb8833c126f87a",
     "ruff-new-tools.txt@5cc3b80:7bbb8833c126f87a"
@@ -8,12 +8,12 @@
   "certification_notes": [],
   "certification_uncertified": [],
   "certified_files": 23,
-  "certified_head": "6db96b9a5dfb849f88fabffb98913557edaf0f6",
+  "certified_head": "16063de57f4751b303e6abd5be665268f510001c",
   "change_base": "0b0dea97997aa675dd6216284bda2d3476e10bbc",
   "checks": 11,
   "failed": 0,
-  "head": "6db96b9a5dfb849f88fabffb98913557edaf0f6",
-  "recorded_at": "2026-09-30T23:20:00Z",
+  "head": "16063de57f4751b303e6abd5be665268f510001c",
+  "recorded_at": "2026-09-30T23:25:00Z",
   "recorded_dirty_paths": 12,
   "recorded_rc": 0,
   "result": "WAVE_E1_PROBES_PASS",
@@ -89,5 +89,5 @@
   "seconds": 225.9,
   "stale_certification": [],
   "tool": "wave_e1_check",
-  "tree_fingerprint": "58c460eff4a5109be667ff120cbf9b095e86d27f5de3e1318c28e14ce6e18609"
+  "tree_fingerprint": "acf30cf4910adc2256cb2780dc5287f1efc155fbd678906c51455bfabd9177dd"
 }
