@@ -502,13 +502,19 @@ def attribution_scan_flips() -> str:
         raise CheckFailure(f'{len(buckets)} attribution buckets, expected one per merged wave')
     merged = [b for b in buckets if b['merge_subject'].startswith('Merge pull request')]
     # The #21 hole: a merged wave bucket was ABSENT from the scan (not policed at all).
-    # Presence with 0 code_lines is legitimate for tooling-only waves (wave-e1 adds no
-    # product sources); the bucket must still appear to prove the root-anchored scan
-    # covers it. Zero lines + zero violations = covered and clean.
-    absent = [b['name'] for b in merged if b['name'] not in {bb['name'] for bb in buckets}]
+    # Derive the expected merged waves from the git history, not from the buckets —
+    # a bucket derived FROM the buckets can never be absent.
+    merges = git('log', '--merges', '--format=%s', f'{CHANGE_BASE}..HEAD').splitlines()
+    expected_merged = set()
+    for subject in merges:
+        match = re.search(r'wave[ -]([a-z0-9]+)', subject, re.I)
+        if match:
+            expected_merged.add(f'wave-{match.group(1).lower()}')
+    bucket_names = {bb['name'] for bb in buckets}
+    absent = sorted(expected_merged - bucket_names)
     if absent:
-        raise CheckFailure('a merged wave bucket is absent from the attribution scan '
-                           '(the #21 hole): ' + str(absent))
+        raise CheckFailure('merged wave buckets absent from the attribution scan (the #21 hole): '
+                           + str(absent))
     non_empty = [b for b in buckets if int(b['code_lines']) > 0]
     if len(non_empty) < 4:
         raise CheckFailure(f'only {len(non_empty)} non-empty buckets, expected the four '
