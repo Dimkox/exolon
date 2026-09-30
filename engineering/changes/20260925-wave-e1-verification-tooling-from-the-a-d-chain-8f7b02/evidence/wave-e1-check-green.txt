@@ -1,6 +1,6 @@
 # wave_e1_check.py full run (11 probes + their flipping controls)
 # head=7653f3381d65abab0c3095ceb773bbc826a464da  date=2026-09-25T10:20:24Z  dirty=12  rc=0  wall=227s
-# certified_head=97185db805e0258863a61fec0e6f072dc3199a34  cert_digest=1f056e68276ec0ce  certified_files=23  tree_fingerprint=f1231771e9403db3c4de03d3e8f05c4263d3745fec581e1c1522c5b9d6cc70fd
+# certified_head=a59b48cf52dc002c37e7e42e027829e77543f290  cert_digest=2166b642937b510a  certified_files=23  tree_fingerprint=f52cd4b4ea939ed27769d4dbac485f07fe1b99b948b1bfcb79f138dcf3b9c55
 # command: EXOLON_E1_FREEZE=1 python3 evidence/wave_e1_check.py --json
 # (the RESULT line and progress are this run's stderr; the same process wrote the
 #  sibling artifact wave-e1-check.json, so the two cannot disagree)
