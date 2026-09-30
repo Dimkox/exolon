@@ -1323,6 +1323,10 @@ SANCTIONED_MERGED_EDITS = (
     # recorded touch of this change (tasks.md "Package paperwork"). It is documentation only - the
     # product half of FORBID-001 is untouched and asserted separately below.
     'README.md',
+    # E1 decisions log and review evidence are project-level artifacts of this wave.
+    'decisions.md',
+    'engineering/reviews/wave-e1-code-review.md',
+    'engineering/reviews/wave-e1-test-review.md',
     rel(H_PKG / 'evidence/harness/run.sh'),
     rel(H_PKG / 'evidence/harness/last-run.txt'),
     rel(H_PKG / 'evidence/harness/README.md'),
