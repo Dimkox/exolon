@@ -7,6 +7,9 @@
  */
 
 import type { LevelData, PlayerState, Enemy, Projectile, Tile, Vec2 } from '../types/GameTypes';
+import type { SpriteSheet } from './SpriteRenderer';
+import type { AnimationManager } from './AnimationManager';
+import { SpriteRenderer } from './SpriteRenderer';
 
 export interface RendererConfig {
   canvas: HTMLCanvasElement;
@@ -17,9 +20,10 @@ export interface RendererConfig {
 export interface DrawOptions {
   showHitboxes: boolean;
   showTiles: boolean;
+  showSprites: boolean;
 }
 
-const DEFAULT_OPTIONS: DrawOptions = { showHitboxes: false, showTiles: true };
+const DEFAULT_OPTIONS: DrawOptions = { showHitboxes: false, showTiles: true, showSprites: false };
 
 export class Renderer {
   private ctx: CanvasRenderingContext2D;
@@ -28,11 +32,15 @@ export class Renderer {
   private scale: number;
   private offsetX: number;
   private offsetY: number;
+  private spriteSheet: SpriteSheet | null;
+  private animManager: AnimationManager | null;
 
   constructor(cfg: RendererConfig) {
     this.ctx = cfg.canvas.getContext('2d')!;
     this.cw = cfg.canvas.width;
     this.ch = cfg.canvas.height;
+    this.spriteSheet = null;
+    this.animManager = null;
 
     // Fit reference into canvas preserving aspect ratio
     const scaleX = this.cw / cfg.referenceWidth;
@@ -40,6 +48,14 @@ export class Renderer {
     this.scale = Math.min(scaleX, scaleY);
     this.offsetX = (this.cw - cfg.referenceWidth * this.scale) / 2;
     this.offsetY = (this.ch - cfg.referenceHeight * this.scale) / 2;
+  }
+
+  setSpriteSheet(sheet: SpriteSheet | null): void {
+    this.spriteSheet = sheet;
+  }
+
+  setAnimationManager(anim: AnimationManager | null): void {
+    this.animManager = anim;
   }
 
   clear(): void {
@@ -82,6 +98,7 @@ export class Renderer {
       torch: '#F80',
       flashing: '#F0F',
       teleport: '#C0F',
+      gate: '#999',
     };
 
     for (let row = 0; row < tiles.length; row++) {
@@ -91,14 +108,17 @@ export class Renderer {
         const t = tileRow[col];
         if (!t || t.type === 'empty') continue;
         const r = this.rectToCanvas(t.x, t.y, t.w, t.h);
+        const alpha = this.animManager?.getAlpha(t.type) ?? 1;
+        this.ctx.globalAlpha = alpha;
         this.ctx.fillStyle = colors[t.type] ?? '#888';
         this.ctx.fillRect(r.x, r.y, r.width, r.height);
-        if (t.type === 'teleport') {
+        if (t.type === 'teleport' || t.type === 'gate') {
           this.ctx.strokeStyle = '#FFF';
           this.ctx.strokeRect(r.x + 1, r.y + 1, r.width - 2, r.height - 2);
         }
       }
     }
+    this.ctx.globalAlpha = 1;
   }
 
   drawPlayer(p: PlayerState): void {
@@ -135,6 +155,21 @@ export class Renderer {
       this.ctx.fillStyle = '#F00';
       const s = 14 * this.scale;
       this.ctx.fillRect(pos.x - s / 2, pos.y - s / 2, s, s);
+    }
+  }
+
+  drawSprite(
+    name: string,
+    x: number,
+    y: number,
+    angle: number = 0,
+    flipX: boolean = false,
+    flipY: boolean = false,
+    scale: number = 1
+  ): void {
+    if (this.spriteSheet) {
+      const spriteRenderer = new SpriteRenderer(this.spriteSheet, this.ctx);
+      spriteRenderer.drawSprite(name, x, y, angle, flipX, flipY, scale);
     }
   }
 

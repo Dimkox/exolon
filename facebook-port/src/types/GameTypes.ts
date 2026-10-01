@@ -78,7 +78,8 @@ export type TileType =
   | 'sphere_home' | 'pump'
   | 'rocket_launcher' | 'changing_room'
   | 'beacon' | 'force_field'
-  | 'stage_end' | 'torch' | 'flashing';
+  | 'stage_end' | 'torch' | 'flashing'
+  | 'gate';
 
 export interface Tile {
   type: TileType;
