@@ -66,3 +66,7 @@ flipping in either phase. Related: a declared-expected set can overstate reality
 second member `hardened_deferral_recorded` cannot redden without rewriting the dated package it
 reads, so the enforceable claim became "no red outside the set + each member live via the merged
 checker's own revert path", recorded as a deviation rather than a silent narrowing.
+
+## 2026-10-01: A code review against an uncommitted working tree reports defects already fixed in committed code
+
+Wave A's first code review (`evidence/review-code.md`, written against the uncommitted working tree) reported 4 Critical wire lies (R1-1..R1-4) and was marked BLOCKED. The delta review (`evidence/review-code-delta.md`, read against committed bytes at HEAD) closed all four with independent flipping controls and verdict PASS — the fixes had already landed before the review was written. Root cause: the review author read the working-tree diff, not the committed bytes; the delta review's method ("current bytes only — no reliance on the writer's prose") is the fix. Pattern for future: any review written against uncommitted changes should be re-run against committed HEAD before it gates delivery, because the committed code can be ahead of the working tree.
