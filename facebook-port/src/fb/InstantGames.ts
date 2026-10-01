@@ -1,12 +1,14 @@
 /**
  * InstantGames — FB Instant Games specific integration
  * Handles loading progress, auth, and game loop integration.
+ *
+ * The FB SDK script is loaded via index.html. This module just wraps
+ * the FBSDK with convenience methods and progress reporting.
  */
 
-import { createFBSDK, type FBSDK } from './FBSDK';
+import { createFBSDK, type FBSDK, type FBPlayer } from './FBSDK';
 
 export interface InstantGamesConfig {
-  sdkUrl: string;
   leaderboardID: string;
   onProgress?: (progress: number) => void;
 }
@@ -18,6 +20,7 @@ export interface InstantGames {
   launch(): Promise<void>;
   reportScore(score: number): Promise<void>;
   getHighScore(): Promise<number>;
+  getProfile(): Promise<FBPlayer | null>;
 }
 
 export async function createInstantGames(): Promise<InstantGames> {
@@ -28,11 +31,7 @@ export async function createInstantGames(): Promise<InstantGames> {
   async function initialize(cfg: InstantGamesConfig): Promise<void> {
     config = cfg;
 
-    // Load SDK script if not already loaded
-    if (typeof window !== 'undefined' && !window.FBInstant) {
-      await loadSDK(cfg.sdkUrl, cfg.onProgress);
-    }
-
+    // SDK script is loaded in index.html, just initialize
     await sdk.initialize();
     ready = true;
   }
@@ -58,31 +57,14 @@ export async function createInstantGames(): Promise<InstantGames> {
     }
   }
 
-  return { sdk, ready, initialize, launch, reportScore, getHighScore };
-}
+  async function getProfile(): Promise<FBPlayer | null> {
+    if (!config) return null;
+    try {
+      return await sdk.getPlayer();
+    } catch {
+      return null;
+    }
+  }
 
-function loadSDK(url: string, onProgress?: (p: number) => void): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = url;
-    script.async = true;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error(`Failed to load FB SDK: ${url}`));
-    // Simulate progress during load
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress = Math.min(progress + 20, 90);
-      onProgress?.(progress);
-    }, 100);
-    script.onload = () => {
-      clearInterval(interval);
-      onProgress?.(100);
-      resolve();
-    };
-    script.onerror = () => {
-      clearInterval(interval);
-      reject(new Error(`Failed to load FB SDK: ${url}`));
-    };
-    document.head.appendChild(script);
-  });
+  return { sdk, ready, initialize, launch, reportScore, getHighScore, getProfile };
 }

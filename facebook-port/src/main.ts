@@ -24,7 +24,6 @@ import { createAudioManager } from './game/AudioManager';
 import { createPersistence } from './game/Persistence';
 import type { GameFlowState, LevelData } from './types/GameTypes';
 
-const FB_SDK_URL = 'https://connect.facebook.net/en_US/fbinstant.6.2.js';
 const LEADERBOARD_ID = 'exolon_high_score';
 
 async function main(): Promise<void> {
@@ -34,14 +33,13 @@ async function main(): Promise<void> {
   // ── Phase 1: FB Instant Games SDK ──
   const ig = await createInstantGames();
   await ig.initialize({
-    sdkUrl: FB_SDK_URL,
     leaderboardID: LEADERBOARD_ID,
     onProgress: (p) => { progressEl.style.width = `${p}%`; },
   });
   await ig.launch();
 
-  const player = await ig.sdk.getPlayer();
-  console.log(`Exolon — player: ${player.playerID}`);
+  const player = await ig.getProfile();
+  console.log(`Exolon — player: ${player?.playerID}`);
 
   // ── Phase 2: Compose game ──
   const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
