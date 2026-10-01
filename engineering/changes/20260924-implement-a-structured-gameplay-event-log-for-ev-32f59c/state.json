@@ -19,11 +19,24 @@
       "from": "scoped",
       "reason": "route human_gates is empty (medium bugfix); controller rulings close all spec gaps",
       "to": "approved"
+    },
+    {
+      "at": "2026-10-01T00:20:00+00:00",
+      "from": "approved",
+      "reason": "all 28/28 evidence checks pass on main; delta code_review PASS (R1-1..R1-4 closed), delta test_review PASS; receipts recorded",
+      "to": "delivered"
     }
   ],
   "route_id": "32f59cc7dcb6",
   "schema_version": 1,
-  "status": "approved",
+  "status": "delivered",
+  "delivery_evidence": {
+    "verification": ".grok-stack/runtime/receipts/32f59cc7dcb6/verification.json",
+    "code_review": ".grok-stack/runtime/receipts/32f59cc7dcb6/code_review.json",
+    "test_review": ".grok-stack/runtime/receipts/32f59cc7dcb6/test_review.json",
+    "checks_passed": "28/28",
+    "tree_fingerprint": "ee2b9dd5b8272c694846337222a8903202dfef2591bff3aa9fd1dccef6f67648"
+  },
   "title": "Implement a structured gameplay event log for every player action and game event in the Exolon Swift/SpriteKit game, and fix the wave-A fixed-tick/input/terminal state-machine audit findings it exposes: P1-9 (fixed-tick accumulator not reset on zone transition), P1-4 (jump latch fires after teleport while UP held), P1-8 (stage bonus re-triggers on final zone enabling score farm), P1-6 (double launcher permanently disabled after bonus collect). Regression tests per finding; logging must be cheap, structured, and testable.",
-  "updated_at": "2026-09-24T19:38:45+00:00"
+  "updated_at": "2026-10-01T00:20:00+00:00"
 }

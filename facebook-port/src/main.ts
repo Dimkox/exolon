@@ -13,6 +13,7 @@ import { createInstantGames } from './fb/InstantGames';
 import { createFixedTickDriver } from './game/GameLoop';
 import { createGameState } from './game/GameState';
 import { Renderer } from './game/Renderer';
+import { OptimizedRenderer } from './game/OptimizedRenderer';
 import { createPlayer, updatePlayer, fireBlaster, fireGrenade, killPlayer, respawnPlayer } from './game/Player';
 import { createInputManager } from './game/InputManager';
 import { createLevelManager } from './game/LevelManager';
@@ -22,7 +23,9 @@ import { createStageBoundary } from './game/StageBoundary';
 import { createLauncherBonus } from './game/LauncherBonus';
 import { createAudioManager } from './game/AudioManager';
 import { createPersistence } from './game/Persistence';
+import { createTouchControls } from './game/TouchControls';
 import type { GameFlowState, LevelData } from './types/GameTypes';
+import type { Enemy, Projectile } from './types/GameTypes';
 
 const LEADERBOARD_ID = 'exolon_high_score';
 
@@ -44,8 +47,13 @@ async function main(): Promise<void> {
   // ── Phase 2: Compose game ──
   const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
   const renderer = new Renderer({ canvas, referenceWidth: 512, referenceHeight: 448 });
+  const optimizedRenderer = new OptimizedRenderer({ canvas, referenceWidth: 512, referenceHeight: 448 });
   const gameState = createGameState();
   const input = createInputManager(() => {}, () => {});
+
+  // Create touch controls for mobile
+  const touchControls = createTouchControls(input.state);
+
   const levelManager = createLevelManager();
   const enemyManager = createEnemyManager();
   const weapons = createWeapons();
@@ -164,8 +172,10 @@ async function main(): Promise<void> {
     const level = currentLevel;
 
     if (level) {
-      renderer.drawTiles(level.tiles);
+      // Use optimized renderer for static tiles (offscreen canvas)
+      optimizedRenderer.drawStatic(level.tiles);
     }
+    // Use regular renderer for dynamic entities
     renderer.drawPlayer(playerState);
     renderer.drawProjectiles(weapons.activeProjectiles);
     renderer.drawEnemies(enemyManager.enemies);
@@ -213,6 +223,17 @@ async function main(): Promise<void> {
       currentLevel = await levelManager.loadZone(0);
       respawnPlayer(playerState, { x: 16, y: 112 });
     }
+  });
+
+  // Handle window resize for optimized renderer
+  window.addEventListener('resize', () => {
+    const c = canvas;
+    const scaleX = window.innerWidth / 512;
+    const scaleY = window.innerHeight / 448;
+    const scale = Math.min(scaleX, scaleY);
+    c.width = 512 * scale;
+    c.height = 448 * scale;
+    optimizedRenderer.resize(c.width, c.height);
   });
 }
 

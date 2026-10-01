@@ -9,10 +9,12 @@
  * Usage: npm run convert-assets
  */
 
-import { parse } from 'xml2js';
+import { parseStringPromise } from 'xml2js';
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
 import { join, extname, basename } from 'path';
 import { createCanvas, loadImage } from 'canvas';
+import { gunzipSync, inflateSync } from 'zlib';
+import { Buffer } from 'buffer';
 
 // Configuration
 const SOURCE_DIR = '/home/pall/projects/exolon/Exolon/Resources';
@@ -47,7 +49,9 @@ interface TMXLayer {
   name: string;
   width: number;
   height: number;
-  data: number[];
+  data: string | number[];
+  encoding?: string;
+  compression?: string;
   opacity: number;
   visible: boolean;
   properties?: Record<string, string>;
@@ -160,6 +164,7 @@ const OBJECT_TYPE_MAP: Record<string, string> = {
   'torch': 'torch',
   'flashing': 'flashing',
   'player_start': 'player_start',
+  'ship': 'player_start',
   'gate': 'gate',
 };
 
@@ -171,8 +176,154 @@ function ensureDir(dir: string): void {
 
 async function parseTMX(filePath: string): Promise<TMXMap> {
   const xml = readFileSync(filePath, 'utf-8');
-  const result = await parse(xml, { explicitArray: false, mergeAttrs: true });
-  return result.map;
+  const result = await parseStringPromise(xml, { explicitArray: false, mergeAttrs: true });
+  const map = result.map;
+
+  // Normalize layers: xml2js returns "layer" array, not "layers"
+  const layers: TMXLayer[] = [];
+  if (map.layer) {
+    const layerArray = Array.isArray(map.layer) ? map.layer : [map.layer];
+    for (const l of layerArray) {
+      // Data content is in _ property when mergeAttrs=true, encoding/compression are direct properties
+      let data: string | number[] = [];
+      let encoding = 'base64';
+      let compression: string | undefined;
+      if (l.data) {
+        if (typeof l.data === 'string') {
+          data = l.data;
+        } else if (l.data._) {
+          data = l.data._;
+        }
+        encoding = l.data.encoding || 'base64';
+        compression = l.data.compression;
+      }
+      // Handle properties - can be single object or array
+      const props = l.properties?.property;
+      let properties: Record<string, string> = {};
+      if (props) {
+        const propArray = Array.isArray(props) ? props : [props];
+        properties = propArray.reduce((acc: Record<string, string>, p: any) => ({ ...acc, [p.name]: p.value }), {});
+      }
+      layers.push({
+        name: l.name,
+        width: parseInt(l.width, 10),
+        height: parseInt(l.height, 10),
+        data,
+        encoding,
+        compression,
+        opacity: parseFloat(l.opacity) || 1,
+        visible: l.visible !== '0',
+        properties,
+      });
+    }
+  }
+
+  // Normalize objectgroups: xml2js returns "objectgroup" array
+  const objectgroups: TMXObjectGroup[] = [];
+  if (map.objectgroup) {
+    const ogArray = Array.isArray(map.objectgroup) ? map.objectgroup : [map.objectgroup];
+    for (const og of ogArray) {
+      const objects: TMXObject[] = [];
+      if (og.object) {
+        const objArray = Array.isArray(og.object) ? og.object : [og.object];
+        for (const obj of objArray) {
+          // Handle properties - can be single object or array
+          const objProps = obj.properties?.property;
+          let properties: Record<string, string> = {};
+          if (objProps) {
+            const propArray = Array.isArray(objProps) ? objProps : [objProps];
+            properties = propArray.reduce((acc: Record<string, string>, p: any) => ({ ...acc, [p.name]: p.value }), {});
+          }
+          objects.push({
+            id: parseInt(obj.id, 10),
+            name: obj.name || '',
+            type: obj.type,
+            x: parseFloat(obj.x),
+            y: parseFloat(obj.y),
+            width: parseFloat(obj.width) || 0,
+            height: parseFloat(obj.height) || 0,
+            properties,
+            gid: obj.gid ? parseInt(obj.gid, 10) : undefined,
+          });
+        }
+      }
+      objectgroups.push({
+        name: og.name,
+        objects,
+      });
+    }
+  }
+
+  // Normalize tilesets: xml2js returns "tileset" (single or array)
+  const tilesets: TMXTileset[] = [];
+  if (map.tileset) {
+    const tsArray = Array.isArray(map.tileset) ? map.tileset : [map.tileset];
+    for (const ts of tsArray) {
+      tilesets.push({
+        firstgid: parseInt(ts.firstgid, 10),
+        name: ts.name,
+        tilewidth: parseInt(ts.tilewidth, 10),
+        tileheight: parseInt(ts.tileheight, 10),
+        image: {
+          source: ts.image?.source || '',
+          width: parseInt(ts.image?.width, 10) || 0,
+          height: parseInt(ts.image?.height, 10) || 0,
+        },
+        margin: parseInt(ts.margin, 10) || 0,
+        spacing: parseInt(ts.spacing, 10) || 0,
+        tilecount: parseInt(ts.tilecount, 10) || 0,
+        columns: parseInt(ts.columns, 10) || 0,
+      });
+    }
+  }
+
+  return {
+    width: parseInt(map.width, 10),
+    height: parseInt(map.height, 10),
+    tilewidth: parseInt(map.tilewidth, 10),
+    tileheight: parseInt(map.tileheight, 10),
+    tilesets,
+    layers,
+    objectgroups,
+    properties: map.properties?.property?.reduce((acc: Record<string, string>, p: any) => ({ ...acc, [p.name]: p.value }), {}) || {},
+  };
+}
+
+function decodeLayerData(data: string, encoding: string, compression: string | undefined, width: number, height: number): number[] {
+  let buffer: Buffer;
+
+  if (encoding === 'csv') {
+    // CSV encoding: comma-separated unsigned integers
+    const values = data.trim().split(',').map(v => parseInt(v.trim(), 10));
+    buffer = Buffer.alloc(values.length * 4);
+    for (let i = 0; i < values.length; i++) {
+      buffer.writeUInt32LE(values[i] || 0, i * 4);
+    }
+  } else {
+    // Base64 encoding (with optional compression)
+    buffer = Buffer.from(data, 'base64');
+
+    // Decompress if needed - only if compression attribute is present
+    if (compression === 'gzip') {
+      buffer = gunzipSync(buffer);
+    } else if (compression === 'zlib') {
+      buffer = inflateSync(buffer);
+    }
+  }
+
+  // Parse as 32-bit unsigned integers (little-endian)
+  const expectedSize = width * height * 4;
+  if (buffer.length < expectedSize) {
+    const newBuffer = Buffer.alloc(expectedSize);
+    buffer.copy(newBuffer);
+    buffer = newBuffer;
+  }
+
+  const result = new Array(width * height);
+  for (let i = 0; i < width * height; i++) {
+    result[i] = buffer.readUInt32LE(i * 4);
+  }
+  return result;
 }
 
 function getTileTypeFromGID(gid: number, tilesets: TMXTileset[]): string | null {
@@ -198,22 +349,36 @@ function convertTMXToLevel(map: TMXMap, zoneNumber: number): LevelData {
   const mapWidth = map.width * tileWidth;
   const mapHeight = map.height * tileHeight;
 
-  // Find collision layer (usually named 'collision' or 'meta')
+  // Find collision layer
   const collisionLayer = map.layers.find(l =>
-    l.name.toLowerCase().includes('collision') ||
-    l.name.toLowerCase().includes('meta') ||
-    l.name.toLowerCase().includes('block')
+    l.name?.toLowerCase().includes('collision') ||
+    l.name?.toLowerCase().includes('meta') ||
+    l.name?.toLowerCase().includes('block')
   ) || map.layers[0];
+
+  // Decode collision layer data (base64 + gzip/zlib)
+  const collisionData = collisionLayer.data as string;
+  const encoding = collisionLayer.encoding || 'base64';
+  const compression = collisionLayer.compression; // No default - only decompress if attribute present
+  const decodedGids = decodeLayerData(collisionData, encoding, compression, map.width, map.height);
 
   // Build tile grid
   const tiles: TileData[][] = Array.from({ length: map.height }, (_, y) =>
     Array.from({ length: map.width }, (_, x) => {
       const idx = y * map.width + x;
-      const gid = collisionLayer.data[idx] || 0;
-      const type = gid > 0 ? getTileTypeFromGID(gid, map.tilesets) : 'empty';
-
+      const gid = decodedGids[idx] || 0;
+      // GID 0 = empty, otherwise check tile properties for type
+      // For now, use a simple mapping based on GID ranges
+      let type = 'empty';
+      if (gid > 0) {
+        // These TMX files use a single tileset; tile types are in tile properties
+        // which we don't fully parse. Use GID ranges as approximation.
+        if (gid >= 1 && gid <= 20) type = 'solid';
+        else if (gid >= 21 && gid <= 40) type = 'destroyable';
+        else type = 'solid';
+      }
       return {
-        type: type ?? 'empty',
+        type,
         x: x * tileWidth,
         y: y * tileHeight,
         w: tileWidth,
@@ -226,21 +391,33 @@ function convertTMXToLevel(map: TMXMap, zoneNumber: number): LevelData {
   const actionMarkers: ActionMarker[] = [];
   let playerStart = { x: 16, y: 112 }; // default
 
-  for (const og of map.objectgroups) {
-    for (const obj of og.objects) {
+  const objectGroups = Array.isArray(map.objectgroups) ? map.objectgroups : [];
+
+  for (const og of objectGroups) {
+    const objects = og.objects || [];
+    for (const obj of objects) {
       const type = obj.type?.toLowerCase() || obj.name?.toLowerCase() || 'unknown';
       const mappedType = OBJECT_TYPE_MAP[type] || type;
 
       if (mappedType === 'player_start') {
         playerStart = { x: obj.x, y: obj.y };
       } else {
+        // Handle properties as either array (old format) or plain object (new format)
+        let properties: Record<string, unknown> = {};
+        if (obj.properties) {
+          if (Array.isArray(obj.properties)) {
+            properties = obj.properties.reduce((acc, p) => ({ ...acc, [p.name]: p.value }), {});
+          } else {
+            properties = obj.properties as Record<string, unknown>;
+          }
+        }
         actionMarkers.push({
           type: mappedType,
           x: obj.x,
           y: obj.y,
           width: obj.width,
           height: obj.height,
-          properties: obj.properties?.reduce((acc, p) => ({ ...acc, [p.name]: p.value }), {}) || {},
+          properties,
         });
       }
     }
